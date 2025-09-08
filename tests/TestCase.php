@@ -29,6 +29,6 @@ class TestCase extends BaseTestCase
         $explodedClass = explode('\\', $class);
         $className = Arr::last($explodedClass);
 
-        return getcwd() . "/fixtures/{$className}/{$fixtureName}";
+        return getcwd() . "/tests/fixtures/{$className}/{$fixtureName}";
     }
 }

@@ -14,7 +14,7 @@ trait PHPFileBuilderTestMockTrait
             $this->functionCall(
                 name: 'file_get_contents',
                 arguments: ['/tmp/test_file.php'],
-                result: file_get_contents(getcwd() . "/Support/$filePath"),
+                result: file_get_contents(getcwd() . "/tests/Support/$filePath"),
             ),
         ]);
     }
