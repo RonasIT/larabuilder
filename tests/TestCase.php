@@ -10,11 +10,6 @@ class TestCase extends BaseTestCase
 {
     use TestingTrait;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     protected function assertPhpFile(string $fixture, string $originFilePath, bool $exportMode = false): void
     {
         $fixturePath = $this->getFixturePath($fixture);
@@ -36,5 +31,4 @@ class TestCase extends BaseTestCase
 
         return getcwd() . "/fixtures/{$className}/{$fixtureName}";
     }
-
 }
