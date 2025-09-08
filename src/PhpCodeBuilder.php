@@ -2,6 +2,7 @@
 
 namespace Ronasit\Larabuilder;
 
-class PhpCodeBuilder {
+class ClassBuilder
+{
 
 }
