@@ -35,7 +35,6 @@ class SetPropertyValue extends NodeVisitorAbstract
             'string' => new Node\Scalar\String_($value),
             'float' => new Node\Scalar\Float_($value),
             'bool'  => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
-            'NULL' => new Expr\ConstFetch(new Name('null')),
         };
 
         return [$value, $type];
