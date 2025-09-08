@@ -22,6 +22,6 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('boolProperty', true)
             ->save();
 
-        $this->assertPhpFile('SomeClass.php', '/tmp/test_file.php');
+        $this->assertPhpFile('SomeClass.php', '/tmp/test_file.php', true);
     }
 }
