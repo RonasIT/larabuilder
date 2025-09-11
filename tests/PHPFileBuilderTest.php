@@ -11,9 +11,13 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetProperty(): void
     {
-        $this->mockFileGetContents('SomeClass.php');
+        $this->mockClassUpdate(
+            filePath: 'some_file_path.php',
+            originalFixture: 'class_with_properties.php',
+            resultFixture: 'class_with_properties.php',
+        );
 
-        app(PHPFileBuilder::class, ['filePath' => '/tmp/test_file.php'])
+        app(PHPFileBuilder::class, ['filePath' => 'some_file_path.php'])
             ->setProperty('intProperty', 1.23)
             ->setProperty('arrayProperty', ['id' => 123])
             ->setProperty('floatProperty', 56)
@@ -21,7 +25,5 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('stringProperty', 'changed string')
             ->setProperty('boolProperty', true)
             ->save();
-
-        $this->assertPhpFile('SomeClass.php', '/tmp/test_file.php', true);
     }
 }
