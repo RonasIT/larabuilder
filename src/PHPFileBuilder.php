@@ -17,7 +17,9 @@ class PHPFileBuilder
     ) {
         $parser = (new ParserFactory())->createForHostVersion();;
 
-        $this->ast = $parser->parse(file_get_contents($this->filePath));
+        $code = file_get_contents($this->filePath);
+
+        $this->ast = $parser->parse($code);
         $this->traverser = new NodeTraverser();
     }
 
