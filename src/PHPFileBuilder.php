@@ -4,7 +4,6 @@ namespace Ronasit\Larabuilder;
 
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter;
 use Ronasit\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
@@ -34,7 +33,7 @@ class PHPFileBuilder
     {
         $stmts = $this->traverser->traverse($this->ast);
 
-        $fileContent = (new PrettyPrinter\Standard)->prettyPrintFile($stmts);
+        $fileContent = (new Printer())->prettyPrintFile($stmts);
 
         file_put_contents($this->filePath, $fileContent);
     }
