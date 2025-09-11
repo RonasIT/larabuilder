@@ -11,7 +11,7 @@ class SetPropertyValue extends NodeVisitorAbstract
 {
     public function __construct(
         protected string $name,
-        protected mixed $value
+        protected mixed $value,
     ) {
     }
 
