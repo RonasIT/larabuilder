@@ -24,6 +24,11 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('nullProperty', 'Changed to String')
             ->setProperty('stringProperty', 'changed string')
             ->setProperty('boolProperty', true)
+            ->setProperty('newMultiArrayProperty', [
+                'arrayProperty' => [1, 'string', true],
+                'someKey' => 1,
+            ])
+            ->setProperty('newString', 'some string')
             ->save();
     }
 }

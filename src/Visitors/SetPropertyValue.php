@@ -17,12 +17,48 @@ class SetPropertyValue extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Property && $node->props[0]->name->name === $this->name) {
-            list($value, $type) = $this->getPropertyValue($this->value);
+        if ($node instanceof Node\Stmt\Class_) {
+            $shouldInsertProperty = true;
 
-            $node->props[0] = new Node\PropertyItem($this->name, $value);
-            $node->type = new Node\Identifier($type);
+            for ($i = 0; $i < count($node->stmts); $i++) {
+                $stmt = $node->stmts[$i];
+
+                if ($stmt instanceof Node\Stmt\Property) {
+                    if ($stmt->props[0]->name->name === $this->name) {
+                        $this->updateProperty($stmt);
+
+                        $shouldInsertProperty = false;
+                    }
+
+                    $nextSmtp = $node->stmts[$i + 1] ?? null;
+
+                    $isLastProperty = empty($nextSmtp) || !($nextSmtp instanceof Node\Stmt\Property);
+
+                    if ($shouldInsertProperty && $isLastProperty) {
+                        $this->insertProperty($node->stmts, ($i+1));
+                    }
+                }
+            }
         }
+    }
+
+    protected function updateProperty(&$stmt): void
+    {
+        list($value, $type) = $this->getPropertyValue($this->value);
+
+        $stmt->props[0] = new Node\PropertyItem($this->name, $value);
+        $stmt->type = new Node\Identifier($type);
+    }
+
+    protected function insertProperty(&$nodeStmts, int $position): void
+    {
+        list($valueNode, $type) = $this->getPropertyValue($this->value);
+
+        $newPropItem = new Node\PropertyItem($this->name, $valueNode);
+        $newProperty = new Node\Stmt\Property(1, [$newPropItem]);
+        $newProperty->type = new Node\Identifier($type);
+
+        array_splice($nodeStmts, $position, 0, [$newProperty]);
     }
 
     protected function getPropertyValue(mixed $value): array
