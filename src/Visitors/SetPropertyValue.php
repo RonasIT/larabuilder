@@ -42,24 +42,24 @@ class SetPropertyValue extends NodeVisitorAbstract
             'array' => $this->makeArrayValue($value),
             'string' => new String_($value),
             'float' => new Float_($value),
-            'bool'  => $this->makeBoolValue($value),
+            'bool' => $this->makeBoolValue($value),
         };
 
         return [$value, $type];
     }
 
-    protected function makeBoolValue($value): ConstFetch
+    protected function makeBoolValue(bool $value): ConstFetch
     {
-        $name = new Name($value ? 'true' : 'false');
+        $name = new Name(($value) ? 'true' : 'false');
 
         return new ConstFetch($name);
     }
 
-    protected function makeArrayValue(array $value): Array_
+    protected function makeArrayValue(array $values): Array_
     {
         $items = [];
 
-        foreach ($value as $key => $val) {
+        foreach ($values as $key => $val) {
             list($val) = $this->getPropertyValue($val);
             list($key) = $this->getPropertyValue($key);
 

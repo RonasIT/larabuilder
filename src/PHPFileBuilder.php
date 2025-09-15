@@ -31,9 +31,9 @@ class PHPFileBuilder
 
     public function save(): void
     {
-        $stmts = $this->traverser->traverse($this->syntaxTree);
+        $syntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->prettyPrintFile($stmts);
+        $fileContent = (new Printer())->prettyPrintFile($syntaxTree);
 
         file_put_contents($this->filePath, $fileContent);
     }
