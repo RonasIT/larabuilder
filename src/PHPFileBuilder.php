@@ -8,7 +8,7 @@ use Ronasit\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
-    protected array $ast;
+    protected array $syntaxTree;
     protected NodeTraverser $traverser;
 
     public function __construct(
@@ -18,7 +18,7 @@ class PHPFileBuilder
 
         $code = file_get_contents($this->filePath);
 
-        $this->ast = $parser->parse($code);
+        $this->syntaxTree = $parser->parse($code);
         $this->traverser = new NodeTraverser();
     }
 
@@ -31,7 +31,7 @@ class PHPFileBuilder
 
     public function save(): void
     {
-        $stmts = $this->traverser->traverse($this->ast);
+        $stmts = $this->traverser->traverse($this->syntaxTree);
 
         $fileContent = (new Printer())->prettyPrintFile($stmts);
 
