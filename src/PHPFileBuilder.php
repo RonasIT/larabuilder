@@ -12,9 +12,9 @@ class PHPFileBuilder
     protected NodeTraverser $traverser;
 
     public function __construct(
-        protected  string $filePath,
+        protected string $filePath,
     ) {
-        $parser = (new ParserFactory())->createForHostVersion();;
+        $parser = (new ParserFactory())->createForHostVersion();
 
         $code = file_get_contents($this->filePath);
 
@@ -22,7 +22,7 @@ class PHPFileBuilder
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value): static
+    public function setProperty(string $name, mixed $value): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value));
 

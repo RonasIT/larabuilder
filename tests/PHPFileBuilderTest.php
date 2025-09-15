@@ -17,7 +17,7 @@ class PHPFileBuilderTest extends TestCase
             resultFixture: 'class_with_properties.php',
         );
 
-        app(PHPFileBuilder::class, ['filePath' => 'some_file_path.php'])
+        (new PHPFileBuilder('some_file_path.php'))
             ->setProperty('intProperty', 1.23)
             ->setProperty('arrayProperty', ['id' => 123])
             ->setProperty('floatProperty', 56)
