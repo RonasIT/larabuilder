@@ -17,12 +17,14 @@
     "require-dev": {
         "orchestra/testbench": "^10.6",
         "php-coveralls/php-coveralls": "^2.8",
-        "phpunit/phpunit": "^12.3"
+        "phpunit/phpunit": "^12.3",
+        "ronasit/laravel-helpers": "^3.5"
     },
     "autoload": {
         "psr-4": {
             "Ronasit\\Larabuilder\\": "src/",
-            "RonasIT\\Larabuilder\\Tests\\": "tests/"
+            "RonasIT\\Larabuilder\\Tests\\": "tests/",
+            "RonasIT\\Larabuilder\\Tests\\Support\\": "tests/Support"
         }
     }
 }
