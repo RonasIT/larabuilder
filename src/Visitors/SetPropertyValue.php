@@ -16,7 +16,7 @@ class SetPropertyValue extends AbstractVisitor
 
     public function enterNode(Node $node): void
     {
-        $this->nodeModification($node);
+        $this->nodeModificationProcess($node);
     }
 
     protected function updateProperty(&$stmt): void
@@ -27,7 +27,7 @@ class SetPropertyValue extends AbstractVisitor
         $stmt->type = new Node\Identifier($type);
     }
 
-    protected function nodeModification(Node $node): void
+    protected function nodeModificationProcess(Node $node): void
     {
         if ($this->isModifyNode($node)) {
             $shouldInsertProperty = true;

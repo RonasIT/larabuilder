@@ -9,5 +9,5 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function isModifyNode(Node $node): bool;
 
-    abstract protected function nodeModification(Node $node): void;
+    abstract protected function nodeModificationProcess(Node $node): void;
 }
