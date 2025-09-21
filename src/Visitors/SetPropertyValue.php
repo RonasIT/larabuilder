@@ -12,8 +12,8 @@ use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
+use PhpParser\Node\Stmt\Class_;
 
 class SetPropertyValue extends AbstractVisitor
 {
@@ -32,8 +32,8 @@ class SetPropertyValue extends AbstractVisitor
     {
         list($value, $type) = $this->getPropertyValue($this->value);
 
-        $stmt->props[0] = new Node\PropertyItem($this->name, $value);
-        $stmt->type = new Node\Identifier($type);
+        $stmt->props[0] = new PropertyItem($this->name, $value);
+        $stmt->type = new Identifier($type);
     }
 
     protected function nodeModificationProcess(Node $node): void
@@ -44,7 +44,7 @@ class SetPropertyValue extends AbstractVisitor
             for ($i = 0; $i < count($node->stmts); $i++) {
                 $stmt = $node->stmts[$i];
 
-                if ($stmt instanceof Node\Stmt\Property) {
+                if ($stmt instanceof Property) {
                     if ($stmt->props[0]->name->name === $this->name) {
                         $this->updateProperty($stmt);
 
@@ -53,7 +53,7 @@ class SetPropertyValue extends AbstractVisitor
 
                     $nextSmtp = $node->stmts[$i + 1] ?? null;
 
-                    $isLastProperty = empty($nextSmtp) || !($nextSmtp instanceof Node\Stmt\Property);
+                    $isLastProperty = empty($nextSmtp) || !($nextSmtp instanceof Property);
 
                     if ($shouldInsertProperty && $isLastProperty) {
                         $this->insertProperty($node->stmts, ($i + 1));
@@ -67,9 +67,9 @@ class SetPropertyValue extends AbstractVisitor
     {
         list($valueNode, $type) = $this->getPropertyValue($this->value);
 
-        $newPropItem = new Node\PropertyItem($this->name, $valueNode);
-        $newProperty = new Node\Stmt\Property(1, [$newPropItem]);
-        $newProperty->type = new Node\Identifier($type);
+        $newPropItem = new PropertyItem($this->name, $valueNode);
+        $newProperty = new Property(1, [$newPropItem]);
+        $newProperty->type = new Identifier($type);
 
         array_splice($nodeStmts, $position, 0, [$newProperty]);
     }
@@ -83,13 +83,13 @@ class SetPropertyValue extends AbstractVisitor
             'array' => $this->makeArrayValue($value),
             'string' => new String_($value),
             'float' => new Float_($value),
-            'bool' => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
+            'bool' => new ConstFetch(new Name($value ? 'true' : 'false')),
         };
 
         return [$value, $type];
     }
 
-    protected function makeArrayValue(array $value): Expr\Array_
+    protected function makeArrayValue(array $value): Array_
     {
         $items = [];
 
@@ -105,6 +105,6 @@ class SetPropertyValue extends AbstractVisitor
 
     protected function isModifyNode(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Class_;
+        return $node instanceof Class_;
     }
 }
