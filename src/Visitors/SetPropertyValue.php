@@ -4,10 +4,9 @@ namespace Ronasit\Larabuilder\Visitors;
 
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
 
-class SetPropertyValue extends NodeVisitorAbstract
+class SetPropertyValue extends AbstractVisitor
 {
     public function __construct(
         protected string $name,
@@ -17,7 +16,20 @@ class SetPropertyValue extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_) {
+        $this->nodeModification($node);
+    }
+
+    protected function updateProperty(&$stmt): void
+    {
+        list($value, $type) = $this->getPropertyValue($this->value);
+
+        $stmt->props[0] = new Node\PropertyItem($this->name, $value);
+        $stmt->type = new Node\Identifier($type);
+    }
+
+    protected function nodeModification(Node $node): void
+    {
+        if ($this->isModifyNode($node)) {
             $shouldInsertProperty = true;
 
             for ($i = 0; $i < count($node->stmts); $i++) {
@@ -35,19 +47,11 @@ class SetPropertyValue extends NodeVisitorAbstract
                     $isLastProperty = empty($nextSmtp) || !($nextSmtp instanceof Node\Stmt\Property);
 
                     if ($shouldInsertProperty && $isLastProperty) {
-                        $this->insertProperty($node->stmts, ($i+1));
+                        $this->insertProperty($node->stmts, ($i + 1));
                     }
                 }
             }
         }
-    }
-
-    protected function updateProperty(&$stmt): void
-    {
-        list($value, $type) = $this->getPropertyValue($this->value);
-
-        $stmt->props[0] = new Node\PropertyItem($this->name, $value);
-        $stmt->type = new Node\Identifier($type);
     }
 
     protected function insertProperty(&$nodeStmts, int $position): void
@@ -70,7 +74,7 @@ class SetPropertyValue extends NodeVisitorAbstract
             'array' => $this->makeArrayValue($value),
             'string' => new Node\Scalar\String_($value),
             'float' => new Node\Scalar\Float_($value),
-            'bool'  => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
+            'bool' => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
         };
 
         return [$value, $type];
@@ -80,7 +84,7 @@ class SetPropertyValue extends NodeVisitorAbstract
     {
         $items = [];
 
-        foreach($value as $key => $val) {
+        foreach ($value as $key => $val) {
             list($val) = $this->getPropertyValue($val);
             list($key) = $this->getPropertyValue($key);
 
@@ -88,5 +92,10 @@ class SetPropertyValue extends NodeVisitorAbstract
         }
 
         return new Node\Expr\Array_($items);
+    }
+
+    protected function isModifyNode(Node $node): bool
+    {
+        return $node instanceof Node\Stmt\Class_;
     }
 }
