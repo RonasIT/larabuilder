@@ -10,7 +10,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node): void
     {
         if ($this->isModifyNode($node)) {
-           $this->nodeModificationProcess($node);
+            $this->nodeModificationProcess($node);
         }
     }
 
