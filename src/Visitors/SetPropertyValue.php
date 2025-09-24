@@ -12,10 +12,9 @@ use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
 
-class SetPropertyValue extends NodeVisitorAbstract
+class SetPropertyValue extends AbstractVisitor
 {
     public function __construct(
         protected string $name,
@@ -23,14 +22,17 @@ class SetPropertyValue extends NodeVisitorAbstract
     ) {
     }
 
-    public function enterNode(Node $node): void
+    protected function isModifyNode(Node $node): bool
     {
-        if ($node instanceof Property && $node->props[0]->name->name === $this->name) {
-            list($value, $type) = $this->getPropertyValue($this->value);
+        return $node instanceof Property && $node->props[0]->name->name === $this->name;
+    }
 
-            $node->props[0] = new PropertyItem($this->name, $value);
-            $node->type = new Identifier($type);
-        }
+    protected function nodeModificationProcess(Node $property): void
+    {
+        list($value, $type) = $this->getPropertyValue($this->value);
+
+        $property->props[0] = new PropertyItem($this->name, $value);
+        $property->type = new Identifier($type);
     }
 
     protected function getPropertyValue(mixed $value): array
