@@ -22,6 +22,19 @@ class SetPropertyValue extends AbstractVisitor
     ) {
     }
 
+    protected function isModifyNode(Node $node): bool
+    {
+        return $node instanceof Property && $node->props[0]->name->name === $this->name;
+    }
+
+    protected function nodeModificationProcess(Node $property): void
+    {
+        list($value, $type) = $this->getPropertyValue($this->value);
+
+        $property->props[0] = new PropertyItem($this->name, $value);
+        $property->type = new Identifier($type);
+    }
+
     protected function getPropertyValue(mixed $value): array
     {
         $type = get_debug_type($value);
@@ -56,18 +69,5 @@ class SetPropertyValue extends AbstractVisitor
         }
 
         return new Array_($items);
-    }
-
-    protected function isModifyNode(Node $node): bool
-    {
-        return $node instanceof Property && $node->props[0]->name->name === $this->name;
-    }
-
-    protected function NodeModificationProcess(Node $node): void
-    {
-        list($value, $type) = $this->getPropertyValue($this->value);
-
-        $node->props[0] = new PropertyItem($this->name, $value);
-        $node->type = new Identifier($type);
     }
 }
