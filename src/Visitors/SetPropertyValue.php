@@ -2,8 +2,11 @@
 
 namespace Ronasit\Larabuilder\Visitors;
 
+use PhpParser\Modifiers;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Property;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
 
@@ -12,53 +15,62 @@ class SetPropertyValue extends NodeVisitorAbstract
     public function __construct(
         protected string $name,
         protected mixed $value,
+        protected ?int $accessModifier = null,
     ) {
     }
 
     public function enterNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_) {
+        if ($node instanceof Class_) {
             $shouldInsertProperty = true;
 
             for ($i = 0; $i < count($node->stmts); $i++) {
-                $stmt = $node->stmts[$i];
+                $classNode = $node->stmts[$i];
 
-                if ($stmt instanceof Node\Stmt\Property) {
-                    if ($stmt->props[0]->name->name === $this->name) {
-                        $this->updateProperty($stmt);
+                if ($classNode instanceof Property) {
+                    if ($this->name === $classNode->props[0]->name->name) {
+                        $this->updateProperty($classNode);
 
                         $shouldInsertProperty = false;
                     }
 
-                    $nextSmtp = $node->stmts[$i + 1] ?? null;
+                    $nextClassNode = $node->stmts[$i + 1] ?? null;
 
-                    $isLastProperty = empty($nextSmtp) || !($nextSmtp instanceof Node\Stmt\Property);
+                    $isLastProperty = empty($nextClassNode) || !($nextClassNode instanceof Property);
 
                     if ($shouldInsertProperty && $isLastProperty) {
-                        $this->insertProperty($node->stmts, ($i+1));
+                        $this->insertProperty($node->stmts, ($i + 1));
                     }
                 }
             }
         }
     }
 
-    protected function updateProperty(&$stmt): void
+    protected function updateProperty(Property $property): void
     {
         list($value, $type) = $this->getPropertyValue($this->value);
 
-        $stmt->props[0] = new Node\PropertyItem($this->name, $value);
-        $stmt->type = new Node\Identifier($type);
+        $property->props[0] = new Node\PropertyItem($this->name, $value);
+        $property->type = new Node\Identifier($type);
+
+        if ($this->accessModifier) {
+            $property->flags = $this->accessModifier;
+        }
     }
 
-    protected function insertProperty(&$nodeStmts, int $position): void
+    protected function insertProperty(array &$classNodes, int $position): void
     {
-        list($valueNode, $type) = $this->getPropertyValue($this->value);
+        list($value, $type) = $this->getPropertyValue($this->value);
 
-        $newPropItem = new Node\PropertyItem($this->name, $valueNode);
-        $newProperty = new Node\Stmt\Property(1, [$newPropItem]);
-        $newProperty->type = new Node\Identifier($type);
+        $property = new Node\Stmt\Property(
+            flags: $this->accessModifier ?? Modifiers::PUBLIC,
+            props: [
+                new Node\PropertyItem($this->name, $value)
+            ],
+            type: new Node\Identifier($type)
+        );
 
-        array_splice($nodeStmts, $position, 0, [$newProperty]);
+        array_splice($classNodes, $position, 0, [$property]);
     }
 
     protected function getPropertyValue(mixed $value): array
@@ -70,7 +82,7 @@ class SetPropertyValue extends NodeVisitorAbstract
             'array' => $this->makeArrayValue($value),
             'string' => new Node\Scalar\String_($value),
             'float' => new Node\Scalar\Float_($value),
-            'bool'  => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
+            'bool' => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
         };
 
         return [$value, $type];
@@ -80,7 +92,7 @@ class SetPropertyValue extends NodeVisitorAbstract
     {
         $items = [];
 
-        foreach($value as $key => $val) {
+        foreach ($value as $key => $val) {
             list($val) = $this->getPropertyValue($val);
             list($key) = $this->getPropertyValue($key);
 

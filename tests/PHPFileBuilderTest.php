@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use PhpParser\Modifiers;
 use Ronasit\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
@@ -23,7 +24,7 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('floatProperty', 56)
             ->setProperty('nullProperty', 'Changed to String')
             ->setProperty('stringProperty', 'changed string')
-            ->setProperty('boolProperty', true)
+            ->setProperty('boolProperty', true, Modifiers::PRIVATE)
             ->setProperty('newMultiArrayProperty', [
                 'arrayProperty' => [1, 'string', true],
                 'someKey' => 1,
