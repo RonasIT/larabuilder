@@ -3,10 +3,15 @@
 namespace Ronasit\Larabuilder\Visitors;
 
 use PhpParser\Modifiers;
-use PhpParser\Node\Expr;
+use PhpParser\Node\ArrayItem;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Scalar\Float_;
+use PhpParser\Node\Scalar\Int_;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
 
@@ -78,27 +83,34 @@ class SetPropertyValue extends NodeVisitorAbstract
         $type = get_debug_type($value);
 
         $value = match ($type) {
-            'int' => new Node\Scalar\Int_($value),
+            'int' => new Int_($value),
             'array' => $this->makeArrayValue($value),
-            'string' => new Node\Scalar\String_($value),
-            'float' => new Node\Scalar\Float_($value),
-            'bool' => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
+            'string' => new String_($value),
+            'float' => new Float_($value),
+            'bool' => $this->makeBoolValue($value),
         };
 
         return [$value, $type];
     }
 
-    protected function makeArrayValue(array $value): Expr\Array_
+    protected function makeBoolValue(bool $value): ConstFetch
+    {
+        $name = new Name(($value) ? 'true' : 'false');
+
+        return new ConstFetch($name);
+    }
+
+    protected function makeArrayValue(array $values): Array_
     {
         $items = [];
 
-        foreach ($value as $key => $val) {
+        foreach ($values as $key => $val) {
             list($val) = $this->getPropertyValue($val);
             list($key) = $this->getPropertyValue($key);
 
-            $items[] = new Node\ArrayItem($val, $key);
+            $items[] = new ArrayItem($val, $key);
         }
 
-        return new Node\Expr\Array_($items);
+        return new Array_($items);
     }
 }

@@ -8,9 +8,9 @@ use PhpParser\Node\Stmt\ClassMethod;
 
 class Printer extends Standard
 {
-    public function prettyPrintFile(array $stmts): string
+    public function prettyPrintFile(array $syntaxTree): string
     {
-        return parent::prettyPrintFile($stmts) . $this->newline;
+        return parent::prettyPrintFile($syntaxTree) . $this->newline;
     }
 
     protected function pStmt_Class(Class_ $node): string

@@ -8,21 +8,21 @@ use Ronasit\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
-    protected array $ast;
+    protected array $syntaxTree;
     protected NodeTraverser $traverser;
 
     public function __construct(
-        protected  string $filePath,
+        protected string $filePath,
     ) {
         $parser = (new ParserFactory())->createForHostVersion();
 
         $code = file_get_contents($this->filePath);
 
-        $this->ast = $parser->parse($code);
+        $this->syntaxTree = $parser->parse($code);
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value, ?int $accessModifier = null): static
+    public function setProperty(string $name, mixed $value, ?int $accessModifier = null): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
 
@@ -31,9 +31,9 @@ class PHPFileBuilder
 
     public function save(): void
     {
-        $stmts = $this->traverser->traverse($this->ast);
+        $syntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->prettyPrintFile($stmts);
+        $fileContent = (new Printer())->prettyPrintFile($syntaxTree);
 
         file_put_contents($this->filePath, $fileContent);
     }
