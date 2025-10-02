@@ -1,10 +1,11 @@
 <?php
 
-namespace Ronasit\Larabuilder;
+namespace RonasIT\Larabuilder;
 
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
-use Ronasit\Larabuilder\Visitors\SetPropertyValue;
+use RonasIT\Larabuilder\Enums\ModifierEnum;
+use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
@@ -22,7 +23,7 @@ class PHPFileBuilder
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value, ?int $accessModifier = null): self
+    public function setProperty(string $name, mixed $value, ?ModifierEnum $accessModifier = null): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
 
