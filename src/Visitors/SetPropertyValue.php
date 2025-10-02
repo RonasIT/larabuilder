@@ -6,7 +6,9 @@ use PhpParser\Modifiers;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Scalar\Float_;
@@ -55,8 +57,8 @@ class SetPropertyValue extends NodeVisitorAbstract
     {
         list($value, $type) = $this->getPropertyValue($this->value);
 
-        $property->props[0] = new Node\PropertyItem($this->name, $value);
-        $property->type = new Node\Identifier($type);
+        $property->props[0] = new PropertyItem($this->name, $value);
+        $property->type = new Identifier($type);
 
         if ($this->accessModifier) {
             $property->flags = $this->accessModifier;
@@ -67,12 +69,12 @@ class SetPropertyValue extends NodeVisitorAbstract
     {
         list($value, $type) = $this->getPropertyValue($this->value);
 
-        $property = new Node\Stmt\Property(
+        $property = new Property(
             flags: $this->accessModifier ?? Modifiers::PUBLIC,
             props: [
-                new Node\PropertyItem($this->name, $value)
+                new PropertyItem($this->name, $value)
             ],
-            type: new Node\Identifier($type)
+            type: new Identifier($type)
         );
 
         array_splice($classNodes, $position, 0, [$property]);
