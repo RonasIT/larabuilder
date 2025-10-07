@@ -4,6 +4,7 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PhpParser\NodeVisitor;
 use Illuminate\Support\Arr;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
@@ -31,7 +32,7 @@ class SetPropertyValue extends NodeVisitorAbstract
         list($this->valueProperty, $this->typeProperty) = $this->getPropertyValue($this->value);
     }
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node): int|Node
     {
         if ($node instanceof Class_) {
             foreach ($node->stmts as $index => $statement) {
@@ -51,7 +52,9 @@ class SetPropertyValue extends NodeVisitorAbstract
                     }
                 }
             }
+            return NodeVisitor::DONT_TRAVERSE_CHILDREN;
         }
+        return $node;
     }
 
     protected function updateProperty(Property $property): void
