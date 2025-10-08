@@ -8,18 +8,13 @@ trait PHPFileBuilderTestMockTrait
 {
     use MockTrait;
 
-    protected function mockClassUpdate(string $filePath, string $originalFixture, string $resultFixture): void
+    protected function callFileGetContent(string $fileName, string $originalFixture): array
     {
-        $this->mockNativeFunction('RonasIT\Larabuilder', [
-            $this->functionCall(
-                name: 'file_get_contents',
-                arguments: [$filePath],
-                result: $this->getFixture("original/{$originalFixture}"),
-            ),
-            $this->functionCall(
-                name: 'file_put_contents',
-                arguments: [$filePath, $this->getFixture("results/{$resultFixture}")]
-            ),
-        ]);
+        return $this->functionCall('file_get_contents', [$fileName], $this->getFixture("original/{$originalFixture}"));
+    }
+
+    protected function callFilePutContent(string $fileName, string $resultFixture, int $flags = 0): array
+    {
+        return $this->functionCall('file_put_contents', [$fileName, $this->getFixture("results/{$resultFixture}"), $flags]);
     }
 }
