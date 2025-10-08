@@ -1,6 +1,6 @@
 <?php
 
-namespace Ronasit\Larabuilder;
+namespace RonasIT\Larabuilder;
 
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\Node\Stmt\Class_;

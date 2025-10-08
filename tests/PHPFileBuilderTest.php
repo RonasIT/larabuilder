@@ -2,7 +2,8 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use Ronasit\Larabuilder\PHPFileBuilder;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase
@@ -23,7 +24,12 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('floatProperty', 56)
             ->setProperty('nullProperty', 'Changed to String')
             ->setProperty('stringProperty', 'changed string')
-            ->setProperty('boolProperty', true)
+            ->setProperty('boolProperty', true, AccessModifierEnum::Private)
+            ->setProperty('newMultiArrayProperty', [
+                'arrayProperty' => [1, 'string', true],
+                'someKey' => 1,
+            ])
+            ->setProperty('newString', 'some string')
             ->save();
     }
 }

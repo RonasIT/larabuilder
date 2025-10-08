@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ronasit\\Larabuilder\\": "src/",
+            "RonasIT\\Larabuilder\\": "src/",
             "RonasIT\\Larabuilder\\Tests\\": "tests/",
             "RonasIT\\Larabuilder\\Tests\\Support\\": "tests/Support"
         }
