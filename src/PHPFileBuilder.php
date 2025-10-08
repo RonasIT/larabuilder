@@ -6,6 +6,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
+use RonasIT\Larabuilder\Visitors\ManageArrayPropertyItems;
 
 class PHPFileBuilder
 {
@@ -26,6 +27,13 @@ class PHPFileBuilder
     public function setProperty(string $name, mixed $value, ?AccessModifierEnum $accessModifier = null): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
+
+        return $this;
+    }
+
+    public function addArrayPropertyItem(string $name, mixed $value): self
+    {
+        $this->traverser->addVisitor(new ManageArrayPropertyItems($name, $value));
 
         return $this;
     }

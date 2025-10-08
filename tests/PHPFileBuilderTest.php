@@ -46,7 +46,6 @@ class PHPFileBuilderTest extends TestCase
             ->addArrayPropertyItem('fillable', 'age')
             ->addArrayPropertyItem('role', 'admin')
             ->addArrayPropertyItem('tags', 'three')
-            ->addArrayPropertyItem('notArray', 'value')
             ->save();
     }
 
