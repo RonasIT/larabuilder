@@ -32,4 +32,31 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('newString', 'some string')
             ->save();
     }
+
+    public function testSetPropertyWithoutExistingProperties(): void
+    {
+        $this->mockClassUpdate(
+            filePath: 'some_file_path.php',
+            originalFixture: 'class_without_properties.php',
+            resultFixture: 'class_without_properties.php',
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
+
+    public function testSetPropertyNotInClass(): void
+    {
+        $this->mockClassUpdate(
+            filePath: 'some_file_path.php',
+            originalFixture: 'not_class.php',
+            resultFixture: 'not_class.php',
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setProperty('floatProperty', 56)
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
 }

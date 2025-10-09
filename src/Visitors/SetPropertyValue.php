@@ -6,6 +6,7 @@ use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitor;
 use Illuminate\Support\Arr;
+use PhpParser\BuilderFactory;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
@@ -23,6 +24,9 @@ class SetPropertyValue extends NodeVisitorAbstract
 {
     protected string $typeProperty;
     protected mixed $valueProperty;
+    protected bool $propertyFound = false;
+    protected BuilderFactory $factory;
+    protected array $collected = [];
 
     public function __construct(
         protected string $name,
@@ -34,28 +38,51 @@ class SetPropertyValue extends NodeVisitorAbstract
 
     public function enterNode(Node $node): int|Node
     {
-        if ($node instanceof Class_) {
-            foreach ($node->stmts as $index => $statement) {
-                if ($statement instanceof Property) {
-                    if ($this->name === $statement->props[0]->name->name) {
-                        $this->updateProperty($statement);
-
-                        break;
-                    }
-
-                    $nextClassNode = Arr::get($node->stmts, $index + 1);
-
-                    $isLastProperty = empty($nextClassNode) || !($nextClassNode instanceof Property);
-
-                    if ($isLastProperty) {
-                        $this->insertProperty($node->stmts, ($index + 1));
-                    }
-                }
+        if ($node instanceof Property) {
+            if ($this->name === $node->props[0]->name->name) {
+                $this->updateProperty($node);
+                $this->propertyFound = true;
             }
             return NodeVisitor::DONT_TRAVERSE_CHILDREN;
         }
         return $node;
     }
+
+    public function leaveNode(Node $node): Node
+    {
+        if ($node instanceof Class_) {
+            if (!$this->propertyFound) {
+                $newProp = $this->insertProperty();
+                $node->stmts[] = $newProp;
+            }
+
+            $this->factory = new BuilderFactory();
+            $classBuilder = $this->factory->class($node->name->toString());
+            foreach ($node->stmts as $stmt) {
+                $classBuilder->addStmt($stmt);
+            }
+
+            return $classBuilder->getNode();
+        }
+        return $node;
+    }
+    // public function afterTraverse(array $nodes): array
+    // {
+        
+    //     return array_map(function($node) {
+    //         if ($node instanceof Class_) {
+
+    //             $this->factory = new BuilderFactory();
+    //             $classBuilder = $this->factory->class($node->name->toString());
+    //             foreach ($node->stmts as $stmt) {
+    //                 $classBuilder->addStmt($stmt);
+    //             }
+
+    //             return $classBuilder->getNode();
+    //         }
+    //         return $node;
+    //     }, $nodes );
+    // }
 
     protected function updateProperty(Property $property): void
     {
@@ -67,17 +94,15 @@ class SetPropertyValue extends NodeVisitorAbstract
         }
     }
 
-    protected function insertProperty(array &$classNodes, int $position): void
+    protected function insertProperty(): Property
     {
-        $property = new Property(
+        return new Property(
             flags: $this->accessModifier->value ?? AccessModifierEnum::Public->value,
             props: [
                 new PropertyItem($this->name, $this->valueProperty),
             ],
             type: new Identifier($this->typeProperty),
         );
-
-        array_splice($classNodes, $position, 0, [$property]);
     }
 
     protected function getPropertyValue(mixed $value): array
