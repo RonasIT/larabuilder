@@ -24,7 +24,6 @@ class SetPropertyValue extends NodeVisitorAbstract
     protected string $propertyType;
     protected mixed $propertyValue;
     protected bool $hasProperty = false;
-    protected BuilderFactory $factory;
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 
@@ -58,8 +57,8 @@ class SetPropertyValue extends NodeVisitorAbstract
                 $node->stmts[] = $newProp;
             }
 
-            $this->factory = new BuilderFactory();
-            $classBuilder = $this->factory->class($node->name->toString());
+            $factory = new BuilderFactory();
+            $classBuilder = $factory->class($node->name->toString());
 
             foreach ($node->stmts as $stmt) {
                 $classBuilder->addStmt($stmt);
