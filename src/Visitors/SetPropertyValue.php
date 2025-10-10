@@ -84,9 +84,7 @@ class SetPropertyValue extends NodeVisitorAbstract
     {
         return new Property(
             flags: $this->accessModifier->value ?? AccessModifierEnum::Public->value,
-            props: [
-                new PropertyItem($this->name, $this->propertyValue),
-            ],
+            props: [$this->propertyItem],
             type: $this->typeIdentifier,
         );
     }
