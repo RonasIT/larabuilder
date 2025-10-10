@@ -2,8 +2,9 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 use RonasIT\Larabuilder\Visitors\ManageArrayPropertyItems;
@@ -40,6 +41,9 @@ class PHPFileBuilder
 
     public function save(): void
     {
+        $this->traverser->addVisitor(new ParentConnectingVisitor());
+        $this->traverser->reverseVisitors();
+
         $syntaxTree = $this->traverser->traverse($this->syntaxTree);
 
         $fileContent = (new Printer())->prettyPrintFile($syntaxTree);

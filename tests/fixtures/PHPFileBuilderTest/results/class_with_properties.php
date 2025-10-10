@@ -6,6 +6,8 @@ use Some;
 
 class SomeClass
 {
+    public const STATUS_ACTIVE = 'active';
+
     public string $stringProperty = 'changed string';
     private bool $boolProperty = true;
     public array $arrayProperty = ['id' => 123];

@@ -6,6 +6,8 @@ use Some;
 
 class SomeClass
 {
+    public const STATUS_ACTIVE = 'active';
+
     public string $stringProperty = 'some value';
     public bool $boolProperty = false;
     public array $arrayProperty = ['element' => 'value'];

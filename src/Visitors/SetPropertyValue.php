@@ -5,7 +5,7 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitor;
-use Illuminate\Support\Arr;
+use PhpParser\BuilderFactory;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
@@ -21,63 +21,74 @@ use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends NodeVisitorAbstract
 {
-    protected string $typeProperty;
-    protected mixed $valueProperty;
+    protected string $propertyType;
+    protected mixed $propertyValue;
+    protected bool $hasProperty = false;
+    protected PropertyItem $propertyItem;
+    protected Identifier $typeIdentifier;
 
     public function __construct(
         protected string $name,
         protected mixed $value,
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
-        list($this->valueProperty, $this->typeProperty) = $this->getPropertyValue($this->value);
+        list($this->propertyValue, $this->propertyType) = $this->getPropertyValue($this->value);
+        $this->propertyItem = new PropertyItem($name, $this->propertyValue);
+        $this->typeIdentifier = new Identifier($this->propertyType);
     }
 
     public function enterNode(Node $node): int|Node
     {
-        if ($node instanceof Class_) {
-            foreach ($node->stmts as $index => $statement) {
-                if ($statement instanceof Property) {
-                    if ($this->name === $statement->props[0]->name->name) {
-                        $this->updateProperty($statement);
-
-                        break;
-                    }
-
-                    $nextClassNode = Arr::get($node->stmts, $index + 1);
-
-                    $isLastProperty = empty($nextClassNode) || !($nextClassNode instanceof Property);
-
-                    if ($isLastProperty) {
-                        $this->insertProperty($node->stmts, ($index + 1));
-                    }
-                }
+        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_) {
+            if ($this->name === $node->props[0]->name->name) {
+                $this->updateProperty($node);
+                $this->hasProperty = true;
             }
             return NodeVisitor::DONT_TRAVERSE_CHILDREN;
         }
         return $node;
     }
 
+    public function leaveNode(Node $node): Node
+    {
+        if ($node instanceof Class_) {
+            if (!$this->hasProperty) {
+                $newProp = $this->insertProperty();
+                $node->stmts[] = $newProp;
+            }
+
+            $factory = new BuilderFactory();
+            $classBuilder = $factory->class($node->name->toString());
+
+            foreach ($node->stmts as $stmt) {
+                $classBuilder->addStmt($stmt);
+            }
+
+            return $classBuilder->getNode();
+        }
+
+        return $node;
+    }
+
     protected function updateProperty(Property $property): void
     {
-        $property->props[0] = new PropertyItem($this->name, $this->valueProperty);
-        $property->type = new Identifier($this->typeProperty);
+        $property->props[0] = $this->propertyItem;
+        $property->type = $this->typeIdentifier;
 
         if ($this->accessModifier) {
             $property->flags = $this->accessModifier->value;
         }
     }
 
-    protected function insertProperty(array &$classNodes, int $position): void
+    protected function insertProperty(): Property
     {
-        $property = new Property(
+        return new Property(
             flags: $this->accessModifier->value ?? AccessModifierEnum::Public->value,
             props: [
-                new PropertyItem($this->name, $this->valueProperty),
+                new PropertyItem($this->name, $this->propertyValue),
             ],
-            type: new Identifier($this->typeProperty),
+            type: $this->typeIdentifier,
         );
-
-        array_splice($classNodes, $position, 0, [$property]);
     }
 
     protected function getPropertyValue(mixed $value): array

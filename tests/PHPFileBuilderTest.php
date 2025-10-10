@@ -34,6 +34,33 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testSetPropertyWithoutExistingProperties(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_properties.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
+
+    public function testSetPropertyNotInClass(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'not_class.php'),
+            $this->callFilePutContent('some_file_path.php', 'not_class.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setProperty('floatProperty', 56)
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
+
     public function testAddArrayPropertyItem(): void
     {
         $this->mockNativeFunction(
