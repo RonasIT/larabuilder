@@ -60,6 +60,7 @@ class SetPropertyValue extends NodeVisitorAbstract
 
             $this->factory = new BuilderFactory();
             $classBuilder = $this->factory->class($node->name->toString());
+
             foreach ($node->stmts as $stmt) {
                 $classBuilder->addStmt($stmt);
             }

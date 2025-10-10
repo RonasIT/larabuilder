@@ -21,7 +21,6 @@ class PHPFileBuilder
         $code = file_get_contents($this->filePath);
 
         $this->syntaxTree = $parser->parse($code);
-
         $this->traverser = new NodeTraverser();
     }
 
@@ -35,7 +34,6 @@ class PHPFileBuilder
     public function save(): void
     {
         $this->traverser->addVisitor(new ParentConnectingVisitor());
-
         $this->traverser->reverseVisitors();
 
         $syntaxTree = $this->traverser->traverse($this->syntaxTree);
