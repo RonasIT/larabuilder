@@ -5,7 +5,7 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitor;
-use Illuminate\Support\Arr;
+use PhpParser\BuilderFactory;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
@@ -14,7 +14,6 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node\Expr\ConstFetch;
@@ -22,56 +21,67 @@ use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
-class ManageArrayPropertyItems extends NodeVisitorAbstract
+class SetArrayPropertyItems extends NodeVisitorAbstract
 {
-    protected string $typeProperty;
-
-    protected mixed $valueProperty;
+    protected string $propertyType;
+    protected mixed $propertyValue;
+    protected bool $hasProperty = false;
+    protected PropertyItem $propertyItem;
+    protected Identifier $typeIdentifier;
 
     public function __construct(
         protected string $name,
         protected mixed $value,
+        protected ?AccessModifierEnum $accessModifier = null,
     ) {
-        [$this->valueProperty, $this->typeProperty] = $this->getPropertyValue($this->value);
+        list($this->propertyValue, $this->propertyType) = $this->getPropertyValue($this->value);
+        $this->propertyItem = new PropertyItem($name, $this->propertyValue);
+        $this->typeIdentifier = new Identifier($this->propertyType);
     }
 
     public function enterNode(Node $node): int|Node
     {
+        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_) {
+            if ($this->name === $node->props[0]->name->name) {
+                $node->type->name === 'array'
+                            ? $this->updateArrayProperty($node)
+                            : throw new UnexpectedPropertyTypeException($this->name, 'array', $node->type);
+                $this->hasProperty = true;
+            }
+            return NodeVisitor::DONT_TRAVERSE_CHILDREN;
+        }
+        return $node;
+    }
+
+    public function leaveNode(Node $node): Node
+    {
         if ($node instanceof Class_) {
-            foreach ($node->stmts as $index => $statement) {
-                if ($statement instanceof Property) {
-                    if ($this->name === $statement->props[0]->name->name) {
-                        $statement->type->name === 'array'
-                            ? $this->updateProperty($statement)
-                            : throw new UnexpectedPropertyTypeException($this->name, 'array', $statement->type);
-
-                        break;
-                    }
-
-                    $nextClassNode = Arr::get($node->stmts, $index + 1);
-
-                    $isLastProperty = empty($nextClassNode) || ! ($nextClassNode instanceof Property);
-
-                    if ($isLastProperty) {
-                        $this->insertProperty($node->stmts, ($index + 1));
-                    }
-                }
+            if (!$this->hasProperty) {
+                $newProp = $this->insertArrayProperty();
+                $node->stmts[] = $newProp;
             }
 
-            return NodeVisitor::DONT_TRAVERSE_CHILDREN;
+            $factory = new BuilderFactory();
+            $classBuilder = $factory->class($node->name->toString());
+
+            foreach ($node->stmts as $stmt) {
+                $classBuilder->addStmt($stmt);
+            }
+
+            return $classBuilder->getNode();
         }
 
         return $node;
     }
 
-    protected function updateProperty( $property): void
+    protected function updateArrayProperty( $property): void
     {
         $property->props[0]->default->items[] = new ArrayItem(new String_($this->value));
     }
 
-    protected function insertProperty(array &$classNodes, int $position): void
+    protected function insertArrayProperty(): Property
     {
-        $property = new Property(
+        return new Property(
             flags: AccessModifierEnum::Public->value,
             props: [
                 new PropertyProperty(
@@ -83,8 +93,6 @@ class ManageArrayPropertyItems extends NodeVisitorAbstract
             ],
             type: new Identifier('array'),
         );
-
-        array_splice($classNodes, $position, 0, [$property]);
     }
 
     protected function getPropertyValue(mixed $value): array
@@ -114,8 +122,8 @@ class ManageArrayPropertyItems extends NodeVisitorAbstract
         $items = [];
 
         foreach ($values as $key => $val) {
-            [$val] = $this->getPropertyValue($val);
-            [$key] = $this->getPropertyValue($key);
+            list($val) = $this->getPropertyValue($val);
+            list($key) = $this->getPropertyValue($key);
 
             $items[] = new ArrayItem($val, $key);
         }
