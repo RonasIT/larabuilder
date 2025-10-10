@@ -2,12 +2,13 @@
 
 namespace RonasIT\Larabuilder\Tests\Support;
 
-use Some;
+use Some\AnotherTrait;
+
 trait SomeTrait
 {
-    use AnotherTrait;
+    public float $floatProperty;
     
-    public function __construct()
+    public function initializeSomeTrait(): void
     {
     }
 }
