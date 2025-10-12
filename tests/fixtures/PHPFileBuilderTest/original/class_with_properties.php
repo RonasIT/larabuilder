@@ -6,7 +6,10 @@ use Some;
 
 class SomeClass
 {
+    use SomeTrait;
+
     public const STATUS_ACTIVE = 'active';
+    public const STATUS_ACTIVE1 = 'active';
 
     public string $stringProperty = 'some value';
     public bool $boolProperty = false;
@@ -17,6 +20,9 @@ class SomeClass
 
     public function __construct()
     {
+        if ($boolProperty) {
+            $nullProperty = null;
+        }
     }
 
     public function someMethod()

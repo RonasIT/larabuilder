@@ -2,12 +2,13 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\PrettyPrinter\Standard;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
 {
@@ -16,28 +17,51 @@ class Printer extends Standard
         return parent::prettyPrintFile($syntaxTree) . $this->newline;
     }
 
-    protected function pStmt_Class(Class_ $node): string
-    {
-        return $this->newline . parent::pStmt_Class($node);
-    }
-
     protected function pStmt_Trait(Trait_ $node): string 
     {
         return $this->newline . parent::pStmt_Trait($node);
     }
 
-    protected function pStmt_TraitUse(TraitUse $node): string 
+    protected function pStmt_Class(Class_ $node): string
     {
-        return parent::pStmt_TraitUse($node) . $this->newline;
+        $lines = [];
+        $prevType = null;
+        $indent = str_repeat(' ', 4);
+        $result = "{$this->newline}class {$node->name}{$this->newline}{";
+
+        foreach ($node->stmts as $stmt) {
+            $currentType = get_class($stmt);
+
+            if ($prevType !== null && $prevType !== $currentType) {
+                $lines[] = '';
+            }
+
+            if ($prevType === ClassMethod::class && $prevType === ClassMethod::class) {
+                $lines[] = '';
+            }
+
+            $lines[] = match ($currentType) {
+                TraitUse::class => $indent . parent::pStmt_TraitUse($stmt),
+                Property::class => $indent . parent::pStmt_Property($stmt),
+                ClassConst::class => $indent . parent::pStmt_ClassConst($stmt),
+                default => $this->indentLines($this->p($stmt), $indent),
+            };
+
+            $prevType = $currentType;
+        }
+
+        $result .= $this->newline . implode($this->nl, $lines);
+        $result .= $this->newline . '}';
+
+        return $result;
     }
 
-    protected function pStmt_ClassConst(ClassConst $node): string 
+    protected function indentLines(string $code, string $indent): string
     {
-        return parent::pStmt_ClassConst($node) . $this->newline;
-    }
+        $lines = explode("\n", $code);
 
-    protected function pStmt_ClassMethod(ClassMethod $node): string
-    {
-        return $this->nl . parent::pStmt_ClassMethod($node);
+        $linesWithIndent = array_map(fn($line) => $line === '' ? '' : $indent . $line,$lines);
+
+        return implode("\n", $linesWithIndent);
     }
 }

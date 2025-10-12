@@ -10,11 +10,11 @@ class SomeClass
     use SomeTrait;
 
     public string $newString = 'some string';
-    
+
     public function __construct()
     {
     }
-    
+
     public function someMethod()
     {
     }
