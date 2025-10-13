@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Tests\Support;
 
 use Some;
+
 class SomeClass extends Some
 {
     use SomeTrait;
@@ -16,12 +17,14 @@ class SomeClass extends Some
     public string $nullProperty = 'Changed to String';
     public array $newMultiArrayProperty = ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true], 'someKey' => 1];
     public string $newString = 'some string';
+    
     public function __construct()
     {
         if ($boolProperty) {
             $nullProperty = null;
         }
     }
+    
     public function someMethod()
     {
     }

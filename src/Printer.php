@@ -2,7 +2,8 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
@@ -12,8 +13,13 @@ class Printer extends Standard
         return parent::prettyPrintFile($syntaxTree) . $this->newline;
     }
 
-    protected function pStmt_Trait(Trait_ $node): string 
+    protected function pStmt_Class(Class_ $node): string
     {
-        return $this->newline . parent::pStmt_Trait($node);
+        return $this->newline . parent::pStmt_Class($node);
+    }
+
+    protected function pStmt_ClassMethod(ClassMethod $node): string
+    {
+        return $this->nl . parent::pStmt_ClassMethod($node);
     }
 }
