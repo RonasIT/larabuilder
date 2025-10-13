@@ -4,7 +4,6 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
-use PhpParser\NodeVisitor;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
@@ -21,8 +20,6 @@ use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends NodeVisitorAbstract
 {
-    protected string $propertyType;
-    protected mixed $propertyValue;
     protected bool $isPropertyExists = false;
 
     protected PropertyItem $propertyItem;
@@ -33,9 +30,9 @@ class SetPropertyValue extends NodeVisitorAbstract
         mixed $value,
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
-        list($this->propertyValue, $this->propertyType) = $this->getPropertyValue($value);
-        $this->propertyItem = new PropertyItem($name, $this->propertyValue);
-        $this->typeIdentifier = new Identifier($this->propertyType);
+        list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+        $this->propertyItem = new PropertyItem($name, $propertyValue);
+        $this->typeIdentifier = new Identifier($propertyType);
     }
 
     public function enterNode(Node $node): Node
@@ -51,7 +48,7 @@ class SetPropertyValue extends NodeVisitorAbstract
     {
         if ($node instanceof Class_ && !$this->isPropertyExists) {
             $node->stmts[] = new Property(
-                flags: $this->accessModifier->value ?? AccessModifierEnum::Public->value,
+                flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
                 props: [$this->propertyItem],
                 type: $this->typeIdentifier,
             );

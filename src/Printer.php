@@ -2,12 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\TraitUse;
-use PhpParser\Node\Stmt\ClassConst;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
