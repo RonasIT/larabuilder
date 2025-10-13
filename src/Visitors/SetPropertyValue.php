@@ -37,7 +37,7 @@ class SetPropertyValue extends NodeVisitorAbstract
 
     public function enterNode(Node $node): Node
     {
-        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_ && $this->name === $node->props[0]->name->name) {
+        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_ && $node->props[0]->name->name === $this->name) {
             $this->updateProperty($node);
             $this->isPropertyExists = true;
         }
