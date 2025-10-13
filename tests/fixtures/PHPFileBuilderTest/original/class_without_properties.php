@@ -6,6 +6,9 @@ use Some;
 use Test;
 use Some\SomeTrait;
 
+/**
+ * Test
+ */
 class SomeClass implements Test, Some
 {
     use SomeTrait;
