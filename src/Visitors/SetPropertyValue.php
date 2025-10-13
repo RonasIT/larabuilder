@@ -23,64 +23,40 @@ class SetPropertyValue extends NodeVisitorAbstract
 {
     protected string $propertyType;
     protected mixed $propertyValue;
-    protected bool $hasProperty = false;
+    protected bool $isPropertyExists = false;
+
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 
     public function __construct(
         protected string $name,
-        protected mixed $value,
+        mixed $value,
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
-        list($this->propertyValue, $this->propertyType) = $this->getPropertyValue($this->value);
+        list($this->propertyValue, $this->propertyType) = $this->getPropertyValue($value);
         $this->propertyItem = new PropertyItem($name, $this->propertyValue);
         $this->typeIdentifier = new Identifier($this->propertyType);
     }
 
-    public function enterNode(Node $node): int|Node
+    public function enterNode(Node $node): Node
     {
-        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_) {
-            if ($this->name === $node->props[0]->name->name) {
-                $this->updateProperty($node);
-                $this->hasProperty = true;
-            }
-            return NodeVisitor::DONT_TRAVERSE_CHILDREN;
+        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_ && $this->name === $node->props[0]->name->name) {
+            $this->updateProperty($node);
+            $this->isPropertyExists = true;
         }
         return $node;
     }
 
     public function leaveNode(Node $node): Node
     {
-        if ($node instanceof Class_) {
-            if (!$this->hasProperty) {
-                $newProp = $this->insertProperty();
-                $node->stmts[] = $newProp;
-            }
+        if ($node instanceof Class_ && !$this->isPropertyExists) {
+            $node->stmts[] = new Property(
+                flags: $this->accessModifier->value ?? AccessModifierEnum::Public->value,
+                props: [$this->propertyItem],
+                type: $this->typeIdentifier,
+            );
 
-            $factory = new BuilderFactory();
-            $classBuilder = $factory->class($node->name->toString());
-
-            if ($node->extends) {
-                $classBuilder->extend($node->extends);
-            }
-
-            if (!empty($node->implements)) {
-                $classBuilder->implement(...$node->implements);
-            }
-
-            if ($node->isAbstract()) {
-                $classBuilder->makeAbstract();
-            }
-
-            if ($node->isFinal()) {
-                $classBuilder->makeFinal();
-            }
-
-            foreach ($node->stmts as $stmt) {
-                $classBuilder->addStmt($stmt);
-            }
-
-            return $classBuilder->getNode();
+            return $this->rebuildClass($node);
         }
 
         return $node;
@@ -96,13 +72,40 @@ class SetPropertyValue extends NodeVisitorAbstract
         }
     }
 
-    protected function insertProperty(): Property
+    /**
+     * Using to automatically group statements by their type simplifies development, 
+     * because we don't need to define the correct place for the insertable node.
+     */
+    protected function rebuildClass(Class_ $node): Class_
     {
-        return new Property(
-            flags: $this->accessModifier->value ?? AccessModifierEnum::Public->value,
-            props: [$this->propertyItem],
-            type: $this->typeIdentifier,
-        );
+        $factory = new BuilderFactory();
+        $classBuilder = $factory->class($node->name->toString());
+
+        if ($node->getDocComment()) {
+            $classBuilder->setDocComment($node->getDocComment());
+        }
+
+        if ($node->extends) {
+            $classBuilder->extend($node->extends);
+        }
+
+        if (!empty($node->implements)) {
+            $classBuilder->implement(...$node->implements);
+        }
+
+        if ($node->isAbstract()) {
+            $classBuilder->makeAbstract();
+        }
+
+        if ($node->isFinal()) {
+            $classBuilder->makeFinal();
+        }
+
+        foreach ($node->stmts as $stmt) {
+            $classBuilder->addStmt($stmt);
+        }
+
+        return $classBuilder->getNode();
     }
 
     protected function getPropertyValue(mixed $value): array

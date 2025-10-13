@@ -34,7 +34,6 @@ class PHPFileBuilder
     public function save(): void
     {
         $this->traverser->addVisitor(new ParentConnectingVisitor());
-        $this->traverser->reverseVisitors();
 
         $syntaxTree = $this->traverser->traverse($this->syntaxTree);
 
