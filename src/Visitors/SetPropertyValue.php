@@ -41,6 +41,7 @@ class SetPropertyValue extends NodeVisitorAbstract
             $this->updateProperty($node);
             $this->isPropertyExists = true;
         }
+
         return $node;
     }
 
