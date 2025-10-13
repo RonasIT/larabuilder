@@ -1,4 +1,5 @@
 /vendor/
+/.vscode/
 /.idea
 .phpunit.result.cache
 .phpunit.cache

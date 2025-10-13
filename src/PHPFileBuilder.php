@@ -1,10 +1,12 @@
 <?php
 
-namespace Ronasit\Larabuilder;
+namespace RonasIT\Larabuilder;
 
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
-use Ronasit\Larabuilder\Visitors\SetPropertyValue;
+use RonasIT\Larabuilder\NodeTraverser;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
@@ -22,15 +24,17 @@ class PHPFileBuilder
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value): self
+    public function setProperty(string $name, mixed $value, ?AccessModifierEnum $accessModifier = null): self
     {
-        $this->traverser->addVisitor(new SetPropertyValue($name, $value));
+        $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
 
         return $this;
     }
 
     public function save(): void
     {
+        $this->traverser->addVisitor(new ParentConnectingVisitor());
+
         $syntaxTree = $this->traverser->traverse($this->syntaxTree);
 
         $fileContent = (new Printer())->prettyPrintFile($syntaxTree);

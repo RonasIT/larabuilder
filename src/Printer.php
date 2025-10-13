@@ -1,10 +1,10 @@
 <?php
 
-namespace Ronasit\Larabuilder;
+namespace RonasIT\Larabuilder;
 
-use PhpParser\PrettyPrinter\Standard;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
 {
