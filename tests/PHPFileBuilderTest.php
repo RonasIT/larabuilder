@@ -50,8 +50,8 @@ class PHPFileBuilderTest extends TestCase
     {
         $this->mockClassUpdate(
             filePath: 'some_file_path.php',
-            originalFixture: 'not_class.php',
-            resultFixture: 'not_class.php',
+            originalFixture: 'trait.php',
+            resultFixture: 'trait.php',
         );
 
         (new PHPFileBuilder('some_file_path.php'))
