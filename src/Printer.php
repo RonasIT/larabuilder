@@ -27,7 +27,13 @@ class Printer extends Standard
         $lines = [];
         $prevType = null;
         $indent = str_repeat(' ', 4);
-        $result = "{$this->newline}class {$node->name}{$this->newline}{";
+
+        $extends = $node->extends ? " extends {$node->extends->toString()}" : '';
+        $implements = !empty($node->implements)
+            ? ' implements ' . implode(', ', array_map(fn($i) => $i->toString(), $node->implements))
+            : '';
+
+        $result = "{$this->newline}class {$node->name}{$extends}{$implements}{$this->newline}{";
 
         foreach ($node->stmts as $stmt) {
             $currentType = get_class($stmt);

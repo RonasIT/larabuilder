@@ -4,7 +4,7 @@ namespace RonasIT\Larabuilder\Tests\Support;
 
 use Some;
 
-class SomeClass
+class SomeClass extends Some
 {
     use SomeTrait;
 
