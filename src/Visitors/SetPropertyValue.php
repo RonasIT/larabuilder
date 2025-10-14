@@ -37,7 +37,7 @@ class SetPropertyValue extends AbstractVisitor
         $node->type = $this->typeIdentifier;
 
         if ($this->accessModifier) {
-            $property->flags = $this->accessModifier->value;
+            $node->flags = $this->accessModifier->value;
         }
     }
 
