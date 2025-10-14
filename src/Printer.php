@@ -2,7 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard;
 
@@ -10,16 +10,35 @@ class Printer extends Standard
 {
     public function prettyPrintFile(array $syntaxTree): string
     {
-        return parent::prettyPrintFile($syntaxTree) . $this->newline;
+        $formattedCode = parent::prettyPrintFile($syntaxTree) . $this->newline;
+
+        return $this->normalizeWhitespace($formattedCode);
     }
 
-    protected function pStmt_Class(Class_ $node): string
+    protected function normalizeWhitespace(string $code): string
     {
-        return $this->newline . parent::pStmt_Class($node);
+        return preg_replace('/[ \t]+\n/', "\n", $code);
     }
 
-    protected function pStmt_ClassMethod(ClassMethod $node): string
-    {
-        return $this->nl . parent::pStmt_ClassMethod($node);
+    protected function pStmts(array $nodes, bool $indent = true): string {
+        $spacedNodes = [];
+        $prevType = null;
+
+        foreach ($nodes as $node) {
+            $currentType = get_class($node);
+
+            if ($prevType !== null && $prevType !== $currentType) {
+                $spacedNodes[] = new Nop();
+            }
+
+            if ($prevType === ClassMethod::class && $currentType === ClassMethod::class) {
+                $spacedNodes[] = new Nop();
+            }
+
+            $spacedNodes[] = $node;
+            $prevType = $currentType;
+        }
+
+        return parent::pStmts($spacedNodes, $indent);
     }
 }
