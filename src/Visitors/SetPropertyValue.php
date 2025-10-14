@@ -31,10 +31,10 @@ class SetPropertyValue extends AbstractVisitor
             && $this->name === $node->props[0]->name->name;
     }
 
-    protected function updateNode(Node $property): void
+    protected function updateNode(Node $node): void
     {
-        $property->props[0] = $this->propertyItem;
-        $property->type = $this->typeIdentifier;
+        $node->props[0] = $this->propertyItem;
+        $node->type = $this->typeIdentifier;
 
         if ($this->accessModifier) {
             $property->flags = $this->accessModifier->value;
