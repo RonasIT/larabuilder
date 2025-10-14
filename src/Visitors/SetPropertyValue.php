@@ -48,7 +48,6 @@ class SetPropertyValue extends AbstractVisitor
 
     protected function insertNode(Node $node): Node
     {
-        
         $node->stmts[] = new Property(
             flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
             props: [$this->propertyItem],
