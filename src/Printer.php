@@ -17,7 +17,7 @@ class Printer extends Standard
 
     protected function normalizeWhitespace(string $code): string
     {
-        return preg_replace('/[ \t]+\n/', "\n", $code);
+        return preg_replace('/[ \t]+(\r?\n)/', '$1', $code);
     }
 
     protected function pStmts(array $nodes, bool $indent = true): string {
