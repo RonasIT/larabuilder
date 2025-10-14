@@ -2,8 +2,9 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\PHPFileBuilder;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase
@@ -71,7 +72,12 @@ class PHPFileBuilderTest extends TestCase
         (new PHPFileBuilder('some_file_path.php'))
             ->addArrayPropertyItem('fillable', 'age')
             ->addArrayPropertyItem('role', 'admin')
+            ->addArrayPropertyItem('bool', true)
             ->addArrayPropertyItem('tags', 'three')
+            ->addArrayPropertyItem('tags', 4)
+            ->addArrayPropertyItem('newMultiArrayProperty', [
+                'array' => [2, 'string', false],
+            ])
             ->save();
     }
 
