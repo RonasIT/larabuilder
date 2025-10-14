@@ -12,10 +12,10 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetProperty(): void
     {
-        $this->mockClassUpdate(
-            filePath: 'some_file_path.php',
-            originalFixture: 'class_with_properties.php',
-            resultFixture: 'class_with_properties.php',
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_properties.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
@@ -35,10 +35,10 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyWithoutExistingProperties(): void
     {
-        $this->mockClassUpdate(
-            filePath: 'some_file_path.php',
-            originalFixture: 'class_without_properties.php',
-            resultFixture: 'class_without_properties.php',
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_properties.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
@@ -48,10 +48,10 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyNotInClass(): void
     {
-        $this->mockClassUpdate(
-            filePath: 'some_file_path.php',
-            originalFixture: 'trait.php',
-            resultFixture: 'trait.php',
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'trait.php'),
+            $this->callFilePutContent('some_file_path.php', 'trait.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
