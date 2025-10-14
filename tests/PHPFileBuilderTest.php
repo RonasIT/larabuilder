@@ -59,4 +59,34 @@ class PHPFileBuilderTest extends TestCase
             ->setProperty('newString', 'some string')
             ->save();
     }
+
+    public function testAddArrayPropertyItem(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_array_properties.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->addArrayPropertyItem('fillable', 'age')
+            ->addArrayPropertyItem('role', 'admin')
+            ->addArrayPropertyItem('tags', 'three')
+            ->save();
+    }
+
+    public function testAddArrayPropertyItemThrowsException(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
+        );
+
+        $this->expectException(UnexpectedPropertyTypeException::class);
+        $this->expectExceptionMessage("Property 'notArray' has unexpected type. Expected 'array', actual 'bool'");
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->addArrayPropertyItem('notArray', 'value')
+            ->save();
+    }
 }
