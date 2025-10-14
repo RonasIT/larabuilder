@@ -10,18 +10,36 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node\Expr\ConstFetch;
 
-class AbstractVisitor extends NodeVisitorAbstract
+abstract class AbstractVisitor extends NodeVisitorAbstract
 {
-    protected function isTargetClassProperty(Node $node, $name): bool
+    abstract protected function shouldUpdateNode(Node $node): bool;
+    abstract protected function shouldInsertNode(Node $node): bool;
+    
+    abstract protected function updateNode(Node $node): void;
+    abstract protected function insertNode(Node $node): Node;
+
+    protected bool $isNodeToBeInserted = true;
+
+    public function enterNode(Node $node): Node
     {
-        return $node instanceof Property
-            && $node->getAttribute('parent') instanceof Class_
-            && $name === $node->props[0]->name->name;
+        if ($this->shouldUpdateNode($node)) {
+            $this->updateNode($node);
+            
+            $this->isNodeToBeInserted = false;
+        }
+        return $node;
+    }
+
+    public function leaveNode(Node $node): Node
+    {
+        if ($this->shouldInsertNode($node) && $this->isNodeToBeInserted) {
+            return $this->insertNode($node);
+        }
+        return $node;
     }
 
     /**
