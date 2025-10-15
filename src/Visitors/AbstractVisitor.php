@@ -31,7 +31,11 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): Node
     {
         if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
-            return $this->insertNode($node);
+            $this->insertNode($node);
+
+            if ($node instanceof Class_) {
+                return $this->rebuildClass($node);
+            }
         }
 
         return $node;
