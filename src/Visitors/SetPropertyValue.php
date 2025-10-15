@@ -4,24 +4,20 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
-use PhpParser\BuilderFactory;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Scalar\String_;
-use PhpParser\NodeVisitorAbstract;
-use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
-class SetPropertyValue extends NodeVisitorAbstract
+class SetPropertyValue extends AbstractVisitor
 {
-    protected bool $isPropertyExists = false;
-
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 
@@ -35,75 +31,39 @@ class SetPropertyValue extends NodeVisitorAbstract
         $this->typeIdentifier = new Identifier($propertyType);
     }
 
-    public function enterNode(Node $node): Node
+    protected function shouldUpdateNode(Node $node): bool
     {
-        if ($node instanceof Property && $node->getAttribute('parent') instanceof Class_ && $node->props[0]->name->name === $this->name) {
-            $this->updateProperty($node);
-            $this->isPropertyExists = true;
-        }
-
-        return $node;
+        return $node instanceof Property
+            && $node->getAttribute('parent') instanceof Class_
+            && $this->name === $node->props[0]->name->name;
     }
 
-    public function leaveNode(Node $node): Node
+    /** @param Property $node */
+    protected function updateNode(Node $node): void
     {
-        if ($node instanceof Class_ && !$this->isPropertyExists) {
-            $node->stmts[] = new Property(
-                flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
-                props: [$this->propertyItem],
-                type: $this->typeIdentifier,
-            );
-
-            return $this->rebuildClass($node);
-        }
-
-        return $node;
-    }
-
-    protected function updateProperty(Property $property): void
-    {
-        $property->props[0] = $this->propertyItem;
-        $property->type = $this->typeIdentifier;
+        $node->props[0] = $this->propertyItem;
+        $node->type = $this->typeIdentifier;
 
         if ($this->accessModifier) {
-            $property->flags = $this->accessModifier->value;
+            $node->flags = $this->accessModifier->value;
         }
     }
 
-    /**
-     * Using to automatically group statements by their type simplifies development, 
-     * because we don't need to define the correct place for the insertable node.
-     */
-    protected function rebuildClass(Class_ $node): Class_
+    protected function shouldInsertNode(Node $node): bool
     {
-        $factory = new BuilderFactory();
-        $classBuilder = $factory->class($node->name->toString());
+        return $node instanceof Class_;
+    }
 
-        if ($node->getDocComment()) {
-            $classBuilder->setDocComment($node->getDocComment());
-        }
+    /** @param Class_ $node */
+    protected function insertNode(Node $node): Node
+    {
+        $node->stmts[] = new Property(
+            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
+            props: [$this->propertyItem],
+            type: $this->typeIdentifier,
+        );
 
-        if ($node->extends) {
-            $classBuilder->extend($node->extends);
-        }
-
-        if (!empty($node->implements)) {
-            $classBuilder->implement(...$node->implements);
-        }
-
-        if ($node->isAbstract()) {
-            $classBuilder->makeAbstract();
-        }
-
-        if ($node->isFinal()) {
-            $classBuilder->makeFinal();
-        }
-
-        foreach ($node->stmts as $stmt) {
-            $classBuilder->addStmt($stmt);
-        }
-
-        return $classBuilder->getNode();
+        return $node;
     }
 
     protected function getPropertyValue(mixed $value): array
