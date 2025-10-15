@@ -29,7 +29,11 @@ class SetArrayPropertyItems extends SetPropertyValue
     protected function updateNode(Node $node): void
     {
         if (!$node->props[0]->default instanceof Array_) {
-            throw new UnexpectedPropertyTypeException($this->name, 'array', $node->type);
+            throw new UnexpectedPropertyTypeException(
+                property: $this->name, 
+                expectedType: 'array',
+                actualType: $node->type !== null ? (string) $node->type : 'null',
+            );
         }
 
         $node->props[0]->default->items[] = $this->arrayItem;

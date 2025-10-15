@@ -11,7 +11,7 @@ class UnexpectedPropertyTypeException extends Exception
         $message = sprintf(
             "Property '%s' has unexpected type. Expected '%s', actual '%s'.",
             $property,
-            $expectedType, $actualType,
+            $expectedType, $actualType
         );
 
         parent::__construct($message);
