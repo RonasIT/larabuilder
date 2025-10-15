@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
+use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard;
@@ -43,5 +44,9 @@ class Printer extends Standard
     {
         return ($prevType !== null && $prevType !== $currentType) 
             || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
+    }
+
+    protected function pExpr_Array(Array_ $node): string {
+        return '[' . $this->pCommaSeparatedMultiline($node->items, true) . $this->nl . ']';
     }
 }
