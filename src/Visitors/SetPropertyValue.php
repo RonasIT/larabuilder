@@ -63,7 +63,7 @@ class SetPropertyValue extends AbstractVisitor
             type: $this->typeIdentifier,
         );
 
-        return $this->rebuildClass($node);
+        return $node;
     }
 
     protected function getPropertyValue(mixed $value): array
