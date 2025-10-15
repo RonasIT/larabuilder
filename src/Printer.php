@@ -2,7 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard;
 
@@ -10,16 +10,38 @@ class Printer extends Standard
 {
     public function prettyPrintFile(array $syntaxTree): string
     {
-        return parent::prettyPrintFile($syntaxTree) . $this->newline;
+        $formattedCode = parent::prettyPrintFile($syntaxTree) . $this->newline;
+
+        return $this->normalizeWhitespace($formattedCode);
     }
 
-    protected function pStmt_Class(Class_ $node): string
+    protected function normalizeWhitespace(string $code): string
     {
-        return $this->newline . parent::pStmt_Class($node);
+        return preg_replace('/[ \t]+(\r?\n)/', '$1', $code);
     }
 
-    protected function pStmt_ClassMethod(ClassMethod $node): string
+    protected function pStmts(array $nodes, bool $indent = true): string
     {
-        return $this->nl . parent::pStmt_ClassMethod($node);
+        $spacedNodes = [];
+        $prevType = null;
+
+        foreach ($nodes as $node) {
+            $currentType = get_class($node);
+
+            if ($this->needToAddEmptyLine($prevType, $currentType)) {
+                $spacedNodes[] = new Nop();
+            }
+
+            $spacedNodes[] = $node;
+            $prevType = $currentType;
+        }
+
+        return parent::pStmts($spacedNodes, $indent);
+    }
+
+    protected function needToAddEmptyLine(?string $prevType, string $currentType): bool
+    {
+        return ($prevType !== null && $prevType !== $currentType) 
+            || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
     }
 }
