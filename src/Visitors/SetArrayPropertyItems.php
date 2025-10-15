@@ -49,6 +49,6 @@ class SetArrayPropertyItems extends SetPropertyValue
             type: new Identifier('array'),
         );
 
-        return $this->rebuildClass($node);
+        return $node;
     }
 }
