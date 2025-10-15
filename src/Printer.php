@@ -17,21 +17,18 @@ class Printer extends Standard
 
     protected function normalizeWhitespace(string $code): string
     {
-        return preg_replace('/[ \t]+\n/', "\n", $code);
+        return preg_replace('/[ \t]+(\r?\n)/', '$1', $code);
     }
 
-    protected function pStmts(array $nodes, bool $indent = true): string {
+    protected function pStmts(array $nodes, bool $indent = true): string
+    {
         $spacedNodes = [];
         $prevType = null;
 
         foreach ($nodes as $node) {
             $currentType = get_class($node);
 
-            if ($prevType !== null && $prevType !== $currentType) {
-                $spacedNodes[] = new Nop();
-            }
-
-            if ($prevType === ClassMethod::class && $currentType === ClassMethod::class) {
+            if ($this->needToAddEmptyLine($prevType, $currentType)) {
                 $spacedNodes[] = new Nop();
             }
 
@@ -40,5 +37,11 @@ class Printer extends Standard
         }
 
         return parent::pStmts($spacedNodes, $indent);
+    }
+
+    protected function needToAddEmptyLine(?string $prevType, string $currentType): bool
+    {
+        return ($prevType !== null && $prevType !== $currentType) 
+            || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
     }
 }
