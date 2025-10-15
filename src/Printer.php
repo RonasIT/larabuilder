@@ -3,7 +3,9 @@
 namespace RonasIT\Larabuilder;
 
 use PhpParser\Node\Stmt\Nop;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Return_;
 use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
@@ -43,5 +45,31 @@ class Printer extends Standard
     {
         return ($prevType !== null && $prevType !== $currentType) 
             || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
+    }
+
+    protected function pExpr_MethodCall(MethodCall $node): string {
+        $newline = $this->nl . str_repeat(' ', 4);
+
+        return  $this->pDereferenceLhs($node->var) . $newline . '->' . $this->pObjectProperty($node->name)
+             . '(' . $this->pMaybeMultiline($node->args) . ')';
+    }
+
+    protected function pStmt_Return(Return_ $node): string {
+        $formattedReturn = 'return' . (null !== $node->expr ? ' ' . $this->p($node->expr) : '') . ';';
+
+        return $this->normalizeReturn($formattedReturn);
+    }
+
+    protected function normalizeReturn(string $code): string
+    {
+        if (substr_count($code, "\n") > 2) {
+            return $code;
+        }
+
+        return preg_replace_callback(
+            pattern: '/return\s+(.*?)\n\s*(.*?)\s*;/s',
+            callback: fn ($matches) => 'return ' . trim($matches[1]) . trim($matches[2]) . ';',
+            subject: $code,
+        );
     }
 }
