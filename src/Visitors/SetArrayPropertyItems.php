@@ -12,7 +12,7 @@ use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
-class SetArrayPropertyItems extends AbstractVisitor
+class SetArrayPropertyItems extends SetPropertyValue
 {
     protected ArrayItem $arrayItem;
 
@@ -25,27 +25,17 @@ class SetArrayPropertyItems extends AbstractVisitor
         $this->arrayItem = new ArrayItem($propertyValue);
     }
 
-    protected function shouldUpdateNode(Node $node): bool
-    {
-        return $node instanceof Property
-            && $node->getAttribute('parent') instanceof Class_
-            && $this->name === $node->props[0]->name->name;
-    }
-
+    /** @param Property $node */
     protected function updateNode(Node $node): void
     {
-        if ($node->type->name !== 'array') {
+        if (!$node->props[0]->default instanceof Array_) {
             throw new UnexpectedPropertyTypeException($this->name, 'array', $node->type);
         }
 
         $node->props[0]->default->items[] = $this->arrayItem;
     }
 
-    protected function shouldInsertNode(Node $node): bool
-    {
-        return $node instanceof Class_;
-    }
-
+    /** @param Class_ $node */
     protected function insertNode(Node $node): Node
     {
         $node->stmts[] = new Property(
