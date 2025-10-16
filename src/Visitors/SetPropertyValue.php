@@ -27,8 +27,16 @@ class SetPropertyValue extends AbstractVisitor
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+
         $this->propertyItem = new PropertyItem($name, $propertyValue);
+        $this->setParent($propertyValue, $this->propertyItem);
+
         $this->typeIdentifier = new Identifier($propertyType);
+    }
+
+    protected function setParent(Node $child, Node $parent): void
+    {
+        $child->setAttribute('parent', $parent);
     }
 
     protected function shouldUpdateNode(Node $node): bool

@@ -7,7 +7,6 @@ use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
@@ -21,8 +20,13 @@ class AddArrayPropertyItem extends SetPropertyValue
         mixed $value,
     ) {
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+
         $this->arrayItem = new ArrayItem($propertyValue);
-        $this->propertyItem = new PropertyProperty($this->name, new Array_([$this->arrayItem]));
+        $arrayNode = new Array_([$this->arrayItem]);
+
+        $this->propertyItem = new PropertyProperty($this->name, $arrayNode);
+        $this->setParent($arrayNode, $this->propertyItem);
+
         $this->typeIdentifier = new Identifier('array');
     }
 
@@ -33,7 +37,7 @@ class AddArrayPropertyItem extends SetPropertyValue
             throw new UnexpectedPropertyTypeException(
                 property: $this->name,
                 expectedType: 'array',
-                actualType: (is_null($node->type)) ? 'null' : (string) $node->type,
+                actualType: $node->type !== null ? (string) $node->type : 'null',
             );
         }
 
