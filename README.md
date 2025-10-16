@@ -5,5 +5,5 @@
 ## Installation
 
 ```bash
-    composer require ronasit/larabuilder --dev
+composer require ronasit/larabuilder --dev
 ```
