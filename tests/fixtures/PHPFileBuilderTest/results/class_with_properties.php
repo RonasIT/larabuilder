@@ -27,7 +27,7 @@ class SomeClass extends Some
         }
     }
 
-    public function someMethod()
+    public function someMethod(): void
     {
     }
 }
