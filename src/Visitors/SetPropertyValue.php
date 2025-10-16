@@ -57,11 +57,7 @@ class SetPropertyValue extends AbstractVisitor
     /** @param Class_ $node */
     protected function insertNode(Node $node): Node
     {
-        $node->stmts[] = new Property(
-            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
-            props: [$this->propertyItem],
-            type: $this->typeIdentifier,
-        );
+        $node->stmts[] = $this->createProperty();
 
         return $node;
     }
@@ -100,5 +96,14 @@ class SetPropertyValue extends AbstractVisitor
         }
 
         return new Array_($items);
+    }
+
+    protected function createProperty(): Node
+    {
+        return new Property(
+            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
+            props: [$this->propertyItem],
+            type: $this->typeIdentifier,
+        );
     }
 }

@@ -2,11 +2,12 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
+use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
 
 class PHPFileBuilder
 {
@@ -27,6 +28,13 @@ class PHPFileBuilder
     public function setProperty(string $name, mixed $value, ?AccessModifierEnum $accessModifier = null): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
+
+        return $this;
+    }
+
+    public function addArrayPropertyItem(string $propertyName, mixed $value): self
+    {
+        $this->traverser->addVisitor(new AddArrayPropertyItem($propertyName, $value));
 
         return $this;
     }

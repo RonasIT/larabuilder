@@ -2,8 +2,9 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\PHPFileBuilder;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase
@@ -12,10 +13,10 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetProperty(): void
     {
-        $this->mockClassUpdate(
-            filePath: 'some_file_path.php',
-            originalFixture: 'class_with_properties.php',
-            resultFixture: 'class_with_properties.php',
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_properties.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
@@ -35,10 +36,10 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyWithoutExistingProperties(): void
     {
-        $this->mockClassUpdate(
-            filePath: 'some_file_path.php',
-            originalFixture: 'class_without_properties.php',
-            resultFixture: 'class_without_properties.php',
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_properties.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
@@ -48,15 +49,50 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyNotInClass(): void
     {
-        $this->mockClassUpdate(
-            filePath: 'some_file_path.php',
-            originalFixture: 'trait.php',
-            resultFixture: 'trait.php',
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'trait.php'),
+            $this->callFilePutContent('some_file_path.php', 'trait.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
             ->setProperty('floatProperty', 56)
             ->setProperty('newString', 'some string')
+            ->save();
+    }
+
+    public function testAddArrayPropertyItem(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_array_properties.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->addArrayPropertyItem('fillable', 'age')
+            ->addArrayPropertyItem('role', 'admin')
+            ->addArrayPropertyItem('bool', true)
+            ->addArrayPropertyItem('tags', 'three')
+            ->addArrayPropertyItem('tags', 4)
+            ->addArrayPropertyItem('newMultiArrayProperty', [
+                'array' => [2, 'string', false],
+            ])
+            ->save();
+    }
+
+    public function testAddArrayPropertyItemThrowsException(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
+        );
+
+        $this->expectException(UnexpectedPropertyTypeException::class);
+        $this->expectExceptionMessage("Property 'notArray' has unexpected type. Expected 'array', actual 'bool'");
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->addArrayPropertyItem('notArray', 'value')
             ->save();
     }
 }
