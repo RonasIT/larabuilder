@@ -32,9 +32,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function addArrayPropertyItem(string $name, mixed $value): self
+    public function addArrayPropertyItem(string $propertyName, mixed $value): self
     {
-        $this->traverser->addVisitor(new AddArrayPropertyItem($name, $value));
+        $this->traverser->addVisitor(new AddArrayPropertyItem($propertyName, $value));
 
         return $this;
     }
