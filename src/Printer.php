@@ -50,8 +50,9 @@ class Printer extends Standard
     protected function pExpr_MethodCall(MethodCall $node): string {
         $newline = $this->nl . str_repeat(' ', 4);
 
-        return  $this->pDereferenceLhs($node->var) . $newline . '->' . $this->pObjectProperty($node->name)
-             . '(' . $this->pMaybeMultiline($node->args) . ')';
+        $methodCall = $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')',
+
+        return $this->pDereferenceLhs($node->var) . "{$newline}->{$methodCall}";
     }
 
     protected function pStmt_Return(Return_ $node): string {
