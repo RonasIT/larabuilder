@@ -17,9 +17,12 @@ class SomeClass
 
     public function __construct()
     {
+        $array = ['one', 'two'];
+        $array = ['one', 'two', ['one', 'two', 'three']];
     }
 
     public function someMethod()
     {
+        $array = ['one', 'two', 'three'];
     }
 }
