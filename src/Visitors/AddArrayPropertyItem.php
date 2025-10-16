@@ -4,25 +4,26 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\PropertyProperty;
+use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
-use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
-class SetArrayPropertyItems extends SetPropertyValue
+class AddArrayPropertyItem extends SetPropertyValue
 {
     protected ArrayItem $arrayItem;
 
     public function __construct(
         protected string $name,
         mixed $value,
-        protected ?AccessModifierEnum $accessModifier = null,
     ) {
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
         $this->arrayItem = new ArrayItem($propertyValue);
+        $this->propertyItem = new PropertyProperty($this->name, new Array_([$this->arrayItem]));
+        $this->typeIdentifier = new Identifier('array');
     }
 
     /** @param Property $node */
@@ -30,9 +31,9 @@ class SetArrayPropertyItems extends SetPropertyValue
     {
         if (!$node->props[0]->default instanceof Array_) {
             throw new UnexpectedPropertyTypeException(
-                property: $this->name, 
+                property: $this->name,
                 expectedType: 'array',
-                actualType: $node->type !== null ? (string) $node->type : 'null',
+                actualType: (is_null($node->type)) ? 'null' : (string) $node->type,
             );
         }
 
@@ -42,16 +43,7 @@ class SetArrayPropertyItems extends SetPropertyValue
     /** @param Class_ $node */
     protected function insertNode(Node $node): Node
     {
-        $node->stmts[] = new Property(
-            flags: AccessModifierEnum::Public->value,
-            props: [
-                new PropertyProperty(
-                    name: $this->name,
-                    default: new Array_([$this->arrayItem]),
-                ),
-            ],
-            type: new Identifier('array'),
-        );
+        $node->stmts[] = $this->createProperty();
 
         return $node;
     }
