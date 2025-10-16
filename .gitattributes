@@ -1,5 +1,5 @@
 /tests export-ignore
 phpunit.xml export-ignore
 composer.lock export-ignore
-/README.md export-ignore
-/pint.json export-ignore
+README.md export-ignore
+pint.json export-ignore
