@@ -47,7 +47,8 @@ class Printer extends Standard
             || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
     }
 
-    protected function pExpr_MethodCall(MethodCall $node): string {
+    protected function pExpr_MethodCall(MethodCall $node): string
+    {
         $newline = $this->nl . str_repeat(' ', 4);
 
         $methodCall = $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')',
