@@ -3,7 +3,9 @@
 namespace RonasIT\Larabuilder;
 
 use PhpParser\Node\Stmt\Nop;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Return_;
 use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
@@ -43,5 +45,36 @@ class Printer extends Standard
     {
         return ($prevType !== null && $prevType !== $currentType) 
             || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
+    }
+
+    protected function pExpr_MethodCall(MethodCall $node): string
+    {
+        $newline = $this->nl . str_repeat(' ', 4);
+
+        $methodCall = $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';
+
+        return $this->pDereferenceLhs($node->var) . "{$newline}->{$methodCall}";
+    }
+
+    protected function pStmt_Return(Return_ $node): string
+    {
+        $formattedReturn = parent::pStmt_Return($node);
+
+        return $this->normalizeReturn($formattedReturn);
+    }
+
+    protected function normalizeReturn(string $code): string
+    {
+        $maxLineBreaksForSingleLine = 2;
+
+        if (substr_count($code, "\n") > $maxLineBreaksForSingleLine) {
+            return $code;
+        }
+
+        if (str_contains($code, '->')) {
+            return implode('->', array_map('trim', explode('->', $code)));
+        }
+
+        return $code;
     }
 }
