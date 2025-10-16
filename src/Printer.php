@@ -56,22 +56,25 @@ class Printer extends Standard
         return $this->pDereferenceLhs($node->var) . "{$newline}->{$methodCall}";
     }
 
-    protected function pStmt_Return(Return_ $node): string {
-        $formattedReturn = 'return' . (null !== $node->expr ? ' ' . $this->p($node->expr) : '') . ';';
+    protected function pStmt_Return(Return_ $node): string
+    {
+        $formattedReturn = parent::pStmt_Return($node);
 
         return $this->normalizeReturn($formattedReturn);
     }
 
     protected function normalizeReturn(string $code): string
     {
-        if (substr_count($code, "\n") > 2) {
+        $maxSingleLineBreaks = 2;
+
+        if (substr_count($code, "\n") > $maxSingleLineBreaks) {
             return $code;
         }
 
-        return preg_replace_callback(
-            pattern: '/return\s+(.*?)\n\s*(.*?)\s*;/s',
-            callback: fn ($matches) => 'return ' . trim($matches[1]) . trim($matches[2]) . ';',
-            subject: $code,
-        );
+        if (str_contains($code, '->')) {
+            return implode('->', array_map('trim', explode('->', $code)));
+        }
+
+        return $code;
     }
 }
