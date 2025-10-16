@@ -5,15 +5,17 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Stmt\ClassConst;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractVisitor
@@ -57,7 +59,21 @@ class SetPropertyValue extends AbstractVisitor
     /** @param Class_ $node */
     protected function insertNode(Node $node): Node
     {
-        $node->stmts[] = $this->createProperty();
+        $stmts = $node->stmts;
+        $insertIndex = 0;
+
+        for ($i = 0; $i < count($stmts); $i++) {
+            if ($stmts[$i] instanceof Property
+                || $stmts[$i] instanceof ClassConst
+                || $stmts[$i] instanceof TraitUse
+            ) {
+                $insertIndex = $i + 1;
+            }
+        }
+
+        array_splice($stmts, $insertIndex, 0, [$this->createProperty()]);
+
+        $node->stmts = $stmts;
 
         return $node;
     }
