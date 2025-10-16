@@ -2,17 +2,19 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use PhpParser\Node;
 use PhpParser\BuilderFactory;
+use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\NodeVisitorAbstract;
 
 abstract class AbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
+
     abstract protected function shouldInsertNode(Node $node): bool;
-    
+
     abstract protected function updateNode(Node $node): void;
+
     abstract protected function insertNode(Node $node): Node;
 
     protected bool $isNodeExists = false;
@@ -21,7 +23,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     {
         if ($this->shouldUpdateNode($node)) {
             $this->updateNode($node);
-            
+
             $this->isNodeExists = true;
         }
 
@@ -42,7 +44,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * Used to automatically group statements by their type, which simplifies development 
+     * Used to automatically group statements by their type, which simplifies development
      * because we don't need to define the correct place for the insertable node.
      */
     protected function rebuildClass(Class_ $node): Class_
