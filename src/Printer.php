@@ -65,9 +65,9 @@ class Printer extends Standard
 
     protected function normalizeReturn(string $code): string
     {
-        $maxSingleLineBreaks = 2;
+        $maxLineBreaksForSingleLine = 2;
 
-        if (substr_count($code, "\n") > $maxSingleLineBreaks) {
+        if (substr_count($code, "\n") > $maxLineBreaksForSingleLine) {
             return $code;
         }
 
