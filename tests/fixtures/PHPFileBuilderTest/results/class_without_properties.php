@@ -12,7 +12,6 @@ use Some\SomeTrait;
 class SomeClass implements Test, Some
 {
     use SomeTrait;
-
     public string $newString = 'some string';
 
     public function __construct()
