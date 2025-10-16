@@ -51,7 +51,7 @@ class Printer extends Standard
     {
         $newline = $this->nl . str_repeat(' ', 4);
 
-        $methodCall = $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')',
+        $methodCall = $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';
 
         return $this->pDereferenceLhs($node->var) . "{$newline}->{$methodCall}";
     }
