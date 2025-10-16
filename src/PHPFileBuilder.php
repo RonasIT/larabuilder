@@ -2,12 +2,11 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\ParserFactory;
-use RonasIT\Larabuilder\NodeTraverser;
-use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use RonasIT\Larabuilder\Visitors\SetPropertyValue;
+use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
