@@ -14,9 +14,19 @@ class SomeClass
         'email',
         'age',
     ];
-    public array $newMultiArrayProperty = ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true], ['array' => [0 => 2, 1 => 'string', 2 => false]]];
-    public array $role = ['admin'];
-    public array $bool = [true];
+    public array $newMultiArrayProperty = ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true], [
+        'array' => [
+            0 => 2,
+            1 => 'string',
+            2 => false,
+        ],
+    ]];
+    public array $role = [
+        'admin',
+    ];
+    public array $bool = [
+        true,
+    ];
 
     public function __construct()
     {

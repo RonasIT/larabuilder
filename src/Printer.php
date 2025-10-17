@@ -2,6 +2,9 @@
 
 namespace RonasIT\Larabuilder;
 
+use PhpParser\Node;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\PrettyPrinter\Standard;
@@ -43,5 +46,29 @@ class Printer extends Standard
     {
         return ($prevType !== null && $prevType !== $currentType) 
             || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
+    }
+
+    protected function pExpr_Array(Array_ $node): string
+    {
+        if ($this->hasParentOfType($node, PropertyItem::class)) {
+            return '[' . $this->pCommaSeparatedMultiline($node->items, true) . $this->nl . ']';
+        }
+
+        return parent::pExpr_Array($node);
+    }
+
+    protected function hasParentOfType(Node $node, string $type): bool
+    {
+        $parent = $node->getAttribute('parent');
+
+        while ($parent !== null) {
+            if ($parent instanceof $type) {
+                return true;
+            }
+
+            $parent = $parent->getAttribute('parent');
+        }
+
+        return false;
     }
 }
