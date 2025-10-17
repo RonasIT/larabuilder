@@ -74,7 +74,10 @@ class SetPropertyValue extends AbstractVisitor
             }
         }
 
-        array_splice($stmts, $insertIndex, 0, [$this->createProperty()]);
+        $newNode = $this->createProperty();
+        $newNode->setAttribute('previous', $stmts[$insertIndex - 1] ?? null);
+
+        array_splice($stmts, $insertIndex, 0, [$newNode]);
 
         $node->stmts = $stmts;
 

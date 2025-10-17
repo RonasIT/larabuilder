@@ -7,13 +7,14 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
 {
-    public function prettyPrintFile(array $syntaxTree): string
+    public function printFormatPreserving(array $stmts, array $origStmts, array $origTokens): string
     {
-        $formattedCode = parent::prettyPrintFile($syntaxTree) . $this->newline;
+        $formattedCode = parent::printFormatPreserving($stmts,$origStmts,$origTokens);
 
         return $this->normalizeWhitespace($formattedCode);
     }
@@ -21,31 +22,6 @@ class Printer extends Standard
     protected function normalizeWhitespace(string $code): string
     {
         return preg_replace('/[ \t]+(\r?\n)/', '$1', $code);
-    }
-
-    protected function pStmts(array $nodes, bool $indent = true): string
-    {
-        $spacedNodes = [];
-        $prevType = null;
-
-        foreach ($nodes as $node) {
-            $currentType = get_class($node);
-
-            if ($this->needToAddEmptyLine($prevType, $currentType)) {
-                $spacedNodes[] = new Nop();
-            }
-
-            $spacedNodes[] = $node;
-            $prevType = $currentType;
-        }
-
-        return parent::pStmts($spacedNodes, $indent);
-    }
-
-    protected function needToAddEmptyLine(?string $prevType, string $currentType): bool
-    {
-        return ($prevType !== null && $prevType !== $currentType) 
-            || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
     }
 
     protected function pExpr_Array(Array_ $node): string
@@ -70,5 +46,18 @@ class Printer extends Standard
         }
 
         return false;
+    }
+
+    protected function pStmt_Property(Property $node): string 
+    {
+        $newLine = $this->shouldAddNewlineBeforeNode($node, Property::class) ? $this->nl : '';
+
+        return $newLine . parent::pStmt_Property($node);
+    }
+
+    protected function shouldAddNewlineBeforeNode(Node $node, string $type): bool
+    {
+        $previousNode = $node->getAttribute('previous');
+        return $previousNode !== null && !($previousNode instanceof $type);
     }
 }
