@@ -5,7 +5,11 @@ namespace RonasIT\Larabuilder\Tests\Support;
 use Some\AnotherTrait;
 
 trait SomeTrait {
-    public float $floatProperty;
+    public int $floatProperty = 56;
+    public array $tags = [
+        'three',
+    ];
+    public string $newString = 'some string';
 
     public function method1()
     {
