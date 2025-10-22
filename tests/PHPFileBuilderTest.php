@@ -105,7 +105,7 @@ class PHPFileBuilderTest extends TestCase
         );
 
         $this->expectException(InvalidPHPFileException::class);
-        $this->expectExceptionMessage("Invalid PHP file: Syntax error, unexpected T_PUBLIC on line 3");
+        $this->expectExceptionMessage("Can not parse PHP file: some_file_path.php");
 
         new PHPFileBuilder('some_file_path.php');
     }

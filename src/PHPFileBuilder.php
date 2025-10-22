@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder;
 
-use Exception;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
@@ -25,8 +24,8 @@ class PHPFileBuilder
 
         try {
             $this->syntaxTree = $parser->parse($code);
-        } catch (Exception $e) {
-            throw new InvalidPHPFileException($e->getMessage());
+        } catch (\PhpParser\Error $e) {
+            throw new InvalidPHPFileException($this->filePath);
         }
 
         $this->traverser = new NodeTraverser();

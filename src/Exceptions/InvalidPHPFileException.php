@@ -6,8 +6,8 @@ use Exception;
 
 class InvalidPHPFileException extends Exception
 {
-    public function __construct(string $errorMessage)
+    public function __construct(string $filePath)
     {
-        parent::__construct("Invalid PHP file: {$errorMessage}.");
+        parent::__construct("Can not parse PHP file: {$filePath}");
     }
 }
