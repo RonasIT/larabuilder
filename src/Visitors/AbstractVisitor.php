@@ -13,7 +13,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     abstract protected function shouldInsertNode(Node $node): bool;
     
     abstract protected function updateNode(Node $node): void;
-    abstract protected function insertNode(Node $node): Node;
+    abstract protected function insertOrUpdateNode(Node $node): Node;
 
     protected bool $isNodeExists = false;
 
@@ -29,7 +29,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): Node
     {
         if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
-            $this->insertNode($node);
+            $this->insertOrUpdateNode($node);
         }
 
         if ($this->isNodeExists && $this->shouldUpdateNode($node)) {

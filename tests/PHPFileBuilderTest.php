@@ -30,6 +30,7 @@ class PHPFileBuilderTest extends TestCase
                 'arrayProperty' => [1, 'string', true],
                 'someKey' => 1,
             ])
+            ->setProperty('newString', 'string', AccessModifierEnum::Private)
             ->setProperty('newString', 'some string')
             ->save();
     }
@@ -44,6 +45,7 @@ class PHPFileBuilderTest extends TestCase
 
         (new PHPFileBuilder('some_file_path.php'))
             ->setProperty('newString', 'some string')
+            ->setProperty('newString', 'update string')
             ->save();
     }
 
@@ -93,6 +95,7 @@ class PHPFileBuilderTest extends TestCase
         (new PHPFileBuilder('some_file_path.php'))
             ->setProperty('floatProperty', 56)
             ->addArrayPropertyItem('tags', 'three')
+            ->addArrayPropertyItem('tags', 4)
             ->setProperty('newString', 'some string')
             ->save();
     }

@@ -60,9 +60,17 @@ class SetPropertyValue extends AbstractVisitor
         return $node instanceof Class_ || $node instanceof Trait_;
     }
 
-    /** @param Class_ $node */
-    protected function insertNode(Node $node): Node
+    /** @param Class_|Trait_ $node */
+    protected function insertOrUpdateNode(Node $node): Node
     {
+        foreach($node->stmts as $stmt) {
+            if ($stmt instanceof Property  && $this->name === $stmt->props[0]->name->name) {
+                $this->updateNode($stmt);
+
+                return $node;
+            }
+        }
+
         $stmts = $node->stmts;
         $insertIndex = 0;
 
