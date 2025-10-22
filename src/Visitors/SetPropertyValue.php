@@ -64,7 +64,7 @@ class SetPropertyValue extends AbstractVisitor
     protected function insertOrUpdateNode(Node $node): Node
     {
         foreach($node->stmts as $stmt) {
-            if ($stmt instanceof Property  && $this->name === $stmt->props[0]->name->name) {
+            if ($stmt instanceof Property && $this->name === $stmt->props[0]->name->name) {
                 $this->updateNode($stmt);
 
                 return $node;
