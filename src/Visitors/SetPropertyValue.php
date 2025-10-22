@@ -59,21 +59,9 @@ class SetPropertyValue extends AbstractVisitor
     /** @param Class_ $node */
     protected function insertNode(Node $node): Node
     {
-        $stmts = $node->stmts;
-        $insertIndex = 0;
+        $insertIndex = $this->getInsertIndex($node->stmts, Property::class);
 
-        for ($i = 0; $i < count($stmts); $i++) {
-            if ($stmts[$i] instanceof Property
-                || $stmts[$i] instanceof ClassConst
-                || $stmts[$i] instanceof TraitUse
-            ) {
-                $insertIndex = $i + 1;
-            }
-        }
-
-        array_splice($stmts, $insertIndex, 0, [$this->createProperty()]);
-
-        $node->stmts = $stmts;
+        array_splice($node->stmts, $insertIndex, 0, [$this->createProperty()]);
 
         return $node;
     }
