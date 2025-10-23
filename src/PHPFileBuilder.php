@@ -2,16 +2,18 @@
 
 namespace RonasIT\Larabuilder;
 
+use PhpParser\Error;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 
 class PHPFileBuilder
 {
-    protected array $syntaxTree;
+    protected array $syntaxTree = [];
     protected NodeTraverser $traverser;
 
     public function __construct(
@@ -21,7 +23,12 @@ class PHPFileBuilder
 
         $code = file_get_contents($this->filePath);
 
-        $this->syntaxTree = $parser->parse($code);
+        try {
+            $this->syntaxTree = $parser->parse($code);
+        } catch (Error $e) {
+            throw new InvalidPHPFileException($this->filePath);
+        }
+
         $this->traverser = new NodeTraverser();
     }
 
