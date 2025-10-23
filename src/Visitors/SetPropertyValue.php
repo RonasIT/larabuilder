@@ -12,10 +12,8 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Expr\ConstFetch;
-use PhpParser\Node\Stmt\ClassConst;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractVisitor
