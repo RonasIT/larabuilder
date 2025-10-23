@@ -40,7 +40,6 @@ class SetPropertyValue extends AbstractVisitor
     protected function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof Property
-            && ($node->getAttribute('parent') instanceof Class_ || $node->getAttribute('parent') instanceof Trait_)
             && $this->name === $node->props[0]->name->name;
     }
 

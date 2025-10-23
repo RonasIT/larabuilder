@@ -17,23 +17,15 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 
     protected bool $isNodeExists = false;
 
-    public function enterNode(Node $node): Node
-    {
-        if ($this->shouldUpdateNode($node)) {
-            $this->isNodeExists = true;
-        }
-
-        return $node;
-    }
-
     public function leaveNode(Node $node): Node
     {
         if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
             $this->insertOrUpdateNode($node);
         }
 
-        if ($this->isNodeExists && $this->shouldUpdateNode($node)) {
+        if ($this->shouldUpdateNode($node)) {
             $this->updateNode($node);
+            $this->isNodeExists = true;
         }
 
         return $node;
