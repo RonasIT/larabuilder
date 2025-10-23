@@ -54,13 +54,13 @@ class SetPropertyValue extends AbstractVisitor
         }
     }
 
-    protected function shouldInsertNode(Node $node): bool
+    protected function shouldHandleNewNode(Node $node): bool
     {
         return $node instanceof Class_ || $node instanceof Trait_;
     }
 
     /** @param Class_|Trait_ $node */
-    protected function insertOrUpdateNode(Node $node): Node
+    protected function handleNewNode(Node $node): Node
     {
         foreach($node->stmts as $stmt) {
             if ($stmt instanceof Property && $this->name === $stmt->props[0]->name->name) {
@@ -70,6 +70,12 @@ class SetPropertyValue extends AbstractVisitor
             }
         }
 
+        return $this->insertNode($node);
+    }
+
+    /** @param Class_|Trait_ $node */
+    protected function insertNode(Node $node): Node
+    {
         $stmts = $node->stmts;
         $insertIndex = 0;
 

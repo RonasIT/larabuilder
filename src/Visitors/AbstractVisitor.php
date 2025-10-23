@@ -10,17 +10,18 @@ use PhpParser\Node\Expr\Array_;
 abstract class AbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
-    abstract protected function shouldInsertNode(Node $node): bool;
+    abstract protected function shouldHandleNewNode(Node $node): bool;
     
     abstract protected function updateNode(Node $node): void;
-    abstract protected function insertOrUpdateNode(Node $node): Node;
+    abstract protected function insertNode(Node $node): Node;
+    abstract protected function handleNewNode(Node $node): Node;
 
     protected bool $isNodeExists = false;
 
     public function leaveNode(Node $node): Node
     {
-        if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
-            $this->insertOrUpdateNode($node);
+        if ($this->shouldHandleNewNode($node) && !$this->isNodeExists) {
+            $this->handleNewNode($node);
         }
 
         if ($this->shouldUpdateNode($node)) {
