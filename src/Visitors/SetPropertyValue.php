@@ -5,15 +5,15 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Expr\ConstFetch;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractVisitor
@@ -57,7 +57,9 @@ class SetPropertyValue extends AbstractVisitor
     /** @param Class_ $node */
     protected function insertNode(Node $node): Node
     {
-        $node->stmts[] = $this->createProperty();
+        $insertIndex = $this->getInsertIndex($node->stmts, Property::class);
+
+        array_splice($node->stmts, $insertIndex, 0, [$this->createProperty()]);
 
         return $node;
     }
