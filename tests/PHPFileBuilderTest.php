@@ -89,8 +89,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
         );
 
-        $this->expectException(UnexpectedPropertyTypeException::class);
-        $this->expectExceptionMessage("Property 'notArray' has unexpected type. Expected 'array', actual 'bool'");
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
 
         (new PHPFileBuilder('some_file_path.php'))
             ->addArrayPropertyItem('notArray', 'value')
@@ -104,8 +103,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'invalid_file.php'),
         );
 
-        $this->expectException(InvalidPHPFileException::class);
-        $this->expectExceptionMessage("Can not parse PHP file: some_file_path.php");
+        $this->assertExceptionThrew(InvalidPHPFileException::class, 'Can not parse PHP file: some_file_path.php');
 
         new PHPFileBuilder('some_file_path.php');
     }
