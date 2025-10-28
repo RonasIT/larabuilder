@@ -3,30 +3,34 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\NodeVisitorAbstract;
 
 abstract class AbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
-    abstract protected function shouldHandleNewNode(Node $node): bool;
+    abstract protected function shouldHandleNode(Node $node): bool;
     
     abstract protected function updateNode(Node $node): void;
     abstract protected function insertNode(Node $node): Node;
-    abstract protected function handleNewNode(Node $node): Node;
-
-    protected bool $isNodeExists = false;
 
     public function leaveNode(Node $node): Node
     {
-        if ($this->shouldHandleNewNode($node) && !$this->isNodeExists) {
-            $this->handleNewNode($node);
-        }
+        if ($this->shouldHandleNode($node)) {
+            /** @var Class_|Trait_ $node */
+            foreach($node->stmts as $stmt) {
+                if ($this->shouldUpdateNode($stmt)) {
+                    $this->updateNode($stmt);
 
-        if ($this->shouldUpdateNode($node)) {
-            $this->updateNode($node);
-            $this->isNodeExists = true;
+                    return $node;
+                }
+            }
+
+            return $this->insertNode($node);
         }
 
         return $node;

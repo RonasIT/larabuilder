@@ -27,7 +27,7 @@ class SomeClass extends Some
         ],
         'someKey' => 1,
     ];
-    private string $newString = 'some string';
+    public string $newString = 'some string';
 
     public function __construct()
     {

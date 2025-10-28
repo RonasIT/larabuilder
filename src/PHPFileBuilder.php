@@ -28,7 +28,7 @@ class PHPFileBuilder
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value, ?AccessModifierEnum $accessModifier = null): self
+    public function setProperty(string $name, mixed $value, AccessModifierEnum $accessModifier = AccessModifierEnum::Public): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
 

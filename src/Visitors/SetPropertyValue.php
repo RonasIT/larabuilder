@@ -54,23 +54,9 @@ class SetPropertyValue extends AbstractVisitor
         }
     }
 
-    protected function shouldHandleNewNode(Node $node): bool
+    protected function shouldHandleNode(Node $node): bool
     {
         return $node instanceof Class_ || $node instanceof Trait_;
-    }
-
-    /** @param Class_|Trait_ $node */
-    protected function handleNewNode(Node $node): Node
-    {
-        foreach($node->stmts as $stmt) {
-            if ($stmt instanceof Property && $this->name === $stmt->props[0]->name->name) {
-                $this->updateNode($stmt);
-
-                return $node;
-            }
-        }
-
-        return $this->insertNode($node);
     }
 
     /** @param Class_|Trait_ $node */
