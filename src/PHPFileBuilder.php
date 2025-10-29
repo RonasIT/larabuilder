@@ -50,7 +50,7 @@ class PHPFileBuilder
         $oldSyntaxTree = $this->syntaxTree;
         $newSyntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree,$oldSyntaxTree,$this->oldTokens);
+        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
     }
