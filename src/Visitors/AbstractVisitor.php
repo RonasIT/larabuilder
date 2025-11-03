@@ -68,11 +68,8 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 
         foreach ($statements as $index => $statement) {
             foreach (self::TYPE_ORDER as $currentTypeIndex => $type) {
-                if ($statement instanceof $type) {
-
-                    if ($currentTypeIndex <= $insertTypeOrder) {
-                        $insertIndex = $index + 1;
-                    }
+                if ($statement instanceof $type && $currentTypeIndex <= $insertTypeOrder) {
+                    $insertIndex = $index + 1;
                 }
             }
         }
