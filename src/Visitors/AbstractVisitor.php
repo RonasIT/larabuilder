@@ -3,9 +3,16 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\BuilderFactory;
-use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassConst;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Enum_;
+use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\Stmt\Trait_;
 
 abstract class AbstractVisitor extends NodeVisitorAbstract
 {
@@ -13,67 +20,61 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     abstract protected function shouldInsertNode(Node $node): bool;
     
     abstract protected function updateNode(Node $node): void;
-    abstract protected function insertNode(Node $node): Node;
+    abstract protected function getInsertableNode(): Node;
 
     protected bool $isNodeExists = false;
 
-    public function enterNode(Node $node): Node
+    protected const TYPE_ORDER = [
+        Namespace_::class,
+        Use_::class,
+        Class_::class,
+        Trait_::class,
+        Enum_::class,
+        TraitUse::class,
+        ClassConst::class,
+        Property::class,
+        ClassMethod::class,
+    ];
+
+    public function leaveNode(Node $node): Node
     {
+        if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
+            $this->insertNode($node);
+        }
+
         if ($this->shouldUpdateNode($node)) {
             $this->updateNode($node);
-            
             $this->isNodeExists = true;
         }
 
         return $node;
     }
 
-    public function leaveNode(Node $node): Node
+    protected function insertNode(Node $node): Node
     {
-        if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
-            $this->insertNode($node);
+        /** @var Class_|Trait_ $node */
+        $newNode = $this->getInsertableNode();
 
-            if ($node instanceof Class_) {
-                return $this->rebuildClass($node);
-            }
-        }
+        $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
+
+        array_splice($node->stmts, $insertIndex, 0, [$newNode]);
 
         return $node;
     }
 
-    /**
-     * Used to automatically group statements by their type, which simplifies development 
-     * because we don't need to define the correct place for the insertable node.
-     */
-    protected function rebuildClass(Class_ $node): Class_
+    protected function getInsertIndex(array $statements, string $insertType): int
     {
-        $factory = new BuilderFactory();
-        $classBuilder = $factory->class($node->name->toString());
+        $insertIndex = 0;
+        $insertTypeOrder = array_search($insertType, self::TYPE_ORDER);
 
-        if ($node->getDocComment()) {
-            $classBuilder->setDocComment($node->getDocComment());
+        foreach ($statements as $index => $statement) {
+            foreach (self::TYPE_ORDER as $currentTypeIndex => $type) {
+                if ($statement instanceof $type && $currentTypeIndex <= $insertTypeOrder) {
+                    $insertIndex = $index + 1;
+                }
+            }
         }
 
-        if ($node->extends) {
-            $classBuilder->extend($node->extends);
-        }
-
-        if (!empty($node->implements)) {
-            $classBuilder->implement(...$node->implements);
-        }
-
-        if ($node->isAbstract()) {
-            $classBuilder->makeAbstract();
-        }
-
-        if ($node->isFinal()) {
-            $classBuilder->makeFinal();
-        }
-
-        foreach ($node->stmts as $stmt) {
-            $classBuilder->addStmt($stmt);
-        }
-
-        return $classBuilder->getNode();
+        return $insertIndex;
     }
 }
