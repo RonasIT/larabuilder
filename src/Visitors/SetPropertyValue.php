@@ -5,15 +5,15 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Expr\ConstFetch;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractVisitor
@@ -54,12 +54,13 @@ class SetPropertyValue extends AbstractVisitor
         return $node instanceof Class_;
     }
 
-    /** @param Class_ $node */
-    protected function insertNode(Node $node): Node
+    protected function getInsertableNode(): Node
     {
-        $node->stmts[] = $this->createProperty();
-
-        return $node;
+        return new Property(
+            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
+            props: [$this->propertyItem],
+            type: $this->typeIdentifier,
+        );
     }
 
     protected function getPropertyValue(mixed $value): array
@@ -96,14 +97,5 @@ class SetPropertyValue extends AbstractVisitor
         }
 
         return new Array_($items);
-    }
-
-    protected function createProperty(): Node
-    {
-        return new Property(
-            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
-            props: [$this->propertyItem],
-            type: $this->typeIdentifier,
-        );
     }
 }

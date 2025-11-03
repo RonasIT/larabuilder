@@ -6,8 +6,6 @@ use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
@@ -38,13 +36,5 @@ class AddArrayPropertyItem extends SetPropertyValue
         }
 
         $node->props[0]->default->items[] = $this->arrayItem;
-    }
-
-    /** @param Class_ $node */
-    protected function insertNode(Node $node): Node
-    {
-        $node->stmts[] = $this->createProperty();
-
-        return $node;
     }
 }
