@@ -69,7 +69,6 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         foreach ($statements as $index => $statement) {
             foreach (self::TYPE_ORDER as $currentTypeIndex => $type) {
                 if ($statement instanceof $type) {
-                    $currentTypeIndex = array_search($type, self::TYPE_ORDER);
 
                     if ($currentTypeIndex <= $insertTypeOrder) {
                         $insertIndex = $index + 1;
