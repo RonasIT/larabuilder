@@ -54,14 +54,18 @@ class SetPropertyValue extends AbstractVisitor
         return $node instanceof Class_;
     }
 
-    /** @param Class_ $node */
-    protected function insertNode(Node $node): Node
+    protected function getInsertType(): string
     {
-        $insertIndex = $this->getInsertIndex($node->stmts, Property::class);
+        return Property::class;
+    }
 
-        array_splice($node->stmts, $insertIndex, 0, [$this->createProperty()]);
-
-        return $node;
+    protected function getInsertableNode(): Node
+    {
+        return new Property(
+            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
+            props: [$this->propertyItem],
+            type: $this->typeIdentifier,
+        );
     }
 
     protected function getPropertyValue(mixed $value): array
@@ -98,14 +102,5 @@ class SetPropertyValue extends AbstractVisitor
         }
 
         return new Array_($items);
-    }
-
-    protected function createProperty(): Node
-    {
-        return new Property(
-            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
-            props: [$this->propertyItem],
-            type: $this->typeIdentifier,
-        );
     }
 }

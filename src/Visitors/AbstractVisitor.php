@@ -20,7 +20,8 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     abstract protected function shouldInsertNode(Node $node): bool;
     
     abstract protected function updateNode(Node $node): void;
-    abstract protected function insertNode(Node $node): Node;
+    abstract protected function getInsertableNode(): Node;
+    abstract protected function getInsertType(): string;
 
     protected bool $isNodeExists = false;
 
@@ -36,24 +37,26 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         ClassMethod::class,
     ];
 
-    public function enterNode(Node $node): Node
-    {
-        if ($this->shouldUpdateNode($node)) {
-            $this->isNodeExists = true;
-        }
-
-        return $node;
-    }
-
     public function leaveNode(Node $node): Node
     {
         if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
             $this->insertNode($node);
         }
 
-        if ($this->isNodeExists && $this->shouldUpdateNode($node)) {
+        if ($this->shouldUpdateNode($node)) {
             $this->updateNode($node);
+            $this->isNodeExists = true;
         }
+
+        return $node;
+    }
+
+    protected function insertNode(Node $node): Node
+    {
+        /** @var Class_|Trait_ $node */
+        $insertIndex = $this->getInsertIndex($node->stmts, $this->getInsertType());
+
+        array_splice($node->stmts, $insertIndex, 0, [$this->getInsertableNode()]);
 
         return $node;
     }
