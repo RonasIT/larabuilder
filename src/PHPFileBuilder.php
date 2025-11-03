@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
@@ -11,6 +12,7 @@ use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 class PHPFileBuilder
 {
     protected array $syntaxTree;
+    protected array $oldTokens;
     protected NodeTraverser $traverser;
 
     public function __construct(
@@ -21,6 +23,7 @@ class PHPFileBuilder
         $code = file_get_contents($this->filePath);
 
         $this->syntaxTree = $parser->parse($code);
+        $this->oldTokens = $parser->getTokens();
         $this->traverser = new NodeTraverser();
     }
 
@@ -41,10 +44,12 @@ class PHPFileBuilder
     public function save(): void
     {
         $this->traverser->addVisitor(new ParentConnectingVisitor());
+        $this->traverser->addVisitor(new CloningVisitor());
 
-        $syntaxTree = $this->traverser->traverse($this->syntaxTree);
+        $oldSyntaxTree = $this->syntaxTree;
+        $newSyntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->prettyPrintFile($syntaxTree);
+        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
     }
