@@ -54,11 +54,6 @@ class SetPropertyValue extends AbstractVisitor
         return $node instanceof Class_;
     }
 
-    protected function getInsertType(): string
-    {
-        return Property::class;
-    }
-
     protected function getInsertableNode(): Node
     {
         return new Property(

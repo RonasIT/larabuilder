@@ -21,7 +21,6 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     
     abstract protected function updateNode(Node $node): void;
     abstract protected function getInsertableNode(): Node;
-    abstract protected function getInsertType(): string;
 
     protected bool $isNodeExists = false;
 
@@ -54,9 +53,11 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     protected function insertNode(Node $node): Node
     {
         /** @var Class_|Trait_ $node */
-        $insertIndex = $this->getInsertIndex($node->stmts, $this->getInsertType());
+        $newNode = $this->getInsertableNode();
 
-        array_splice($node->stmts, $insertIndex, 0, [$this->getInsertableNode()]);
+        $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
+
+        array_splice($node->stmts, $insertIndex, 0, [$newNode]);
 
         return $node;
     }
