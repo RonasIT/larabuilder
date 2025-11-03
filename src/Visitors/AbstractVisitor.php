@@ -61,18 +61,18 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         return $node;
     }
 
-    protected function getInsertIndex(array $stmts, string $insertType): int
+    protected function getInsertIndex(array $statements, string $insertType): int
     {
         $insertIndex = 0;
         $insertTypeOrder = array_search($insertType, self::TYPE_ORDER);
 
-        foreach ($stmts as $i => $stmt) {
-            foreach (self::TYPE_ORDER as $type) {
-                if ($stmt instanceof $type) {
-                    $currentTypeOrder = array_search($type, self::TYPE_ORDER);
+        foreach ($statements as $index => $statement) {
+            foreach (self::TYPE_ORDER as $currentTypeIndex => $type) {
+                if ($statement instanceof $type) {
+                    $currentTypeIndex = array_search($type, self::TYPE_ORDER);
 
-                    if ($currentTypeOrder <= $insertTypeOrder) {
-                        $insertIndex = $i + 1;
+                    if ($currentTypeIndex <= $insertTypeOrder) {
+                        $insertIndex = $index + 1;
                     }
                 }
             }
