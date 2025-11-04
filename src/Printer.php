@@ -5,8 +5,8 @@ namespace RonasIT\Larabuilder;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
-use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
@@ -44,7 +44,7 @@ class Printer extends Standard
 
     protected function needToAddEmptyLine(?string $prevType, string $currentType): bool
     {
-        return ($prevType !== null && $prevType !== $currentType) 
+        return ($prevType !== null && $prevType !== $currentType)
             || ($prevType === ClassMethod::class && $currentType === ClassMethod::class);
     }
 

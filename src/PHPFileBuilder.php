@@ -3,14 +3,13 @@
 namespace RonasIT\Larabuilder;
 
 use PhpParser\Error;
-use PhpParser\ParserFactory;
-use RonasIT\Larabuilder\NodeTraverser;
-use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use RonasIT\Larabuilder\Visitors\SetPropertyValue;
-use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
+use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
