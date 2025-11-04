@@ -5,8 +5,6 @@ namespace RonasIT\Larabuilder;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
-use PhpParser\Node\Stmt\Nop;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
 
@@ -14,7 +12,7 @@ class Printer extends Standard
 {
     public function printFormatPreserving(array $stmts, array $origStmts, array $origTokens): string
     {
-        $formattedCode = parent::printFormatPreserving($stmts,$origStmts,$origTokens);
+        $formattedCode = parent::printFormatPreserving($stmts, $origStmts, $origTokens);
 
         return $this->normalizeWhitespace($formattedCode);
     }
@@ -48,7 +46,7 @@ class Printer extends Standard
         return false;
     }
 
-    protected function pStmt_Property(Property $node): string 
+    protected function pStmt_Property(Property $node): string
     {
         $newLine = $this->shouldAddNewlineBeforeNode($node, Property::class) ? $this->nl : '';
 
@@ -58,6 +56,7 @@ class Printer extends Standard
     protected function shouldAddNewlineBeforeNode(Node $node, string $type): bool
     {
         $previousNode = $node->getAttribute('previous');
+
         return $previousNode !== null && !($previousNode instanceof $type);
     }
 }

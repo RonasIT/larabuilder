@@ -3,19 +3,17 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Name;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Scalar\Int_;
-use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
-use PhpParser\Node\Expr\ConstFetch;
-use PhpParser\Node\Stmt\ClassConst;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
@@ -60,29 +58,13 @@ class SetPropertyValue extends AbstractVisitor
         return $node instanceof Class_ || $node instanceof Trait_;
     }
 
-    /** @param Class_ $node */
-    protected function insertNode(Node $node): Node
+    protected function getInsertableNode(): Node
     {
-        $stmts = $node->stmts;
-        $insertIndex = 0;
-
-        for ($i = 0; $i < count($stmts); $i++) {
-            if ($stmts[$i] instanceof Property
-                || $stmts[$i] instanceof ClassConst
-                || $stmts[$i] instanceof TraitUse
-            ) {
-                $insertIndex = $i + 1;
-            }
-        }
-
-        $newNode = $this->createProperty();
-        $newNode->setAttribute('previous', $stmts[$insertIndex - 1] ?? null);
-
-        array_splice($stmts, $insertIndex, 0, [$newNode]);
-
-        $node->stmts = $stmts;
-
-        return $node;
+        return new Property(
+            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
+            props: [$this->propertyItem],
+            type: $this->typeIdentifier,
+        );
     }
 
     protected function getPropertyValue(mixed $value): array
@@ -119,14 +101,5 @@ class SetPropertyValue extends AbstractVisitor
         }
 
         return new Array_($items);
-    }
-
-    protected function createProperty(): Node
-    {
-        return new Property(
-            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
-            props: [$this->propertyItem],
-            type: $this->typeIdentifier,
-        );
     }
 }

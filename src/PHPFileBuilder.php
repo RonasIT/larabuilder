@@ -2,13 +2,14 @@
 
 namespace RonasIT\Larabuilder;
 
-use PhpParser\ParserFactory;
-use RonasIT\Larabuilder\NodeTraverser;
-use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use RonasIT\Larabuilder\Visitors\SetPropertyValue;
+use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
@@ -23,8 +24,14 @@ class PHPFileBuilder
 
         $code = file_get_contents($this->filePath);
 
-        $this->syntaxTree = $parser->parse($code);
+        try {
+            $this->syntaxTree = $parser->parse($code);
+        } catch (Error $e) {
+            throw new InvalidPHPFileException($this->filePath);
+        }
+
         $this->oldTokens = $parser->getTokens();
+
         $this->traverser = new NodeTraverser();
     }
 
@@ -50,7 +57,7 @@ class PHPFileBuilder
         $oldSyntaxTree = $this->syntaxTree;
         $newSyntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree,$oldSyntaxTree,$this->oldTokens);
+        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
     }

@@ -18,7 +18,8 @@
         "orchestra/testbench": "^10.6",
         "php-coveralls/php-coveralls": "^2.8",
         "phpunit/phpunit": "^12.3",
-        "ronasit/laravel-helpers": ">=3.5.8"
+        "ronasit/laravel-helpers": ">=3.5.8",
+        "laravel/pint": "^1.25"
     },
     "autoload": {
         "psr-4": {
