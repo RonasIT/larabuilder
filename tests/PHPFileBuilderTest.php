@@ -103,7 +103,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'invalid_file.php'),
         );
 
-        $this->assertExceptionThrew(InvalidPHPFileException::class, 'Can not parse PHP file: some_file_path.php');
+        $this->assertExceptionThrew(InvalidPHPFileException::class, 'Cannot parse PHP file: some_file_path.php');
 
         new PHPFileBuilder('some_file_path.php');
     }
