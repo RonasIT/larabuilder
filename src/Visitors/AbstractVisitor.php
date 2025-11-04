@@ -82,7 +82,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 
     protected function setParentForNewNodeTree(Node $child, Node $parent): void
     {
-       $child->setAttribute('parent', $parent);
+        $child->setAttribute('parent', $parent);
 
         if ($child instanceof Array_) {
             foreach ($child->items as $item) {
