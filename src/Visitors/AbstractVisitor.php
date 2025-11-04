@@ -80,6 +80,12 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         return $insertIndex;
     }
 
+    protected function prepareNewNode(mixed $parent, mixed $child): mixed
+    {
+        $this->setParentForNode($child, $parent);
+        return $parent;
+    }
+
     protected function setParentForNode(Node $child, Node $parent): void
     {
         $child->setAttribute('parent', $parent);

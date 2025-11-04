@@ -23,8 +23,7 @@ class AddArrayPropertyItem extends SetPropertyValue
         $this->arrayItem = new ArrayItem($propertyValue);
         $arrayNode = new Array_([$this->arrayItem]);
 
-        $this->propertyItem = new PropertyProperty($this->name, $arrayNode);
-        $this->setParentForNode($arrayNode, $this->propertyItem);
+        $this->propertyItem = $this->prepareNewNode(new PropertyProperty($this->name, $arrayNode), $arrayNode);
 
         $this->typeIdentifier = new Identifier('array');
     }
