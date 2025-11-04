@@ -3,23 +3,25 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\TraitUse;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\NodeVisitorAbstract;
 
 abstract class AbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
+
     abstract protected function shouldInsertNode(Node $node): bool;
-    
+
     abstract protected function updateNode(Node $node): void;
+
     abstract protected function getInsertableNode(): Node;
 
     protected bool $isNodeExists = false;
