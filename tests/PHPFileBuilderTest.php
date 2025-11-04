@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Tests;
 
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -88,11 +89,22 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
         );
 
-        $this->expectException(UnexpectedPropertyTypeException::class);
-        $this->expectExceptionMessage("Property 'notArray' has unexpected type. Expected 'array', actual 'bool'");
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
 
         (new PHPFileBuilder('some_file_path.php'))
             ->addArrayPropertyItem('notArray', 'value')
             ->save();
+    }
+
+    public function testInvalidPhpFileThrowsException(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'invalid_file.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidPHPFileException::class, 'Cannot parse PHP file: some_file_path.php');
+
+        new PHPFileBuilder('some_file_path.php');
     }
 }
