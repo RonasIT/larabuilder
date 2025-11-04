@@ -46,7 +46,7 @@ class Printer extends Standard
         return false;
     }
 
-    protected function pStmt_Property(Property $node): string 
+    protected function pStmt_Property(Property $node): string
     {
         $newLine = $this->shouldAddNewlineBeforeNode($node, Property::class) ? $this->nl : '';
 

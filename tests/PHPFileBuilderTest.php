@@ -2,10 +2,10 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
+use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase

@@ -3,18 +3,18 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Name;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Scalar\Int_;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
-use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractVisitor

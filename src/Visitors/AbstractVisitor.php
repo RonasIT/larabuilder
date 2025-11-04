@@ -3,25 +3,27 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\TraitUse;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\NodeVisitorAbstract;
 
 abstract class AbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
+
     abstract protected function shouldHandleNode(Node $node): bool;
-    
+
     abstract protected function updateNode(Node $node): void;
+
     abstract protected function getInsertableNode(): Node;
 
     protected const TYPE_ORDER = [
@@ -40,7 +42,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
     {
         if ($this->shouldHandleNode($node)) {
             /** @var Class_|Trait_ $node */
-            foreach($node->stmts as $stmt) {
+            foreach ($node->stmts as $stmt) {
                 if ($this->shouldUpdateNode($stmt)) {
                     $this->updateNode($stmt);
 
@@ -56,7 +58,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 
     protected function setParentForNewNodeTree(Node $child, Node $parent): void
     {
-       $child->setAttribute('parent', $parent);
+        $child->setAttribute('parent', $parent);
 
         if ($child instanceof Array_) {
             foreach ($child->items as $item) {

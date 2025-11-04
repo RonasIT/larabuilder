@@ -4,8 +4,8 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Identifier;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
@@ -36,7 +36,7 @@ class AddArrayPropertyItem extends SetPropertyValue
             throw new UnexpectedPropertyTypeException(
                 property: $this->name,
                 expectedType: 'array',
-                actualType: (string) ($node->type ?? 'null')
+                actualType: (string) ($node->type ?? 'null'),
             );
         }
 
