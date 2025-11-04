@@ -29,7 +29,7 @@ class SetPropertyValue extends AbstractVisitor
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
 
         $this->propertyItem = $this->prepareNewNode(new PropertyItem($this->name, $propertyValue), $propertyValue);
-    
+
         $this->typeIdentifier = new Identifier($propertyType);
     }
 
