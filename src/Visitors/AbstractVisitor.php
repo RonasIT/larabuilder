@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -78,5 +79,27 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         }
 
         return $insertIndex;
+    }
+
+    protected function prepareNewNode(mixed $parent, mixed $child): mixed
+    {
+        $this->setParentForNode($child, $parent);
+
+        return $parent;
+    }
+
+    protected function setParentForNode(Node $child, Node $parent): void
+    {
+        $child->setAttribute('parent', $parent);
+
+        if ($child instanceof Array_) {
+            foreach ($child->items as $item) {
+                $item->setAttribute('parent', $child);
+
+                if ($item->value instanceof Array_) {
+                    $this->setParentForNode($item->value, $item);
+                }
+            }
+        }
     }
 }

@@ -19,8 +19,12 @@ class AddArrayPropertyItem extends SetPropertyValue
         mixed $value,
     ) {
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+
         $this->arrayItem = new ArrayItem($propertyValue);
-        $this->propertyItem = new PropertyProperty($this->name, new Array_([$this->arrayItem]));
+        $arrayNode = new Array_([$this->arrayItem]);
+
+        $this->propertyItem = $this->prepareNewNode(new PropertyProperty($this->name, $arrayNode), $arrayNode);
+
         $this->typeIdentifier = new Identifier('array');
     }
 

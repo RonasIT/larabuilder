@@ -27,7 +27,9 @@ class SetPropertyValue extends AbstractVisitor
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
-        $this->propertyItem = new PropertyItem($name, $propertyValue);
+
+        $this->propertyItem = $this->prepareNewNode(new PropertyItem($this->name, $propertyValue), $propertyValue);
+
         $this->typeIdentifier = new Identifier($propertyType);
     }
 
