@@ -23,8 +23,7 @@ class AddArrayPropertyItem extends SetPropertyValue
         $this->arrayItem = new ArrayItem($propertyValue);
         $arrayNode = new Array_([$this->arrayItem]);
 
-        $this->propertyItem = new PropertyProperty($this->name, $arrayNode);
-        $this->setParentForNewNodeTree($arrayNode, $this->propertyItem);
+        $this->propertyItem = $this->prepareNewNode(new PropertyProperty($this->name, $arrayNode), $arrayNode);
 
         $this->typeIdentifier = new Identifier('array');
     }
@@ -36,7 +35,7 @@ class AddArrayPropertyItem extends SetPropertyValue
             throw new UnexpectedPropertyTypeException(
                 property: $this->name,
                 expectedType: 'array',
-                actualType: $node->type !== null ? (string) $node->type : 'null',
+                actualType: (is_null($node->type)) ? 'null' : (string) $node->type,
             );
         }
 
