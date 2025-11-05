@@ -3,7 +3,6 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
-use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
@@ -56,22 +55,6 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         return $node;
     }
 
-    protected function setParentForNewNodeTree(Node $child, Node $parent): void
-    {
-        $child->setAttribute('parent', $parent);
-
-        if ($child instanceof Array_) {
-            foreach ($child->items as $item) {
-                if ($item instanceof ArrayItem) {
-                    $item->setAttribute('parent', $child);
-                    if ($item->value instanceof Node) {
-                        $this->setParentForNewNodeTree($item->value, $item);
-                    }
-                }
-            }
-        }
-    }
-
     /** @param Class_|Trait_ $node */
     protected function insertNode(Node $node): Node
     {
@@ -100,5 +83,27 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         }
 
         return $insertIndex;
+    }
+
+    protected function prepareNewNode(mixed $parent, mixed $child): mixed
+    {
+        $this->setParentForNode($child, $parent);
+
+        return $parent;
+    }
+
+    protected function setParentForNode(Node $child, Node $parent): void
+    {
+        $child->setAttribute('parent', $parent);
+
+        if ($child instanceof Array_) {
+            foreach ($child->items as $item) {
+                $item->setAttribute('parent', $child);
+
+                if ($item->value instanceof Array_) {
+                    $this->setParentForNode($item->value, $item);
+                }
+            }
+        }
     }
 }
