@@ -36,7 +36,7 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         TraitUse::class,
         ClassConst::class,
         Property::class,
-        ClassMethod::class,
+        ClassMethod::class
     ];
 
     public function leaveNode(Node $node): Node
@@ -90,14 +90,12 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
         return $parent;
     }
 
-    protected function setParentForNode(Node $child, Node $parent): void
-    {
+    protected function setParentForNode(Node $child,Node$parent): void {
         $child->setAttribute('parent', $parent);
 
         if ($child instanceof Array_) {
             foreach ($child->items as $item) {
                 $item->setAttribute('parent', $child);
-
                 if ($item->value instanceof Array_) {
                     $this->setParentForNode($item->value, $item);
                 }
