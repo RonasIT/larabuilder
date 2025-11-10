@@ -48,7 +48,7 @@ class Printer extends Standard
 
     protected function pStmt_Property(Property $node): string
     {
-        $newLine = $this->shouldAddNewlineBeforeNode($node, Property::class) ? $this->nl : '';
+        $newLine = ($this->shouldAddNewlineBeforeNode($node, Property::class)) ? $this->nl : '';
 
         return $newLine . parent::pStmt_Property($node);
     }
