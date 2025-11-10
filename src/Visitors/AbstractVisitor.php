@@ -60,6 +60,8 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 
         $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
 
+        $newNode->setAttribute('previous', $node->stmts[$insertIndex - 1] ?? null);
+
         array_splice($node->stmts, $insertIndex, 0, [$newNode]);
 
         return $node;
