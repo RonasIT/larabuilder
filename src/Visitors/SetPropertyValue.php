@@ -14,6 +14,7 @@ use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractVisitor
@@ -36,7 +37,7 @@ class SetPropertyValue extends AbstractVisitor
     protected function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof Property
-            && $node->getAttribute('parent') instanceof Class_
+            && ($node->getAttribute('parent') instanceof Class_ || $node->getAttribute('parent') instanceof Trait_)
             && $this->name === $node->props[0]->name->name;
     }
 
@@ -53,7 +54,7 @@ class SetPropertyValue extends AbstractVisitor
 
     protected function shouldInsertNode(Node $node): bool
     {
-        return $node instanceof Class_;
+        return $node instanceof Class_ || $node instanceof Trait_;
     }
 
     protected function getInsertableNode(): Node
