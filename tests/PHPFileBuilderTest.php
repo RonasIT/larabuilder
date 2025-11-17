@@ -31,6 +31,7 @@ class PHPFileBuilderTest extends TestCase
                 'arrayProperty' => [1, 'string', true],
                 'someKey' => 1,
             ])
+            ->setProperty('newString', 'string', AccessModifierEnum::Private)
             ->setProperty('newString', 'some string')
             ->save();
     }
@@ -45,6 +46,7 @@ class PHPFileBuilderTest extends TestCase
 
         (new PHPFileBuilder('some_file_path.php'))
             ->setProperty('newString', 'some string')
+            ->setProperty('newString', 'update string')
             ->save();
     }
 
@@ -105,7 +107,80 @@ class PHPFileBuilderTest extends TestCase
         (new PHPFileBuilder('some_file_path.php'))
             ->setProperty('floatProperty', 56)
             ->addArrayPropertyItem('tags', 'three')
+            ->addArrayPropertyItem('tags', 4)
             ->setProperty('newString', 'some string')
+            ->save();
+    }
+
+    public function testSetMethodCallBodyEmpty(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'expression_empty.php'),
+            $this->callFilePutContent('some_file_path.php', 'expression_empty.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setMethodCallBody('withExceptions', '
+                $exceptions->render(function (HttpException $exception, Request $request) {
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                });
+            ')
+            ->setMethodCallBody('withMiddleware', '
+                $middleware->use([
+                    HandleCors::class,
+                    CheckForMaintenanceMode::class,
+                    ValidatePostSize::class,
+                    TrimStrings::class,
+                    ConvertEmptyStringsToNull::class,
+                    AutoDocMiddleware::class,
+                ]);
+            ')
+            ->setMethodCallBody('withExceptions', '
+                $exceptions->render(function (ExpectationFailedException $exception) {
+                    throw $exception;
+                });
+            ')
+            ->save();
+    }
+
+    public function testSetMethodCallBodyCustom(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'expression_custom.php'),
+            $this->callFilePutContent('some_file_path.php', 'expression_custom.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setMethodCallBody('withExceptions', '
+                $exceptions->render(function (HttpException $exception, Request $request) {
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                });
+            ')
+            ->save();
+    }
+
+    public function testSetMethodCallBodyExist(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'expression_exist.php'),
+            $this->callFilePutContent('some_file_path.php', 'expression_exist.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->setMethodCallBody('withExceptions', '
+                $exceptions->render(function (HttpException $exception, Request $request) {
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                });
+            ')
             ->save();
     }
 }

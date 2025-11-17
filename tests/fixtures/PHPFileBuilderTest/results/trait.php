@@ -8,6 +8,7 @@ trait SomeTrait {
     public int $floatProperty = 56;
     public array $tags = [
         'three',
+        4,
     ];
     public string $newString = 'some string';
 

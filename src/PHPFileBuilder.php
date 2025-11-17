@@ -9,6 +9,7 @@ use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\SetMethodCallBodyValue;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
@@ -35,7 +36,7 @@ class PHPFileBuilder
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value, ?AccessModifierEnum $accessModifier = null): self
+    public function setProperty(string $name, mixed $value, AccessModifierEnum $accessModifier = AccessModifierEnum::Public): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
 
@@ -45,6 +46,13 @@ class PHPFileBuilder
     public function addArrayPropertyItem(string $propertyName, mixed $value): self
     {
         $this->traverser->addVisitor(new AddArrayPropertyItem($propertyName, $value));
+
+        return $this;
+    }
+
+    public function setMethodCallBody(string $method, string $value): self
+    {
+        $this->traverser->addVisitor(new SetMethodCallBodyValue($method, $value));
 
         return $this;
     }
