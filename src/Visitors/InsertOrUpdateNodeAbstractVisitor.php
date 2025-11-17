@@ -27,7 +27,7 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends NodeVisitorAbstract
 
     abstract protected function updateNode(Node $node): void;
 
-    abstract protected function getInsertableNode(): array|null|Node;
+    abstract protected function getInsertableNode(): Node;
 
     protected const TYPE_ORDER = [
         Namespace_::class,
