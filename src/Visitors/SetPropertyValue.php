@@ -17,7 +17,7 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
-class SetPropertyValue extends AbstractVisitor
+class SetPropertyValue extends InsertOrUpdateNodeAbstractVisitor
 {
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
@@ -51,7 +51,7 @@ class SetPropertyValue extends AbstractVisitor
         }
     }
 
-    protected function shouldHandleNode(Node $node): bool
+    protected function isParentNode(Node $node): bool
     {
         return $node instanceof Class_ || $node instanceof Trait_;
     }
