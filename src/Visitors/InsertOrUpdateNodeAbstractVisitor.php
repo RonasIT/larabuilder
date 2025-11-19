@@ -15,17 +15,19 @@ use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 
-abstract class AbstractVisitor extends NodeVisitorAbstract
+abstract class InsertOrUpdateNodeAbstractVisitor extends NodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
 
-    abstract protected function shouldInsertNode(Node $node): bool;
+    /**
+     * Determine the criteria for selecting the node to work with.
+     * If `shouldUpdateNode` does not find a matching node, a new node will be inserted under this one.
+     */
+    abstract protected function isParentNode(Node $node): bool;
 
     abstract protected function updateNode(Node $node): void;
 
     abstract protected function getInsertableNode(): Node;
-
-    protected bool $isNodeExists = false;
 
     protected const TYPE_ORDER = [
         Namespace_::class,
@@ -41,21 +43,25 @@ abstract class AbstractVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): Node
     {
-        if ($this->shouldInsertNode($node) && !$this->isNodeExists) {
-            $this->insertNode($node);
-        }
+        if ($this->isParentNode($node)) {
+            /** @var Class_|Trait_ $node */
+            foreach ($node->stmts as $stmt) {
+                if ($this->shouldUpdateNode($stmt)) {
+                    $this->updateNode($stmt);
 
-        if ($this->shouldUpdateNode($node)) {
-            $this->updateNode($node);
-            $this->isNodeExists = true;
+                    return $node;
+                }
+            }
+
+            return $this->insertNode($node);
         }
 
         return $node;
     }
 
+    /** @param Class_|Trait_ $node */
     protected function insertNode(Node $node): Node
     {
-        /** @var Class_|Trait_ $node */
         $newNode = $this->getInsertableNode();
 
         $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
