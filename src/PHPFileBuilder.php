@@ -4,7 +4,6 @@ namespace RonasIT\Larabuilder;
 
 use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
