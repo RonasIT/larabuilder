@@ -51,7 +51,6 @@ class PHPFileBuilder
 
     public function save(): void
     {
-        $this->traverser->addVisitor(new ParentConnectingVisitor());
         $this->traverser->addVisitor(new CloningVisitor());
 
         $oldSyntaxTree = $this->syntaxTree;
