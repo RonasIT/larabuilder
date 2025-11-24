@@ -4,7 +4,6 @@ namespace RonasIT\Larabuilder;
 
 use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
@@ -35,7 +34,7 @@ class PHPFileBuilder
         $this->traverser = new NodeTraverser();
     }
 
-    public function setProperty(string $name, mixed $value, ?AccessModifierEnum $accessModifier = null): self
+    public function setProperty(string $name, mixed $value, AccessModifierEnum $accessModifier = AccessModifierEnum::Public): self
     {
         $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
 
@@ -51,7 +50,6 @@ class PHPFileBuilder
 
     public function save(): void
     {
-        $this->traverser->addVisitor(new ParentConnectingVisitor());
         $this->traverser->addVisitor(new CloningVisitor());
 
         $oldSyntaxTree = $this->syntaxTree;
