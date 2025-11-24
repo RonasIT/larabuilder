@@ -7,3 +7,30 @@
 ```bash
 composer require ronasit/larabuilder --dev
 ```
+
+## Usage
+
+The logic of the package usage consists of the there stages:
+1. Open a `php` file
+2. Call required class modifications methods
+3. Render modified class structure and overwrite existed file
+
+```php
+new PHPFileBuilder(app_path('Models/User.php'))
+    ->addArrayPropertyItem('fillable', 'is_active')
+    ->setProperty('casts', [
+        'is_active' => 'boolean',
+    ], AccessModifierEnum::Protected)
+    ->save();
+```
+
+### Features
+
+#### setProperty
+
+Add new class property with the passed value and passed access level in case property does not exists in the class. Otherwise
+will change already existed class property's value **AND access level**
+
+#### addArrayPropertyItem
+
+Add new item to the `array` class property. Will add new property in case it not exists yet.
