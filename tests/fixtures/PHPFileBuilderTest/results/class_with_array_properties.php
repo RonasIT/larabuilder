@@ -7,7 +7,7 @@ use Some;
 class SomeClass
 {
     public string $stringProperty = 'some value';
-    protected array $tags = ['one', 'two', 'three', 4];
+    protected array $tags = ['one', 'two', 3, true, 5.5, 78.4, 'three', 4];
     public bool $notArray = false;
     protected array $fillable = [
         'name',

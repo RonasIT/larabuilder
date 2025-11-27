@@ -109,6 +109,49 @@ class PHPFileBuilderTest extends TestCase
             ->addArrayPropertyItem('tags', 'three')
             ->addArrayPropertyItem('tags', 4)
             ->setProperty('newString', 'some string')
+            ->removeArrayPropertyItem('fillable', ['name'])
+            ->save();
+    }
+
+    public function testRemoveArrayPropertyItem(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_array_properties_removed.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->removeArrayPropertyItem('fillable', ['name', 'age'])
+            ->removeArrayPropertyItem('tags', ['two', 3, 5.5, true])
+            ->removeArrayPropertyItem('newMultiArrayProperty', ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true]])
+            ->save();
+    }
+
+    public function testRemoveArrayPropertyItemThrowsException(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
+        );
+
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->removeArrayPropertyItem('notArray', ['value'])
+            ->save();
+    }
+
+    public function testRemoveArrayPropertyItemNotProperty(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_properties_unchanged.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->removeArrayPropertyItem('notProperty', ['value'])
             ->save();
     }
 }
