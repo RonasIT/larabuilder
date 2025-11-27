@@ -4,9 +4,9 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Expr\ConstFetch;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
 class RemoveArrayPropertyItem extends SetPropertyValue
