@@ -125,6 +125,7 @@ class PHPFileBuilderTest extends TestCase
             ->removeArrayPropertyItem('fillable', ['name', 'age'])
             ->removeArrayPropertyItem('tags', ['two', 3, 5.5, true])
             ->removeArrayPropertyItem('newMultiArrayProperty', ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true]])
+            ->removeArrayPropertyItem('newMultiArrayProperty', ['arrayProperty2' => [1]])
             ->save();
     }
 

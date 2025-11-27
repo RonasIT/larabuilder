@@ -12,7 +12,9 @@ class SomeClass
     protected array $fillable = [
         'email',
     ];
-    public array $newMultiArrayProperty = [];
+    public array $newMultiArrayProperty = [
+        'arrayProperty2' => [1, 2, 3],
+    ];
 
     public function __construct()
     {

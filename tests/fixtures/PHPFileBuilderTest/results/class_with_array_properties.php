@@ -14,13 +14,17 @@ class SomeClass
         'email',
         'age',
     ];
-    public array $newMultiArrayProperty = ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true], [
-        'array' => [
-            0 => 2,
-            1 => 'string',
-            2 => false,
+    public array $newMultiArrayProperty = [
+        'arrayProperty' => [0 => 1, 1 => 'string', 2 => true],
+        'arrayProperty2' => [1, 2, 3],
+        [
+            'array' => [
+                0 => 2,
+                1 => 'string',
+                2 => false,
+            ],
         ],
-    ]];
+    ];
     public array $role = [
         'admin',
     ];

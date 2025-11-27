@@ -13,7 +13,10 @@ class SomeClass
         'name',
         'email',
     ];
-    public array $newMultiArrayProperty = ['arrayProperty' => [0 => 1, 1 => 'string', 2 => true]];
+    public array $newMultiArrayProperty = [
+        'arrayProperty' => [0 => 1, 1 => 'string', 2 => true],
+        'arrayProperty2' => [1, 2, 3],
+    ];
 
     public function __construct()
     {
