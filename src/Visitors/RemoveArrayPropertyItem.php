@@ -42,7 +42,7 @@ class RemoveArrayPropertyItem extends SetPropertyValue
 
         foreach ($arrayProperty->items as $item) {
             foreach ($this->valuesToRemove as $removeValue) {
-                if ($this->itemsAreEqual($item->value, $removeValue)) {
+                if ($this->areNodesEqual($item->value, $removeValue)) {
                     continue 2;
                 }
             }
@@ -53,30 +53,31 @@ class RemoveArrayPropertyItem extends SetPropertyValue
         $arrayProperty->items = $newItems;
     }
 
-    protected function itemsAreEqual(Node $expected, Node $actual): bool
+    protected function areNodesEqual(Node $expected, Node $actual): bool
     {
-        switch (true) {
-            case $expected instanceof Scalar && $actual instanceof Scalar:
-                return $expected->value === $actual->value;
-            case $expected instanceof ConstFetch && $actual instanceof ConstFetch:
-                return $expected->name->name === $actual->name->name;
-            case $expected instanceof Array_ && $actual instanceof Array_:
-                if (count($expected->items) !== count($actual->items)) {
-                    return false;
-                }
+        return match (true) {
+            $expected instanceof Scalar && $actual instanceof Scalar => $expected->value === $actual->value,
+            $expected instanceof ConstFetch && $actual instanceof ConstFetch => $expected->name->name === $actual->name->name,
+            $expected instanceof Array_ && $actual instanceof Array_ => $this->areArrayNodesEqual($expected, $actual),
+            default => false,
+        };
+    }
 
-                foreach ($expected->items as $i => $expectedItem) {
-                    $actualItem = $actual->items[$i];
-
-                    if (!$this->itemsAreEqual($expectedItem->value, $actualItem->value)) {
-                        return false;
-                    }
-                }
-
-                return true;
+    protected function areArrayNodesEqual(Node $expected, Node $actual): bool
+    {
+        if (count($expected->items) !== count($actual->items)) {
+            return false;
         }
 
-        return false;
+        foreach ($expected->items as $i => $expectedItem) {
+            $actualItem = $actual->items[$i];
+
+            if (!$this->areNodesEqual($expectedItem->value, $actualItem->value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function insertNode(Node $node): Node
