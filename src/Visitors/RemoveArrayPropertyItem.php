@@ -41,13 +41,9 @@ class RemoveArrayPropertyItem extends SetPropertyValue
         $newItems = [];
 
         foreach ($arrayProperty->items as $item) {
-            foreach ($this->valuesToRemove as $removeValue) {
-                if ($this->areNodesEqual($item->value, $removeValue)) {
-                    continue 2;
-                }
+            if (!$this->shouldRemoveItem($item)) {
+                $newItems[] = $item;
             }
-
-            $newItems[] = $item;
         }
 
         $arrayProperty->items = $newItems;
@@ -63,14 +59,14 @@ class RemoveArrayPropertyItem extends SetPropertyValue
         };
     }
 
-    protected function areArrayNodesEqual(Node $expected, Node $actual): bool
+    protected function areArrayNodesEqual(Array_ $expected, Array_ $actual): bool
     {
         if (count($expected->items) !== count($actual->items)) {
             return false;
         }
 
-        foreach ($expected->items as $i => $expectedItem) {
-            $actualItem = $actual->items[$i];
+        foreach ($expected->items as $index => $expectedItem) {
+            $actualItem = $actual->items[$index];
 
             if (!$this->areNodesEqual($expectedItem->value, $actualItem->value)) {
                 return false;
@@ -78,6 +74,17 @@ class RemoveArrayPropertyItem extends SetPropertyValue
         }
 
         return true;
+    }
+
+    protected function shouldRemoveItem(Node $item): bool
+    {
+        foreach ($this->valuesToRemove as $removeValue) {
+            if ($this->areNodesEqual($item->value, $removeValue)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function insertNode(Node $node): Node
