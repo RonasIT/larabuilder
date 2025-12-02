@@ -39,15 +39,10 @@ class RemoveArrayPropertyItem extends SetPropertyValue
             );
         }
 
-        $newItems = [];
-
-        foreach ($arrayProperty->items as $item) {
-            if (!$this->shouldRemoveItem($item)) {
-                $newItems[] = $item;
-            }
-        }
-
-        $arrayProperty->items = $newItems;
+        $arrayProperty->items = Arr::where(
+            array: $arrayProperty->items,
+            callback: fn (Node $item) => !$this->shouldRemoveItem($item),
+        );
     }
 
     protected function areNodesEqual(Node $expected, Node $actual): bool
@@ -62,26 +57,19 @@ class RemoveArrayPropertyItem extends SetPropertyValue
 
     protected function areArrayNodesEqual(Array_ $expected, Array_ $actual): bool
     {
-        foreach ($expected->items as $index => $expectedItem) {
+        return Arr::every($expected->items,  function ($expectedItem, $index) use ($actual) {
             $actualItem = Arr::get($actual->items, $index);
 
-            if (is_null($actualItem) || !$this->areNodesEqual($expectedItem->value, $actualItem->value)) {
-                return false;
-            }
-        }
-
-        return true;
+            return !is_null($actualItem) && $this->areNodesEqual($expectedItem->value, $actualItem->value);
+        });
     }
 
     protected function shouldRemoveItem(Node $item): bool
     {
-        foreach ($this->valuesToRemove as $removeValue) {
-            if ($this->areNodesEqual($item->value, $removeValue)) {
-                return true;
-            }
-        }
-
-        return false;
+        return Arr::some(
+            array: $this->valuesToRemove,
+            callback: fn (Node $removeValue) => $this->areNodesEqual($item->value, $removeValue),
+        );
     }
 
     protected function insertNode(Node $node): Node
