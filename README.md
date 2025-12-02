@@ -34,3 +34,7 @@ will change already existing class property's value **AND access level**
 #### addArrayPropertyItem
 
 Add new item to the `array` class property. Will add new property in case it does not exist yet.
+
+#### removeArrayPropertyItem
+
+Remove items from the `array` class property.

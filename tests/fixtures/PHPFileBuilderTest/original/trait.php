@@ -7,6 +7,11 @@ use Some\AnotherTrait;
 trait SomeTrait {
     public float $floatProperty;
 
+    protected array $fillable = [
+        'name',
+        'email',
+    ];
+
     public function method1()
     {
         return $this
