@@ -57,7 +57,7 @@ class RemoveArrayPropertyItem extends SetPropertyValue
 
     protected function areArrayNodesEqual(Array_ $expected, Array_ $actual): bool
     {
-        return Arr::every($expected->items,  function ($expectedItem, $index) use ($actual) {
+        return Arr::every($expected->items, function ($expectedItem, $index) use ($actual) {
             $actualItem = Arr::get($actual->items, $index);
 
             return !is_null($actualItem) && $this->areNodesEqual($expectedItem->value, $actualItem->value);
