@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ConstFetch;
@@ -61,14 +62,10 @@ class RemoveArrayPropertyItem extends SetPropertyValue
 
     protected function areArrayNodesEqual(Array_ $expected, Array_ $actual): bool
     {
-        if (count($expected->items) !== count($actual->items)) {
-            return false;
-        }
-
         foreach ($expected->items as $index => $expectedItem) {
-            $actualItem = $actual->items[$index];
+            $actualItem = Arr::get($actual->items, $index);
 
-            if (!$this->areNodesEqual($expectedItem->value, $actualItem->value)) {
+            if (is_null($actualItem) || !$this->areNodesEqual($expectedItem->value, $actualItem->value)) {
                 return false;
             }
         }
