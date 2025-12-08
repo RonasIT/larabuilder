@@ -39,10 +39,10 @@ class RemoveArrayPropertyItem extends SetPropertyValue
             );
         }
 
-        $arrayProperty->items = Arr::where(
+        $arrayProperty->items = array_values(Arr::where(
             array: $arrayProperty->items,
             callback: fn (Node $item) => !$this->shouldRemoveItem($item),
-        );
+        ));
     }
 
     protected function areNodesEqual(Node $expected, Node $actual): bool
@@ -57,6 +57,10 @@ class RemoveArrayPropertyItem extends SetPropertyValue
 
     protected function areArrayNodesEqual(Array_ $expected, Array_ $actual): bool
     {
+        if (count($expected->items) !== count($actual->items)) {
+            return false;
+        }
+
         return Arr::every($expected->items, function ($expectedItem, $index) use ($actual) {
             $actualItem = Arr::get($actual->items, $index);
 
