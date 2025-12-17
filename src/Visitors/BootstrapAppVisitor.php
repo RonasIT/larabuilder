@@ -21,6 +21,8 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
     protected Parser $parser;
 
     protected string $parentMethod = 'withExceptions';
+    protected string $targetMethod = 'render';
+
     protected array $renderStatements;
 
     public function __construct(
@@ -72,7 +74,7 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
 
     private function isRenderCall(Expression $stmt): bool
     {
-        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === 'render';
+        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
     }
 
     private function matchesExceptionType(Expression $stmt): bool
