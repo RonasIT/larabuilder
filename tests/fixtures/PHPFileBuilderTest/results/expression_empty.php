@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->use([HandleCors::class, CheckForMaintenanceMode::class, ValidatePostSize::class, TrimStrings::class, ConvertEmptyStringsToNull::class, AutoDocMiddleware::class]);
+        //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (HttpException $exception, Request $request) {

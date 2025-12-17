@@ -121,28 +121,21 @@ class PHPFileBuilderTest extends TestCase
         );
 
         (new PHPFileBuilder('some_file_path.php'))
-            ->setMethodCallBody('withExceptions', '
-                $exceptions->render(function (HttpException $exception, Request $request) {
+            ->addExceptionRender(
+                exceptionClass: 'HttpException',
+                renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
                         : null;
-                });
-            ')
-            ->setMethodCallBody('withMiddleware', '
-                $middleware->use([
-                    HandleCors::class,
-                    CheckForMaintenanceMode::class,
-                    ValidatePostSize::class,
-                    TrimStrings::class,
-                    ConvertEmptyStringsToNull::class,
-                    AutoDocMiddleware::class,
-                ]);
-            ')
-            ->setMethodCallBody('withExceptions', '
-                $exceptions->render(function (ExpectationFailedException $exception) {
+                ',
+                withRequest: true,
+            )
+            ->addExceptionRender(
+                exceptionClass: 'ExpectationFailedException',
+                renderBody: '
                     throw $exception;
-                });
-            ')
+                ',
+            )
             ->save();
     }
 
@@ -155,13 +148,21 @@ class PHPFileBuilderTest extends TestCase
         );
 
         (new PHPFileBuilder('some_file_path.php'))
-            ->setMethodCallBody('withExceptions', '
-                $exceptions->render(function (HttpException $exception, Request $request) {
+            ->addExceptionRender(
+                exceptionClass: 'HttpException',
+                renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
                         : null;
-                });
-            ')
+                ',
+                withRequest: true,
+            )
+            ->addExceptionRender(
+                exceptionClass: 'ExpectationFailedException',
+                renderBody: '
+                    throw $exception;
+                ',
+            )
             ->save();
     }
 
@@ -174,13 +175,15 @@ class PHPFileBuilderTest extends TestCase
         );
 
         (new PHPFileBuilder('some_file_path.php'))
-            ->setMethodCallBody('withExceptions', '
-                $exceptions->render(function (HttpException $exception, Request $request) {
+            ->addExceptionRender(
+                exceptionClass: 'HttpException',
+                renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
                         : null;
-                });
-            ')
+                ',
+                withRequest: true,
+            )
             ->save();
     }
 }
