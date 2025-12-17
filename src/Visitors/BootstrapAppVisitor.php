@@ -33,17 +33,17 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
         $this->renderStatements = [$this->buildRenderCall()];
     }
 
-    public function leaveNode(Node $node): ?Node
+    public function leaveNode(Node $node): Node
     {
         if (!$node instanceof MethodCall) {
-            return null;
+            return $node;
         }
 
-        if (!$this->isParentNode($node) || !$this->shouldInsertNode($node)) {
-            return null;
+        if ($this->isParentNode($node) && $this->shouldInsertNode($node)) {
+            return $this->insertNode($node);
         }
 
-        return $this->insertNode($node);
+        return $node;
     }
 
     protected function isParentNode(Node $node): bool
