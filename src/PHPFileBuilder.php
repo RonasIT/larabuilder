@@ -8,7 +8,7 @@ use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
-use RonasIT\Larabuilder\Visitors\BootstrapAppVisitor;
+use RonasIT\Larabuilder\Visitors\BootstrapAppVisitors\AddExceptionRender;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
@@ -51,7 +51,7 @@ class PHPFileBuilder
 
     public function addExceptionRender(string $exceptionClass, string $renderBody, bool $withRequest = false): self
     {
-        $this->traverser->addVisitor(new BootstrapAppVisitor($exceptionClass, $renderBody, $withRequest));
+        $this->traverser->addVisitor(new AddExceptionRender($exceptionClass, $renderBody, $withRequest));
 
         return $this;
     }

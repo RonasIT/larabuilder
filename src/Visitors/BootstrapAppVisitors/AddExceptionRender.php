@@ -1,8 +1,7 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\BootstrapAppVisitors;
 
-use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
@@ -12,16 +11,12 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 
-class BootstrapAppVisitor extends NodeVisitorAbstract
+class AddExceptionRender extends BootstrapAppAbstractVisitor
 {
     protected Parser $parser;
-
-    protected string $parentMethod = 'withExceptions';
-    protected string $targetMethod = 'render';
 
     protected array $renderStatements;
 
@@ -33,51 +28,12 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
         $this->parser = (new ParserFactory())->createForHostVersion();
 
         $this->renderStatements = [$this->buildRenderCall()];
+
+        $this->parentMethod = 'withExceptions';
+        $this->targetMethod = 'render';
     }
 
-    public function leaveNode(Node $node): Node
-    {
-        if (!$node instanceof MethodCall) {
-            return $node;
-        }
-
-        if ($this->isParentNode($node) && $this->shouldInsertNode($node)) {
-            return $this->insertNode($node);
-        }
-
-        return $node;
-    }
-
-    protected function isParentNode(Node $node): bool
-    {
-        return $node instanceof MethodCall && $node->name->toString() === $this->parentMethod;
-    }
-
-    protected function shouldInsertNode(MethodCall $node): bool
-    {
-        foreach ($node->args[0]->value->stmts as $stmt) {
-            if (!$stmt instanceof Expression) {
-                continue;
-            }
-
-            if (!$this->isRenderCall($stmt)) {
-                continue;
-            }
-
-            if ($this->matchesExceptionType($stmt)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function isRenderCall(Expression $stmt): bool
-    {
-        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
-    }
-
-    private function matchesExceptionType(Expression $stmt): bool
+    protected function matchesExceptionType(Expression $stmt): bool
     {
         $closure = $stmt->expr->args[0]->value ?? null;
         $param = $closure?->params[0] ?? null;
@@ -104,7 +60,7 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
         return $node;
     }
 
-    private function buildRenderCall(): Expression
+    protected function buildRenderCall(): Expression
     {
         return new Expression(
             new MethodCall(
@@ -117,7 +73,7 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
         );
     }
 
-    private function buildClosure(): Closure
+    protected function buildClosure(): Closure
     {
         $params = [
             new Param(
@@ -139,7 +95,7 @@ class BootstrapAppVisitor extends NodeVisitorAbstract
         ]);
     }
 
-    private function parseClosureBody(): array
+    protected function parseClosureBody(): array
     {
         return $this->parser->parse('<?php ' . $this->renderBody);
     }
