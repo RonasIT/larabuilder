@@ -38,7 +38,15 @@ class AddExceptionRender extends BootstrapAppAbstractVisitor
         $closure = $stmt->expr->args[0]->value ?? null;
         $param = $closure?->params[0] ?? null;
 
-        return $param?->type instanceof Name && $param->type->toString() === $this->exceptionClass;
+        if (!($param?->type instanceof Name)) {
+            return false;
+        }
+
+        $typeName = $param->type->toString();
+        $fullClassName = $this->exceptionClass;
+        $shortClassName = $this->getShortClassName($this->exceptionClass);
+
+        return $typeName === $fullClassName || $typeName === $shortClassName;
     }
 
     protected function insertNode(MethodCall $node): MethodCall

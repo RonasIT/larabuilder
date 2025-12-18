@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
 abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract
 {
-    private const FORBIDDEN_NODES = [
+    protected const FORBIDDEN_NODES = [
         Class_::class => 'class',
         Trait_::class => 'trait',
         Interface_::class => 'interface',
@@ -74,8 +74,15 @@ abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract
         return true;
     }
 
-    private function isRenderCall(Expression $stmt): bool
+    protected function isRenderCall(Expression $stmt): bool
     {
         return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
+    }
+
+    protected function getShortClassName(string $fullClassName): string
+    {
+        $parts = explode('\\', $fullClassName);
+
+        return $parts[count($parts) - 1];
     }
 }
