@@ -37,17 +37,18 @@ Add new item to the `array` class property. Will add new property in case it doe
 
 ## Bootstrap app
 
-The following methods are specifically designed to modify the bootstrap/app.php file in your Laravel application:
+The following methods are specifically designed to modify the bootstrap/app.php file in Laravel application:
 
 ### addExceptionRender
 
 Adds a new exception render to the withExceptions method in bootstrap/app.php.
 
 #### Parameters:
-1. exceptionClass — the class name of the exception.
-2. renderBody (string) — the body of the render method.
-3. withRequest (bool, optional, default: false) — whether to pass the request object to the render body.
-    - If set to true, the request object will be available inside the render body under the variable $request.
+1. `exceptionClass` — the class name of the exception.
+    - Recommended: Use fully qualified class names, including namespaces, to prevent ambiguity.
+2. `renderBody` (`string`) — the body of the render method.
+3. `withRequest` (`bool`, optional, default: `false`) — whether to pass the request object to the render body.
+    - If set to `true`, the request object will be available inside the render body under the variable `$request`.
 
 #### Behavior:
 - Only adds a new render if it does not already exist for the specified exception class.
