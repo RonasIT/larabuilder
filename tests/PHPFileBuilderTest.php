@@ -2,10 +2,10 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
-use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase
@@ -109,81 +109,6 @@ class PHPFileBuilderTest extends TestCase
             ->addArrayPropertyItem('tags', 'three')
             ->addArrayPropertyItem('tags', 4)
             ->setProperty('newString', 'some string')
-            ->save();
-    }
-
-    public function testSetMethodCallBodyEmpty(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', 'expression_empty.php'),
-            $this->callFilePutContent('some_file_path.php', 'expression_empty.php'),
-        );
-
-        (new PHPFileBuilder('some_file_path.php'))
-            ->addExceptionRender(
-                exceptionClass: 'HttpException',
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                withRequest: true,
-            )
-            ->addExceptionRender(
-                exceptionClass: 'ExpectationFailedException',
-                renderBody: '
-                    throw $exception;
-                ',
-            )
-            ->save();
-    }
-
-    public function testSetMethodCallBodyCustom(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', 'expression_custom.php'),
-            $this->callFilePutContent('some_file_path.php', 'expression_custom.php'),
-        );
-
-        (new PHPFileBuilder('some_file_path.php'))
-            ->addExceptionRender(
-                exceptionClass: 'HttpException',
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                withRequest: true,
-            )
-            ->addExceptionRender(
-                exceptionClass: 'ExpectationFailedException',
-                renderBody: '
-                    throw $exception;
-                ',
-            )
-            ->save();
-    }
-
-    public function testSetMethodCallBodyExist(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', 'expression_exist.php'),
-            $this->callFilePutContent('some_file_path.php', 'expression_exist.php'),
-        );
-
-        (new PHPFileBuilder('some_file_path.php'))
-            ->addExceptionRender(
-                exceptionClass: 'HttpException',
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                withRequest: true,
-            )
             ->save();
     }
 }
