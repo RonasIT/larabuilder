@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -31,7 +32,7 @@ class BootstrapAppVisitorTest extends TestCase
                 withRequest: true,
             )
             ->addExceptionRender(
-                exceptionClass: 'ExpectationFailedException',
+                exceptionClass: ExpectationFailedException::class,
                 renderBody: '
                     throw $exception;
                 ',
@@ -49,7 +50,7 @@ class BootstrapAppVisitorTest extends TestCase
 
         (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
-                exceptionClass: 'HttpException',
+                exceptionClass: HttpException::class,
                 renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
@@ -58,7 +59,7 @@ class BootstrapAppVisitorTest extends TestCase
                 withRequest: true,
             )
             ->addExceptionRender(
-                exceptionClass: 'ExpectationFailedException',
+                exceptionClass: ExpectationFailedException::class,
                 renderBody: '
                     throw $exception;
                 ',
@@ -76,7 +77,7 @@ class BootstrapAppVisitorTest extends TestCase
 
         (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
-                exceptionClass: 'HttpException',
+                exceptionClass: HttpException::class,
                 renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
@@ -121,10 +122,8 @@ class BootstrapAppVisitorTest extends TestCase
 
         (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
-                exceptionClass: 'ExpectationFailedException',
-                renderBody: '
-                    throw $exception;
-                ',
+                exceptionClass: HttpException::class,
+                renderBody: 'return;',
             )
             ->save();
     }

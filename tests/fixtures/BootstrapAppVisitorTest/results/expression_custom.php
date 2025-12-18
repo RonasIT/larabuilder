@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\TrimStrings;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,9 +12,6 @@ use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
-use PHPUnit\Framework\ExpectationFailedException;
-use RonasIT\AutoDoc\Http\Middleware\AutoDocMiddleware;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -31,22 +27,19 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleCors::class,
             CheckForMaintenanceMode::class,
             ValidatePostSize::class,
-            TrimStrings::class,
             ConvertEmptyStringsToNull::class,
-            AutoDocMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->dontReport([
             AuthenticationException::class,
             AuthorizationException::class,
-            HttpException::class,
             ModelNotFoundException::class,
             TokenMismatchException::class,
             ValidationException::class,
         ]);
 
-        $exceptions->render(function (ExpectationFailedException $exception) {
+        $exceptions->render(function (PHPUnit\Framework\ExpectationFailedException $exception) {
             throw $exception;
         });
 
@@ -55,7 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'password_confirmation',
         ]);
 
-        $exceptions->render(function (HttpException $exception, Illuminate\Http\Request $request) {
+        $exceptions->render(function (Symfony\Component\HttpKernel\Exception\HttpException $exception, Illuminate\Http\Request $request) {
             return $request->expectsJson() ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode()) : null;
         });
     })

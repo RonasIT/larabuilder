@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return $request->expectsJson() ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode()) : null;
         });
 
-        $exceptions->render(function (ExpectationFailedException $exception) {
+        $exceptions->render(function (PHPUnit\Framework\ExpectationFailedException $exception) {
             throw $exception;
         });
     })->create();
