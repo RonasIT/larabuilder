@@ -34,3 +34,33 @@ will change already existing class property's value **AND access level**
 #### addArrayPropertyItem
 
 Add new item to the `array` class property. Will add new property in case it does not exist yet.
+
+## Bootstrap app
+
+The following methods are specifically designed to modify the bootstrap/app.php file in your Laravel application:
+
+### addExceptionRender
+
+Adds a new exception render to the withExceptions method in bootstrap/app.php.
+
+#### Parameters:
+1. exceptionClass — the class name of the exception.
+2. renderBody (string) — the body of the render method.
+3. withRequest (bool, optional, default: false) — whether to pass the request object to the render body.
+    - If set to true, the request object will be available inside the render body under the variable $request.
+
+#### Behavior:
+- Only adds a new render if it does not already exist for the specified exception class.
+- Does not modify existing renders.
+
+Example:
+
+```php
+new PHPFileBuilder(base_path('bootstrap/app.php'))
+    ->addExceptionRender(
+        ValidationException::class,
+        'return response()->json($request->all(), 422);',
+        true
+    )
+    ->save();
+```
