@@ -11,7 +11,6 @@ use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Middleware\HandleCors;
-use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -56,7 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'password_confirmation',
         ]);
 
-        $exceptions->render(function (HttpException $exception, Request $request) {
+        $exceptions->render(function (HttpException $exception, Illuminate\Http\Request $request) {
             return $request->expectsJson() ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode()) : null;
         });
     })

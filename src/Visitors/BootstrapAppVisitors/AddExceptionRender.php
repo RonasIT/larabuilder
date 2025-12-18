@@ -85,7 +85,7 @@ class AddExceptionRender extends BootstrapAppAbstractVisitor
         if ($this->withRequest) {
             $params[] = new Param(
                 var: new Variable('request'),
-                type: new Name('Request'),
+                type: new Name('Illuminate\Http\Request'),
             );
         }
 

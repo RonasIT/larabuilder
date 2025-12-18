@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BootstrapAppVisitorTest extends TestCase
 {
@@ -15,13 +16,13 @@ class BootstrapAppVisitorTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', 'expression_empty.php'),
-            $this->callFilePutContent('some_file_path.php', 'expression_empty.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
         );
 
-        (new PHPFileBuilder('some_file_path.php'))
+        (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
-                exceptionClass: 'HttpException',
+                exceptionClass: HttpException::class,
                 renderBody: '
                     return ($request->expectsJson())
                         ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
@@ -42,11 +43,11 @@ class BootstrapAppVisitorTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', 'expression_custom.php'),
-            $this->callFilePutContent('some_file_path.php', 'expression_custom.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
         );
 
-        (new PHPFileBuilder('some_file_path.php'))
+        (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
                 exceptionClass: 'HttpException',
                 renderBody: '
@@ -69,11 +70,11 @@ class BootstrapAppVisitorTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', 'expression_exist.php'),
-            $this->callFilePutContent('some_file_path.php', 'expression_exist.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'expression_exist.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
         );
 
-        (new PHPFileBuilder('some_file_path.php'))
+        (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
                 exceptionClass: 'HttpException',
                 renderBody: '
@@ -113,12 +114,12 @@ class BootstrapAppVisitorTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
-            $this->callFileGetContent('some_file_path.php', $fixture),
+            $this->callFileGetContent('bootstrap/app.php', $fixture),
         );
 
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
-        (new PHPFileBuilder('some_file_path.php'))
+        (new PHPFileBuilder('bootstrap/app.php'))
             ->addExceptionRender(
                 exceptionClass: 'ExpectationFailedException',
                 renderBody: '
