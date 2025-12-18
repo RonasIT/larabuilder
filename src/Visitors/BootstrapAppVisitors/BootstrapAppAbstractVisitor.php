@@ -3,13 +3,13 @@
 namespace RonasIT\Larabuilder\Visitors\BootstrapAppVisitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\Trait_;
-use PhpParser\Node\Stmt\Enum_;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Interface_;
+use PhpParser\Node\Stmt\Trait_;
+use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
 abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract

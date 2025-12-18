@@ -2,9 +2,9 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use RonasIT\Larabuilder\PHPFileBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
+use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class BootstrapAppVisitorTest extends TestCase
