@@ -54,8 +54,6 @@ Adds a new exception render to the withExceptions method in bootstrap/app.php.
 - Only adds a new render if it does not already exist for the specified exception class.
 - Does not modify existing renders.
 
-Example:
-
 ```php
 new PHPFileBuilder(base_path('bootstrap/app.php'))
     ->addExceptionRender(
