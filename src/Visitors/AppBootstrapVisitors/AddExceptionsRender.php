@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors\BootstrapAppVisitors;
+namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Closure;
@@ -14,11 +14,11 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 
-class AddExceptionRender extends BootstrapAppAbstractVisitor
+class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
     protected Parser $parser;
 
-    protected array $renderStatements;
+    protected Expression $renderStatements;
 
     public function __construct(
         protected string $exceptionClass,
@@ -27,13 +27,15 @@ class AddExceptionRender extends BootstrapAppAbstractVisitor
     ) {
         $this->parser = (new ParserFactory())->createForHostVersion();
 
-        $this->renderStatements = [$this->buildRenderCall()];
+        $this->renderStatements = $this->buildRenderCall();
 
-        $this->parentMethod = 'withExceptions';
-        $this->targetMethod = 'render';
+        parent::__construct(
+            parentMethod: 'withExceptions',
+            targetMethod: 'render',
+        );
     }
 
-    protected function matchesExceptionType(Expression $stmt): bool
+    protected function matchesCustomCriteria(Expression $stmt): bool
     {
         $closure = $stmt->expr->args[0]->value ?? null;
         $param = $closure?->params[0] ?? null;
@@ -54,16 +56,16 @@ class AddExceptionRender extends BootstrapAppAbstractVisitor
         $currentStatements = $node->args[0]->value->stmts;
 
         if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
-            $node->args[0]->value->stmts = $this->renderStatements;
+            $node->args[0]->value->stmts = [$this->renderStatements];
 
             return $node;
         }
 
         $lastExistingStatement = end($currentStatements);
 
-        $this->renderStatements[0]->setAttribute('previous', $lastExistingStatement);
+        $this->renderStatements->setAttribute('previous', $lastExistingStatement);
 
-        $node->args[0]->value->stmts = array_merge($currentStatements, $this->renderStatements);
+        $node->args[0]->value->stmts[] = $this->renderStatements;
 
         return $node;
     }

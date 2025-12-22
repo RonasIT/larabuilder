@@ -39,7 +39,7 @@ Add new item to the `array` class property. Will add new property in case it doe
 
 The following methods are specifically designed to modify the bootstrap/app.php file in Laravel application:
 
-### addExceptionRender
+### addExceptionsRender
 
 Adds a new exception render to the withExceptions method in bootstrap/app.php.
 
@@ -56,7 +56,7 @@ Adds a new exception render to the withExceptions method in bootstrap/app.php.
 
 ```php
 new PHPFileBuilder(base_path('bootstrap/app.php'))
-    ->addExceptionRender(
+    ->addExceptionsRender(
         ValidationException::class,
         'return response()->json($request->all(), 422);',
         true

@@ -4,16 +4,16 @@ namespace RonasIT\Larabuilder\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
+use RonasIT\Larabuilder\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
-use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class BootstrapAppVisitorTest extends TestCase
+class AppBootstrapVisitorTest extends TestCase
 {
     use PHPFileBuilderTestMockTrait;
 
-    public function testAddExceptionRenderEmpty(): void
+    public function testAddExceptionsRenderEmpty(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
@@ -21,8 +21,8 @@ class BootstrapAppVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
         );
 
-        (new PHPFileBuilder('bootstrap/app.php'))
-            ->addExceptionRender(
+        (new AppBootstrapBuilder('bootstrap/app.php'))
+            ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: '
                     return ($request->expectsJson())
@@ -31,7 +31,7 @@ class BootstrapAppVisitorTest extends TestCase
                 ',
                 withRequest: true,
             )
-            ->addExceptionRender(
+            ->addExceptionsRender(
                 exceptionClass: ExpectationFailedException::class,
                 renderBody: '
                     throw $exception;
@@ -40,7 +40,7 @@ class BootstrapAppVisitorTest extends TestCase
             ->save();
     }
 
-    public function testAddExceptionRenderCustom(): void
+    public function testAddExceptionsRenderCustom(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
@@ -48,8 +48,8 @@ class BootstrapAppVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
         );
 
-        (new PHPFileBuilder('bootstrap/app.php'))
-            ->addExceptionRender(
+        (new AppBootstrapBuilder('bootstrap/app.php'))
+            ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: '
                     return ($request->expectsJson())
@@ -58,7 +58,7 @@ class BootstrapAppVisitorTest extends TestCase
                 ',
                 withRequest: true,
             )
-            ->addExceptionRender(
+            ->addExceptionsRender(
                 exceptionClass: ExpectationFailedException::class,
                 renderBody: '
                     throw $exception;
@@ -67,7 +67,7 @@ class BootstrapAppVisitorTest extends TestCase
             ->save();
     }
 
-    public function testAddExceptionRenderExist(): void
+    public function testAddExceptionsRenderExist(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder',
@@ -75,8 +75,8 @@ class BootstrapAppVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
         );
 
-        (new PHPFileBuilder('bootstrap/app.php'))
-            ->addExceptionRender(
+        (new AppBootstrapBuilder('bootstrap/app.php'))
+            ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: '
                     return ($request->expectsJson())
@@ -120,8 +120,8 @@ class BootstrapAppVisitorTest extends TestCase
 
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
-        (new PHPFileBuilder('bootstrap/app.php'))
-            ->addExceptionRender(
+        (new AppBootstrapBuilder('bootstrap/app.php'))
+            ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
             )

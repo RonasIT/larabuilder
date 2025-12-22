@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors\BootstrapAppVisitors;
+namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
@@ -12,7 +12,7 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
-abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract
+abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
     protected const FORBIDDEN_NODES = [
         Class_::class => 'class',
@@ -21,12 +21,17 @@ abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract
         Enum_::class => 'enum',
     ];
 
-    protected string $parentMethod;
-    protected string $targetMethod;
-
-    abstract protected function matchesExceptionType(Expression $stmt): bool;
+    abstract protected function matchesCustomCriteria(Expression $stmt): bool;
 
     abstract protected function insertNode(MethodCall $node): MethodCall;
+
+    public function __construct(
+        protected string $parentMethod,
+        protected string $targetMethod,
+    ) {
+        $this->parentMethod = $parentMethod;
+        $this->targetMethod = $targetMethod;
+    }
 
     public function enterNode(Node $node)
     {
@@ -62,11 +67,11 @@ abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            if (!$this->isRenderCall($stmt)) {
+            if (!$this->isCallbackCall($stmt)) {
                 continue;
             }
 
-            if ($this->matchesExceptionType($stmt)) {
+            if ($this->matchesCustomCriteria($stmt)) {
                 return false;
             }
         }
@@ -74,7 +79,7 @@ abstract class BootstrapAppAbstractVisitor extends NodeVisitorAbstract
         return true;
     }
 
-    protected function isRenderCall(Expression $stmt): bool
+    protected function isCallbackCall(Expression $stmt): bool
     {
         return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
     }
