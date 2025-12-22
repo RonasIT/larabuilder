@@ -4,7 +4,7 @@ namespace RonasIT\Larabuilder\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
-use RonasIT\Larabuilder\AppBootstrapBuilder;
+use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,7 +16,7 @@ class AppBootstrapVisitorTest extends TestCase
     public function testAddExceptionsRenderEmpty(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
             $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
         );
@@ -43,7 +43,7 @@ class AppBootstrapVisitorTest extends TestCase
     public function testAddExceptionsRenderCustom(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
             $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
         );
@@ -70,7 +70,7 @@ class AppBootstrapVisitorTest extends TestCase
     public function testAddExceptionsRenderExist(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('bootstrap/app.php', 'expression_exist.php'),
             $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
         );
@@ -114,7 +114,7 @@ class AppBootstrapVisitorTest extends TestCase
     public function testInvalidBootstrapAppFileException(string $fixture, string $type): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('bootstrap/app.php', $fixture),
         );
 

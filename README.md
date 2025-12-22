@@ -55,7 +55,7 @@ Adds a new exception render to the withExceptions method in bootstrap/app.php.
 - Does not modify existing renders.
 
 ```php
-new PHPFileBuilder(base_path('bootstrap/app.php'))
+new AppBootstrapBuilder(base_path('bootstrap/app.php'))
     ->addExceptionsRender(
         ValidationException::class,
         'return response()->json($request->all(), 422);',

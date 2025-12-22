@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Larabuilder;
+namespace RonasIT\Larabuilder\Builders;
 
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
 

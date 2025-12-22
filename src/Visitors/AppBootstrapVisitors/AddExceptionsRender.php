@@ -18,7 +18,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
     protected Parser $parser;
 
-    protected Expression $renderStatements;
+    protected Expression $renderStatement;
 
     public function __construct(
         protected string $exceptionClass,
@@ -27,7 +27,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
     ) {
         $this->parser = (new ParserFactory())->createForHostVersion();
 
-        $this->renderStatements = $this->buildRenderCall();
+        $this->renderStatement = $this->buildRenderCall();
 
         parent::__construct(
             parentMethod: 'withExceptions',
@@ -37,18 +37,15 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
 
     protected function matchesCustomCriteria(Expression $stmt): bool
     {
-        $closure = $stmt->expr->args[0]->value ?? null;
-        $param = $closure?->params[0] ?? null;
+        $paramType = $stmt->expr->args[0]?->value?->params[0]?->type ?? null;
 
-        if (!($param?->type instanceof Name)) {
+        if (!($paramType instanceof Name)) {
             return false;
         }
 
-        $typeName = $param->type->toString();
-        $fullClassName = $this->exceptionClass;
-        $shortClassName = $this->getShortClassName($this->exceptionClass);
+        $typeName = $paramType->toString();
 
-        return $typeName === $fullClassName || $typeName === $shortClassName;
+        return $typeName === $this->exceptionClass || $typeName === class_basename($this->exceptionClass);
     }
 
     protected function insertNode(MethodCall $node): MethodCall
@@ -56,16 +53,16 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         $currentStatements = $node->args[0]->value->stmts;
 
         if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
-            $node->args[0]->value->stmts = [$this->renderStatements];
+            $node->args[0]->value->stmts = [$this->renderStatement];
 
             return $node;
         }
 
         $lastExistingStatement = end($currentStatements);
 
-        $this->renderStatements->setAttribute('previous', $lastExistingStatement);
+        $this->renderStatement->setAttribute('previous', $lastExistingStatement);
 
-        $node->args[0]->value->stmts[] = $this->renderStatements;
+        $node->args[0]->value->stmts[] = $this->renderStatement;
 
         return $node;
     }

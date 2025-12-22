@@ -15,13 +15,11 @@ use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
     protected const FORBIDDEN_NODES = [
-        Class_::class => 'class',
-        Trait_::class => 'trait',
-        Interface_::class => 'interface',
-        Enum_::class => 'enum',
+        Class_::class,
+        Trait_::class,
+        Interface_::class,
+        Enum_::class,
     ];
-
-    abstract protected function matchesCustomCriteria(Expression $stmt): bool;
 
     abstract protected function insertNode(MethodCall $node): MethodCall;
 
@@ -29,16 +27,14 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         protected string $parentMethod,
         protected string $targetMethod,
     ) {
-        $this->parentMethod = $parentMethod;
-        $this->targetMethod = $targetMethod;
     }
 
     public function enterNode(Node $node)
     {
-        foreach (self::FORBIDDEN_NODES as $type => $label) {
-            if ($node instanceof $type) {
-                throw new InvalidBootstrapAppFileException($label);
-            }
+        $isBootstrapAppFile = array_any(self::FORBIDDEN_NODES, fn ($type) => $node instanceof $type);
+
+        if ($isBootstrapAppFile) {
+            throw new InvalidBootstrapAppFileException(class_basename($node));
         }
     }
 
@@ -79,15 +75,13 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         return true;
     }
 
+    protected function matchesCustomCriteria(Expression $statement): bool
+    {
+        return true;
+    }
+
     protected function isCallbackCall(Expression $stmt): bool
     {
         return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
-    }
-
-    protected function getShortClassName(string $fullClassName): string
-    {
-        $parts = explode('\\', $fullClassName);
-
-        return $parts[count($parts) - 1];
     }
 }
