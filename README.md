@@ -39,34 +39,15 @@ Add new item to the `array` class property. Will add new property in case it doe
 
 ### Bootstrap app
 
-
 To modify the Laravel bootstrap app file, use special `AppBootstrapBuilder`:
 
+```php
 new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class,  '
     throw $exception;
 ');
+```
 
 ### addExceptionsRender
 
-Adds a new exception render to the `withExceptions` called method.
-
-#### Parameters:
-1. `exceptionClass` — the class name of the exception.
-    - Recommended: Use fully qualified class names, including namespaces, to prevent ambiguity.
-2. `renderBody` (`string`) — the body of the render method.
-3. `withRequest` (`bool`, optional, default: `false`) — whether to pass the request object to the render body.
-    - If set to `true`, the request object will be available inside the render body under the variable `$request`.
-
-#### Behavior:
-- Only adds a new render if it does not already exist for the specified exception class.
-- Does not modify existing renders.
-
-```php
-new AppBootstrapBuilder(base_path('bootstrap/app.php'))
-    ->addExceptionsRender(
-        ValidationException::class,
-        'return response()->json($request->all(), 422);',
-        true
-    )
-    ->save();
-```
+Adds a new exception render to the `withExceptions` called method in case it not exists yet. Do not modify already added
+render for the passed exception class.
