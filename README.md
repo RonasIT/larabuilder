@@ -35,6 +35,10 @@ will change already existing class property's value **AND access level**
 
 Add new item to the `array` class property. Will add new property in case it does not exist yet.
 
+#### removeArrayPropertyItem
+
+Remove items from the `array` class property. If the property or item does not exist no action is taken.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app
