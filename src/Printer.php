@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
 
@@ -58,5 +59,19 @@ class Printer extends Standard
         $previousNode = $node->getAttribute('previous');
 
         return $previousNode !== null && !($previousNode instanceof $type);
+    }
+
+    protected function pStmt_Expression(Expression $node): string
+    {
+        $newLine = ($this->shouldAddNewlineBeforeExpression($node, Expression::class)) ? $this->nl : '';
+
+        return $newLine . parent::pStmt_Expression($node);
+    }
+
+    protected function shouldAddNewlineBeforeExpression(Node $node, string $type): bool
+    {
+        $previousNode = $node->getAttribute('previous');
+
+        return $previousNode !== null && $previousNode instanceof $type;
     }
 }

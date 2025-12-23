@@ -2,10 +2,10 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
-use RonasIT\Larabuilder\PHPFileBuilder;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase
@@ -15,7 +15,7 @@ class PHPFileBuilderTest extends TestCase
     public function testSetProperty(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
             $this->callFilePutContent('some_file_path.php', 'class_with_properties.php'),
         );
@@ -39,7 +39,7 @@ class PHPFileBuilderTest extends TestCase
     public function testSetPropertyWithoutExistingProperties(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
             $this->callFilePutContent('some_file_path.php', 'class_without_properties.php'),
         );
@@ -53,7 +53,7 @@ class PHPFileBuilderTest extends TestCase
     public function testAddArrayPropertyItem(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
             $this->callFilePutContent('some_file_path.php', 'class_with_array_properties.php'),
         );
@@ -73,7 +73,7 @@ class PHPFileBuilderTest extends TestCase
     public function testAddArrayPropertyItemThrowsException(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
         );
 
@@ -87,7 +87,7 @@ class PHPFileBuilderTest extends TestCase
     public function testInvalidPhpFileThrowsException(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'invalid_file.php'),
         );
 
@@ -99,7 +99,7 @@ class PHPFileBuilderTest extends TestCase
     public function testSetPropertyInTrait(): void
     {
         $this->mockNativeFunction(
-            'RonasIT\Larabuilder',
+            'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'trait.php'),
             $this->callFilePutContent('some_file_path.php', 'trait.php'),
         );
