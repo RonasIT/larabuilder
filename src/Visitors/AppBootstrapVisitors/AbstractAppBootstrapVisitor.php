@@ -77,7 +77,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected function matchesCustomCriteria(Expression $statement): bool
     {
-        return true;
+        return false;
     }
 
     protected function isCallbackCall(Expression $stmt): bool
