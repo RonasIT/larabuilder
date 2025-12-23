@@ -37,7 +37,12 @@ Add new item to the `array` class property. Will add new property in case it doe
 
 ## Bootstrap app
 
-The following methods are specifically designed to modify the bootstrap/app.php file in Laravel application:
+
+To modify the Laravel bootstrap app file, use special `AppBootstrapBuilder`:
+
+new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class,  '
+    throw $exception;
+');
 
 ### addExceptionsRender
 
