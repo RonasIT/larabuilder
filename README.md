@@ -48,7 +48,7 @@ To modify the Laravel bootstrap app file, use special `AppBootstrapBuilder`:
 ```php
 new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class,  '
     throw $exception;
-');
+')->save();
 ```
 
 #### addExceptionsRender
