@@ -146,7 +146,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testRemoveArrayPropertyItemNotProperty(): void
+    public function testRemoveArrayPropertyItemNoProperty(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
