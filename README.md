@@ -41,7 +41,7 @@ The following methods are specifically designed to modify the bootstrap/app.php 
 
 ### addExceptionsRender
 
-Adds a new exception render to the withExceptions method in bootstrap/app.php.
+Adds a new exception render to the `withExceptions` called method.
 
 #### Parameters:
 1. `exceptionClass` — the class name of the exception.
