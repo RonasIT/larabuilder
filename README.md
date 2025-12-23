@@ -35,7 +35,9 @@ will change already existing class property's value **AND access level**
 
 Add new item to the `array` class property. Will add new property in case it does not exist yet.
 
-## Bootstrap app
+## Special Laravel structure builders
+
+### Bootstrap app
 
 
 To modify the Laravel bootstrap app file, use special `AppBootstrapBuilder`:
