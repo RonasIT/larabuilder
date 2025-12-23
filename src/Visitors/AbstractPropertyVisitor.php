@@ -14,7 +14,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 
-abstract class PropertyValueAbstract extends InsertOrUpdateNodeAbstractVisitor
+abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
 {
     public function __construct(
         protected string $name,

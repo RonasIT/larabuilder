@@ -1,12 +1,14 @@
 <?php
 
-namespace RonasIT\Larabuilder;
+namespace RonasIT\Larabuilder\Builders;
 
 use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
+use RonasIT\Larabuilder\NodeTraverser;
+use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;

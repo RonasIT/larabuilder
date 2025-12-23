@@ -11,7 +11,7 @@ use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
-class RemoveArrayPropertyItem extends PropertyValueAbstract
+class RemoveArrayPropertyItem extends AbstractPropertyVisitor
 {
     public function __construct(
         string $name,

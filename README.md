@@ -38,3 +38,20 @@ Add new item to the `array` class property. Will add new property in case it doe
 #### removeArrayPropertyItem
 
 Remove items from the `array` class property. If the property or item does not exist no action is taken.
+
+## Special Laravel structure builders
+
+### Bootstrap app
+
+To modify the Laravel bootstrap app file, use special `AppBootstrapBuilder`:
+
+```php
+new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class,  '
+    throw $exception;
+');
+```
+
+### addExceptionsRender
+
+Adds a new exception render to the `withExceptions` called method in case it does not exist yet. Does not modify already added
+render for the passed exception class.
