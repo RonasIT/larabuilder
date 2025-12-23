@@ -6,6 +6,10 @@ use Some\AnotherTrait;
 
 trait SomeTrait {
     public int $floatProperty = 56;
+
+    protected array $fillable = [
+        'email',
+    ];
     public array $tags = [
         'three',
         4,
