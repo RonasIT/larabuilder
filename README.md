@@ -49,5 +49,5 @@ new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class
 
 ### addExceptionsRender
 
-Adds a new exception render to the `withExceptions` called method in case it not exists yet. Do not modify already added
+Adds a new exception render to the `withExceptions` called method in case it does not exist yet. Does not modify already added
 render for the passed exception class.
