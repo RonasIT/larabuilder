@@ -21,15 +21,11 @@ class AppBootstrapVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
         );
 
-        (new AppBootstrapBuilder('bootstrap/app.php'))
+        (new AppBootstrapBuilder())
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                withRequest: true,
+                renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
             )
             ->addExceptionsRender(
                 exceptionClass: ExpectationFailedException::class,
@@ -48,15 +44,11 @@ class AppBootstrapVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
         );
 
-        (new AppBootstrapBuilder('bootstrap/app.php'))
+        (new AppBootstrapBuilder())
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                withRequest: true,
+                renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
             )
             ->addExceptionsRender(
                 exceptionClass: ExpectationFailedException::class,
@@ -75,15 +67,11 @@ class AppBootstrapVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
         );
 
-        (new AppBootstrapBuilder('bootstrap/app.php'))
+        (new AppBootstrapBuilder())
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                withRequest: true,
+                renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
             )
             ->save();
     }
@@ -120,7 +108,7 @@ class AppBootstrapVisitorTest extends TestCase
 
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
-        (new AppBootstrapBuilder('bootstrap/app.php'))
+        (new AppBootstrapBuilder())
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',

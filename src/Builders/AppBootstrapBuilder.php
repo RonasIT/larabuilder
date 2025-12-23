@@ -6,9 +6,14 @@ use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
 
 class AppBootstrapBuilder extends PHPFileBuilder
 {
-    public function addExceptionsRender(string $exceptionClass, string $renderBody, bool $withRequest = false): self
+    public function __construct(string $filePath = 'bootstrap/app.php')
     {
-        $this->traverser->addVisitor(new AddExceptionsRender($exceptionClass, $renderBody, $withRequest));
+        parent::__construct($filePath);
+    }
+
+    public function addExceptionsRender(string $exceptionClass, string $renderBody, bool $includeRequestArg = false): self
+    {
+        $this->traverser->addVisitor(new AddExceptionsRender($exceptionClass, $renderBody, $includeRequestArg));
 
         return $this;
     }
