@@ -23,7 +23,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
     public function __construct(
         protected string $exceptionClass,
         protected string $renderBody,
-        protected bool $withRequest,
+        protected bool $includeRequestArg,
     ) {
         $this->parser = (new ParserFactory())->createForHostVersion();
 
@@ -89,7 +89,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
             ),
         ];
 
-        if ($this->withRequest) {
+        if ($this->includeRequestArg) {
             $params[] = new Param(
                 var: new Variable('request'),
                 type: new Name('Illuminate\Http\Request'),

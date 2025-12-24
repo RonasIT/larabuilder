@@ -48,10 +48,10 @@ To modify the Laravel bootstrap app file, use special `AppBootstrapBuilder`:
 ```php
 new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class,  '
     throw $exception;
-');
+')->save();
 ```
 
-### addExceptionsRender
+#### addExceptionsRender
 
 Adds a new exception render to the `withExceptions` called method in case it does not exist yet. Does not modify already added
 render for the passed exception class.
