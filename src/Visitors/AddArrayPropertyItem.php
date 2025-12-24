@@ -15,7 +15,7 @@ class AddArrayPropertyItem extends SetPropertyValue
     protected ArrayItem $arrayItem;
 
     public function __construct(
-        protected string $name,
+        string $name,
         mixed $value,
     ) {
         parent::__construct($name, $value);
