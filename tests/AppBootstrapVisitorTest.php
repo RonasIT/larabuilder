@@ -21,7 +21,7 @@ class AppBootstrapVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
         );
 
-        (new AppBootstrapBuilder())
+        new AppBootstrapBuilder()
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: $this->getJsonFixture('render_body'),
@@ -44,7 +44,7 @@ class AppBootstrapVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
         );
 
-        (new AppBootstrapBuilder())
+        new AppBootstrapBuilder()
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: $this->getJsonFixture('render_body'),
@@ -67,7 +67,7 @@ class AppBootstrapVisitorTest extends TestCase
             $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
         );
 
-        (new AppBootstrapBuilder())
+        new AppBootstrapBuilder()
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: $this->getJsonFixture('render_body'),
@@ -108,7 +108,7 @@ class AppBootstrapVisitorTest extends TestCase
 
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
-        (new AppBootstrapBuilder())
+        new AppBootstrapBuilder()
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
