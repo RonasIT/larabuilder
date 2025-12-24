@@ -18,6 +18,8 @@ class AddArrayPropertyItem extends SetPropertyValue
         protected string $name,
         mixed $value,
     ) {
+        parent::__construct($name, $value);
+
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
 
         $this->arrayItem = new ArrayItem($propertyValue);
