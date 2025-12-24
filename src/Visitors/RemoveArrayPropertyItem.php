@@ -29,7 +29,7 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
             throw new UnexpectedPropertyTypeException(
                 property: $this->name,
                 expectedType: 'array',
-                actualType: $node->type,
+                actualType: $node->type?->name,
             );
         }
 

@@ -35,7 +35,7 @@ class AddArrayPropertyItem extends SetPropertyValue
             throw new UnexpectedPropertyTypeException(
                 property: $this->name,
                 expectedType: 'array',
-                actualType: $node->type,
+                actualType: $node->type?->name,
             );
         }
 
