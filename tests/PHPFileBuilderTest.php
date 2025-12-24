@@ -158,4 +158,18 @@ class PHPFileBuilderTest extends TestCase
             ->removeArrayPropertyItem('notProperty', ['value'])
             ->save();
     }
+
+    public function testRemoveArrayPropertyUnexpectedPropertyExceptionNull(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
+        );
+
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'nullProperty' has unexpected type. Expected 'array', actual 'null'.");
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->removeArrayPropertyItem('nullProperty', ['value'])
+            ->save();
+    }
 }
