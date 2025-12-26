@@ -17,6 +17,7 @@ class SomeClass
         'arrayProperty' => [0 => 1, 1 => 'string', 2 => true],
         'arrayProperty2' => [1, 2, 3],
         'arrayProperty3' => ['key1' => 5, 'key2' => 3.67, 'key3' => false, 'key4' => 'test', 'key5' => [10, true, 'foo'], 'key6' => null],
+        'string1',
     ];
 
     public function __construct()
