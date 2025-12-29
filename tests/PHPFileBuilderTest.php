@@ -215,7 +215,7 @@ class PHPFileBuilderTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('add_imports_to_class.php', 'add_imports_to_class.php'),
-            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php')
+            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php'),
         );
 
         new PHPFileBuilder('add_imports_to_class.php')

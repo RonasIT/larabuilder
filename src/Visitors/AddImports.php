@@ -2,12 +2,12 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use PhpParser\NodeVisitorAbstract;
-use PhpParser\Node\Stmt\Use_;
-use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\Node\Stmt\UseUse;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\ClassLike;
+use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Use_;
+use PhpParser\Node\Stmt\UseUse;
+use PhpParser\NodeVisitorAbstract;
 
 class AddImports extends NodeVisitorAbstract
 {
@@ -35,7 +35,7 @@ class AddImports extends NodeVisitorAbstract
             return $nodes;
         }
 
-        $newImportNodes = array_map(fn ($ns) => new Use_([new UseUse(new Name($ns))]), $newImports);
+        $newImportNodes = array_map(fn ($import) => new Use_([new UseUse(new Name($import))]), $newImports);
 
         $insertionIndex = $this->findInsertionIndex($targetNodes);
 
