@@ -222,4 +222,30 @@ class PHPFileBuilderTest extends TestCase
             ->addImports([])
             ->save();
     }
+
+    public function testAddImportsAlreadyImported()
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_imports_to_class.php', 'add_imports_to_class.php'),
+            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php'),
+        );
+
+        new PHPFileBuilder('add_imports_to_class.php')
+            ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
+            ->save();
+    }
+
+    public function testAddImportsToFileWithoutNamespace()
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_imports_to_file_without_namespace.php', 'add_imports_to_file_without_namespace.php'),
+            $this->callFilePutContent('add_imports_to_file_without_namespace.php', 'add_imports_to_file_without_namespace.php'),
+        );
+
+        new PHPFileBuilder('add_imports_to_file_without_namespace.php')
+            ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
+            ->save();
+    }
 }

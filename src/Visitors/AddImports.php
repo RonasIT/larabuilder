@@ -25,29 +25,38 @@ class AddImports extends NodeVisitorAbstract
 
         $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
 
-        $targetNodes = (is_null($targetNamespace)) ? $nodes : $targetNamespace->stmts;
-
-        $existingImports = $this->getExistingImports($targetNodes);
-
-        $newImports = array_diff($this->imports, $existingImports);
-
-        if (empty($newImports)) {
-            return $nodes;
+        if (!is_null($targetNamespace)) {
+            $targetNodes = &$targetNamespace->stmts;
+        } else {
+            $targetNodes = &$nodes;
         }
 
-        $newImportNodes = array_map(fn ($import) => new Use_([new UseUse(new Name($import))]), $newImports);
+        $newImports = $this->getUniqueNewImports($targetNodes);
 
-        $insertionIndex = $this->findInsertionIndex($targetNodes);
-
-        array_splice($targetNodes, $insertionIndex, 0, $newImportNodes);
-
-        if ($targetNamespace) {
-            $targetNamespace->stmts = $targetNodes;
-
-            return $nodes;
+        if (!empty($newImports)) {
+            $this->injectImports($targetNodes, $newImports);
         }
 
-        return $targetNodes;
+        return $nodes;
+    }
+
+    protected function getUniqueNewImports(array $nodes): array
+    {
+        $existing = $this->getExistingImports($nodes);
+
+        return array_diff($this->imports, $existing);
+    }
+
+    protected function injectImports(array &$nodes, array $newImports): void
+    {
+        $importNodes = array_map(
+            callback: fn ($import) => new Use_([new UseUse(new Name($import))]),
+            array: $newImports,
+        );
+
+        $index = $this->findInsertionIndex($nodes);
+
+        array_splice($nodes, $index, 0, $importNodes);
     }
 
     protected function getExistingImports(array $nodes): array
