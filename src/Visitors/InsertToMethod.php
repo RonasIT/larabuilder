@@ -57,7 +57,7 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
     protected function parsePHPCode(string $code): array
     {
         if (!str_starts_with(trim($code), '<?php')) {
-            $code = "<?php\n" . $code;
+            $code = "<?php\n{$code}";
         }
 
         $parser = (new ParserFactory())->createForHostVersion();
