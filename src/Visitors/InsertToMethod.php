@@ -24,7 +24,7 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function insertNode(Node $node): Node
     {
-        throw new NodeNotExistException($this->functionName);
+        throw new NodeNotExistException('Method', $this->functionName);
     }
 
     protected function shouldUpdateNode(Node $node): bool

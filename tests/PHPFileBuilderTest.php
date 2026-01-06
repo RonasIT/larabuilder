@@ -214,7 +214,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
         );
 
-        $this->assertExceptionThrew(NodeNotExistException::class, "Node 'noMethod' does not exist.");
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
 
         (new PHPFileBuilder('some_file_path.php'))
             ->insertCodeToMethod('noMethod', $this->getFixture('sample_code.php'))
