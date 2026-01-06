@@ -4,7 +4,9 @@ namespace RonasIT\Larabuilder\Tests;
 
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
+use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
@@ -170,6 +172,65 @@ class PHPFileBuilderTest extends TestCase
 
         (new PHPFileBuilder('some_file_path.php'))
             ->removeArrayPropertyItem('nullProperty', ['value'])
+            ->save();
+    }
+
+    public function testInsertToMagicMethod(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_method_code_added.php'),
+            $this->callFileGetContent('some_path.php', 'class_with_properties.php'),
+            $this->callFilePutContent('some_path.php', 'class_with_method_code.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->insertCodeToMethod('someMethod', $this->getFixture('sample_code.php'))
+            ->save();
+
+        (new PHPFileBuilder('some_path.php'))
+            ->insertCodeToMethod('__construct', '$this->name = $name;', InsertPositionEnum::Start)
+            ->save();
+    }
+
+    public function testInsertToTraitMethod(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('trait.php', 'trait.php'),
+            $this->callFilePutContent('trait.php', 'trait_with_method_code_added.php'),
+        );
+
+        (new PHPFileBuilder('trait.php'))
+            ->insertCodeToMethod('method1', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
+            ->save();
+    }
+
+    public function testInsertToMethodNotExist(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+        );
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Node 'noMethod' does not exist.");
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->insertCodeToMethod('noMethod', $this->getFixture('sample_code.php'))
+            ->save();
+    }
+
+    public function testInsertToMethodEmptyString(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_properties_unchanged.php'),
+        );
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->insertCodeToMethod('someMethod', '')
             ->save();
     }
 }

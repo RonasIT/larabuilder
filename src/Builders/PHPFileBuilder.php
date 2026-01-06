@@ -6,10 +6,12 @@ use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\InsertToMethod;
 use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
@@ -54,6 +56,13 @@ class PHPFileBuilder
     public function removeArrayPropertyItem(string $propertyName, array $value): self
     {
         $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $value));
+
+        return $this;
+    }
+
+    public function insertCodeToMethod(string $functionName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
+    {
+        $this->traverser->addVisitor(new InsertToMethod($functionName, $code, $position));
 
         return $this;
     }
