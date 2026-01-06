@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use Exception;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
@@ -231,6 +232,20 @@ class PHPFileBuilderTest extends TestCase
 
         (new PHPFileBuilder('some_file_path.php'))
             ->insertCodeToMethod('someMethod', '')
+            ->save();
+    }
+
+    public function testInsertToMethodInvalidCode(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+        );
+
+        $this->assertExceptionThrew(Exception::class, 'Cannot parse PHP code');
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->insertCodeToMethod('someMethod', $this->getFixture('original/invalid_file.php'))
             ->save();
     }
 }
