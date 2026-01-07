@@ -39,7 +39,7 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
     protected function areNodesEqual(Node $expected, mixed $actual): bool
     {
         $actual = match (true) {
-            is_bool($actual) => $actual ? 'true' : 'false',
+            is_bool($actual) => ($actual) ? 'true' : 'false',
             is_null($actual) => 'null',
             default => $actual,
         };
@@ -47,7 +47,7 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
         return match (true) {
             $expected instanceof Scalar => $expected->value === $actual,
             $expected instanceof ConstFetch => $expected->name->name === $actual,
-            $expected instanceof Array_ => $this->areArrayNodesEqual($expected, $actual),
+            $expected instanceof Array_ && is_array($actual) => $this->areArrayNodesEqual($expected, $actual),
             default => false,
         };
     }
