@@ -9,7 +9,7 @@ use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AppBootstrapVisitorTest extends TestCase
+class AppBootstrapBuilderTest extends TestCase
 {
     use PHPFileBuilderTestMockTrait;
 

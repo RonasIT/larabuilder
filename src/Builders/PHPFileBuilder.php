@@ -10,6 +10,7 @@ use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
@@ -28,7 +29,7 @@ class PHPFileBuilder
 
         try {
             $this->syntaxTree = $parser->parse($code);
-        } catch (Error $e) {
+        } catch (Error) {
             throw new InvalidPHPFileException($this->filePath);
         }
 
@@ -68,5 +69,12 @@ class PHPFileBuilder
         $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
+    }
+
+    public function addImports(array $imports): self
+    {
+        $this->traverser->addVisitor(new AddImports($imports));
+
+        return $this;
     }
 }

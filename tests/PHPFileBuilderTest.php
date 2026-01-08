@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
@@ -171,6 +172,81 @@ class PHPFileBuilderTest extends TestCase
 
         (new PHPFileBuilder('some_file_path.php'))
             ->removeArrayPropertyItem('nullProperty', ['value'])
+            ->save();
+    }
+
+    public static function provideAddImportsFiles(): array
+    {
+        return [
+            [
+                'fixture' => 'add_imports_to_class.php',
+            ],
+            [
+                'fixture' => 'add_imports_to_trait.php',
+            ],
+            [
+                'fixture' => 'add_imports_to_interface.php',
+            ],
+            [
+                'fixture' => 'add_imports_to_enum.php',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideAddImportsFiles')]
+    public function testAddImports(string $fixture): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent($fixture, $fixture),
+            $this->callFilePutContent($fixture, $fixture),
+        );
+
+        new PHPFileBuilder($fixture)
+            ->addImports([
+                'RonasIT\Larabuilder\Tests\Support\FirstClass',
+                'RonasIT\Larabuilder\Tests\Support\SecondClass',
+                'RonasIT\Larabuilder\Tests\Support\ThirdClass',
+            ])
+            ->save();
+    }
+
+    public function testAddImportsEmptyList(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_imports_to_class.php', 'add_imports_to_class.php'),
+            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php'),
+        );
+
+        new PHPFileBuilder('add_imports_to_class.php')
+            ->addImports([])
+            ->save();
+    }
+
+    public function testAddImportsAlreadyImported(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_imports_to_class.php', 'add_imports_to_class.php'),
+            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php'),
+        );
+
+        new PHPFileBuilder('add_imports_to_class.php')
+            ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
+            ->save();
+    }
+
+    public function testAddImportsToFileWithoutNamespace(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_imports_to_file_without_namespace.php', 'add_imports_to_file_without_namespace.php'),
+            $this->callFilePutContent('add_imports_to_file_without_namespace.php', 'add_imports_to_file_without_namespace.php'),
+        );
+
+        new PHPFileBuilder('add_imports_to_file_without_namespace.php')
+            ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
             ->save();
     }
 }
