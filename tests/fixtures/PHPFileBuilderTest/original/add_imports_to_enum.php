@@ -4,7 +4,7 @@ namespace RonasIT\Larabuilder\Tests\Support;
 
 use RonasIT\Larabuilder\Tests\Support\FirstClass;
 
-Enum SomeEnum
+enum SomeEnum
 {
 
 }

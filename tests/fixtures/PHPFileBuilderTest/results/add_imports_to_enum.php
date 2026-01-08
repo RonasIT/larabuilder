@@ -6,7 +6,7 @@ use RonasIT\Larabuilder\Tests\Support\FirstClass;
 use RonasIT\Larabuilder\Tests\Support\SecondClass;
 use RonasIT\Larabuilder\Tests\Support\ThirdClass;
 
-Enum SomeEnum
+enum SomeEnum
 {
 
 }

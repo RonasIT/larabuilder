@@ -210,7 +210,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddImportsEmptyList()
+    public function testAddImportsEmptyList(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -223,7 +223,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddImportsAlreadyImported()
+    public function testAddImportsAlreadyImported(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -236,7 +236,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddImportsToFileWithoutNamespace()
+    public function testAddImportsToFileWithoutNamespace(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
