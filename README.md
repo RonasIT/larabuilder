@@ -39,6 +39,10 @@ Add new item to the `array` class property. Will add new property in case it doe
 
 Remove items from the `array` class property. If the property or item does not exist no action is taken.
 
+### addImports
+
+Add new imports to the file. This method will add a new import only in case it does not exist yet, preventing duplicate `use` statements.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app
