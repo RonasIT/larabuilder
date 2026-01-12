@@ -54,9 +54,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function removeArrayPropertyItem(string $propertyName, array $value): self
+    public function removeArrayPropertyItem(string $propertyName, array $values): self
     {
-        $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $value));
+        $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $values));
 
         return $this;
     }
