@@ -76,7 +76,7 @@ class Printer extends Standard
         return $previousNode !== null && $previousNode instanceof $type;
     }
 
-    protected function pScalar_UnformattedCode(UnformattedCode $node): string
+    protected function pStmt_UnformattedCode(UnformattedCode $node): string
     {
         $value = $this->prepareUnformattedCode($node->value);
 

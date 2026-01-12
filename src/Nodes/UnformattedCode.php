@@ -2,9 +2,9 @@
 
 namespace RonasIT\Larabuilder\Nodes;
 
-use PhpParser\Node\Scalar;
+use PhpParser\Node\Stmt;
 
-class UnformattedCode extends Scalar
+class UnformattedCode extends Stmt
 {
     public function __construct(
         public string $value,
@@ -19,6 +19,6 @@ class UnformattedCode extends Scalar
 
     public function getType(): string
     {
-        return 'Scalar_UnformattedCode';
+        return 'Stmt_UnformattedCode';
     }
 }

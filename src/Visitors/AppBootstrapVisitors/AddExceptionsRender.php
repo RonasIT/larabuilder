@@ -70,6 +70,11 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         return $node;
     }
 
+    protected function validateRenderBody(): array
+    {
+        return $this->parser->parse('<?php ' . $this->renderBody);
+    }
+
     protected function buildRenderCall(): Expression
     {
         return new Expression(
@@ -103,10 +108,5 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
             'params' => $params,
             'stmts' => [new UnformattedCode($this->renderBody)],
         ]);
-    }
-
-    protected function validateRenderBody(): array
-    {
-        return $this->parser->parse('<?php ' . $this->renderBody);
     }
 }
