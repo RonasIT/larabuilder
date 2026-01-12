@@ -13,6 +13,7 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\Nodes\UnformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
@@ -26,6 +27,8 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         protected bool $includeRequestArg,
     ) {
         $this->parser = (new ParserFactory())->createForHostVersion();
+
+        $this->validateRenderBody();
 
         $this->renderStatement = $this->buildRenderCall();
 
@@ -98,11 +101,11 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
 
         return new Closure([
             'params' => $params,
-            'stmts' => $this->parseClosureBody(),
+            'stmts' => [new UnformattedCode($this->renderBody)],
         ]);
     }
 
-    protected function parseClosureBody(): array
+    protected function validateRenderBody(): array
     {
         return $this->parser->parse('<?php ' . $this->renderBody);
     }
