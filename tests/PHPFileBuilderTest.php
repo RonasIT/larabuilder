@@ -177,7 +177,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertToMagicMethod(): void
+    public function testInsertToMethod(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -243,7 +243,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, 'Cannot parse PHP code');
+        $this->assertExceptionThrew(Exception::class, 'Cannot parse PHP code: Syntax error, unexpected T_PUBLIC on line 3');
 
         (new PHPFileBuilder('some_file_path.php'))
             ->insertCodeToMethod('someMethod', $this->getFixture('original/invalid_file.php'))

@@ -41,17 +41,17 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
     protected function updateNode(Node $node): void
     {
         $newStmt = $this->parsePHPCode($this->code);
-        $stmts = $node->stmts ?? [];
-        $emptyLine = $node->stmts ? [new Nop()] : [];
+        $existingStmts = $node->stmts ?? [];
+        $separator = (!empty($existingStmts)) ? [new Nop()] : [];
 
         $node->stmts = $this->insertPosition === InsertPositionEnum::Start
-            ? [...$newStmt, ...$emptyLine, ...$stmts]
-            : [...$stmts, ...$emptyLine, ...$newStmt];
+            ? [...$newStmt, ...$separator, ...$existingStmts]
+            : [...$existingStmts, ...$separator, ...$newStmt];
     }
 
     protected function getInsertableNode(): Node
     {
-        return new Node\Stmt\Nop();
+        return new Nop();
     }
 
     protected function parsePHPCode(string $code): array
@@ -64,8 +64,8 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
 
         try {
             $ast = $parser->parse($code);
-        } catch (Error $e) {
-            throw new Exception('Cannot parse PHP code');
+        } catch (Error $error) {
+            throw new Exception("Cannot parse PHP code: {$error->getMessage()}");
         }
 
         return $ast;
