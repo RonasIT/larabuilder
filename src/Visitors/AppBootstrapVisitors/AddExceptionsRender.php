@@ -11,14 +11,10 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Nodes\UnformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
-    protected Parser $parser;
-
     protected Expression $renderStatement;
 
     public function __construct(
@@ -26,9 +22,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
-        $this->parser = (new ParserFactory())->createForHostVersion();
-
-        $this->validateRenderBody();
+        $this->validateRenderBody($renderBody);
 
         $this->renderStatement = $this->buildRenderCall();
 
@@ -68,11 +62,6 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         $node->args[0]->value->stmts[] = $this->renderStatement;
 
         return $node;
-    }
-
-    protected function validateRenderBody(): array
-    {
-        return $this->parser->parse('<?php ' . $this->renderBody);
     }
 
     protected function buildRenderCall(): Expression
