@@ -4,7 +4,7 @@ namespace RonasIT\Larabuilder\Nodes;
 
 use PhpParser\Node\Stmt;
 
-class UnformattedCode extends Stmt
+class PreformattedCode extends Stmt
 {
     public function __construct(
         public string $value,
@@ -19,6 +19,6 @@ class UnformattedCode extends Stmt
 
     public function getType(): string
     {
-        return 'Stmt_UnformattedCode';
+        return 'Stmt_PreformattedCode';
     }
 }

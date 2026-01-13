@@ -11,7 +11,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\Nodes\UnformattedCode;
+use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
@@ -22,14 +22,17 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
-        $this->validateRenderBody($renderBody);
-
         $this->renderStatement = $this->buildRenderCall();
 
         parent::__construct(
             parentMethod: 'withExceptions',
             targetMethod: 'render',
         );
+    }
+
+    public function beforeTraverse(array $nodes): void
+    {
+        $this->validateRenderBody($this->renderBody);
     }
 
     protected function matchesCustomCriteria(Expression $stmt): bool
@@ -95,7 +98,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
 
         return new Closure([
             'params' => $params,
-            'stmts' => [new UnformattedCode($this->renderBody)],
+            'stmts' => [new PreformattedCode($this->renderBody)],
         ]);
     }
 }

@@ -30,7 +30,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
     ) {
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         $isBootstrapAppFile = array_any(self::FORBIDDEN_NODES, fn ($type) => $node instanceof $type);
 
@@ -86,10 +86,8 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
     }
 
-    protected function validateRenderBody(string $body): array
+    protected function validateRenderBody(string $body): void
     {
-        $parser = (new ParserFactory())->createForHostVersion();
-
-        return $parser->parse('<?php ' . $body);
+        (new ParserFactory())->createForHostVersion()->parse('<?php ' . $body);
     }
 }

@@ -8,7 +8,7 @@ use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
-use RonasIT\Larabuilder\Nodes\UnformattedCode;
+use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class Printer extends Standard
 {
@@ -76,9 +76,9 @@ class Printer extends Standard
         return $previousNode !== null && $previousNode instanceof $type;
     }
 
-    protected function pStmt_UnformattedCode(UnformattedCode $node): string
+    protected function pStmt_PreformattedCode(PreformattedCode $node): string
     {
-        $value = $this->prepareUnformattedCode($node->value);
+        $value = $this->preparePreformattedCode($node->value);
 
         $indentLength = strspn($value, " \t");
         $indent = substr($value, 0, $indentLength);
@@ -86,18 +86,18 @@ class Printer extends Standard
         $lines = explode("\n", $value);
 
         $lines = array_map(
-            callback: fn (string $line) => str_starts_with($line, $indent) ? substr($line, $indentLength) : $line,
+            callback: fn (string $line) => (str_starts_with($line, $indent)) ? substr($line, $indentLength) : $line,
             array: $lines,
         );
 
         return implode($this->nl, $lines);
     }
 
-    protected function prepareUnformattedCode(string $value): string
+    protected function preparePreformattedCode(string $value): string
     {
         $value = str_replace("\r\n", "\n", $value);
         $value = ltrim($value, "\n");
 
-        return rtrim($value, " \t\n");
+        return rtrim($value);
     }
 }
