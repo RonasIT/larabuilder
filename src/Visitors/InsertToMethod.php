@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
@@ -16,7 +17,7 @@ use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
     public function __construct(
-        protected string $functionName,
+        protected string $methodName,
         protected string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
@@ -24,13 +25,24 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function insertNode(Node $node): Node
     {
-        throw new NodeNotExistException('Method', $this->functionName);
+        throw new NodeNotExistException('Method', $this->methodName);
+    }
+
+    public function beforeTraverse(array $nodes): void
+    {
+        $nodeFinder = new NodeFinder();
+
+        $node = $nodeFinder->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
+
+        if (is_null($node)) {
+            throw new NodeNotExistException('Method', $this->methodName);
+        }
     }
 
     protected function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof ClassMethod
-            && $this->functionName === $node->name->name;
+            && $this->methodName === $node->name->name;
     }
 
     protected function isParentNode(Node $node): bool
@@ -44,7 +56,7 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
         $existingStmts = $node->stmts ?? [];
         $separator = (!empty($existingStmts)) ? [new Nop()] : [];
 
-        $node->stmts = $this->insertPosition === InsertPositionEnum::Start
+        $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
             ? [...$newStmt, ...$separator, ...$existingStmts]
             : [...$existingStmts, ...$separator, ...$newStmt];
     }

@@ -325,4 +325,18 @@ class PHPFileBuilderTest extends TestCase
             ->insertCodeToMethod('someMethod', $this->getFixture('original/invalid_file.php'))
             ->save();
     }
+
+    public function testInsertToMethodNotClass(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'add_imports_to_enum.php'),
+        );
+
+        $this->assertExceptionThrew(Exception::class, "Method 'someMethod' does not exist.");
+
+        (new PHPFileBuilder('some_file_path.php'))
+            ->insertCodeToMethod('someMethod', '')
+            ->save();
+    }
 }
