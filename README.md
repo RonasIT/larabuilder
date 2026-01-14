@@ -55,7 +55,7 @@ new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class
 ')->save();
 ```
 
-This builder has all described above features and the special methods:
+This builder has all the features described above and the special methods:
 
 #### addExceptionsRender
 
