@@ -68,6 +68,13 @@ class PHPFileBuilder
         return $this;
     }
 
+    public function addImports(array $imports): self
+    {
+        $this->traverser->addVisitor(new AddImports($imports));
+
+        return $this;
+    }
+
     public function save(): void
     {
         $this->traverser->addVisitor(new CloningVisitor());
@@ -78,12 +85,5 @@ class PHPFileBuilder
         $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
-    }
-
-    public function addImports(array $imports): self
-    {
-        $this->traverser->addVisitor(new AddImports($imports));
-
-        return $this;
     }
 }

@@ -43,6 +43,10 @@ Remove items from the `array` class property. If the property or item does not e
 
 Insert the provided code into the specified method body at the desired position - by default, to the end of the method.
 
+#### addImports
+
+Add new imports to the file. This method will add a new import only in case it does not exist yet, preventing duplicate `use` statements.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app
@@ -54,6 +58,8 @@ new AppBootstrapBuilder()->addExceptionsRender(ExpectationFailedException::class
     throw $exception;
 ')->save();
 ```
+
+This builder has all the features described above and the special methods:
 
 #### addExceptionsRender
 
