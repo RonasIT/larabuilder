@@ -47,7 +47,11 @@ class AppBootstrapBuilderTest extends TestCase
         new AppBootstrapBuilder()
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
-                renderBody: $this->getJsonFixture('render_body'),
+                renderBody: '
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                ',
                 includeRequestArg: true,
             )
             ->addExceptionsRender(

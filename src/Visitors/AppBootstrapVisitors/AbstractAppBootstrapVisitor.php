@@ -10,6 +10,7 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
 abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
@@ -29,7 +30,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
     ) {
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         $isBootstrapAppFile = array_any(self::FORBIDDEN_NODES, fn ($type) => $node instanceof $type);
 
@@ -83,5 +84,10 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
     protected function isCallbackCall(Expression $stmt): bool
     {
         return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
+    }
+
+    protected function validateRenderBody(string $body): void
+    {
+        new ParserFactory()->createForHostVersion()->parse('<?php ' . $body);
     }
 }
