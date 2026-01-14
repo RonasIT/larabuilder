@@ -82,14 +82,14 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         $params = [
             new Param(
                 var: new Variable('exception'),
-                type: new Name($this->exceptionClass),
+                type: new Name(class_basename($this->exceptionClass)),
             ),
         ];
 
         if ($this->includeRequestArg) {
             $params[] = new Param(
                 var: new Variable('request'),
-                type: new Name('Illuminate\Http\Request'),
+                type: new Name('Request'),
             );
         }
 

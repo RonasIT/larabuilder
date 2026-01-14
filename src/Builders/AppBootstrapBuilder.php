@@ -15,6 +15,14 @@ class AppBootstrapBuilder extends PHPFileBuilder
     {
         $this->traverser->addVisitor(new AddExceptionsRender($exceptionClass, $renderBody, $includeRequestArg));
 
+        $imports = [$exceptionClass];
+
+        if ($includeRequestArg) {
+            $imports[] = 'Illuminate\Http\Request';
+        }
+
+        $this->addImports($imports);
+
         return $this;
     }
 }

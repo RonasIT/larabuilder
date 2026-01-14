@@ -12,6 +12,7 @@ use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\ExpectationFailedException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -39,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ValidationException::class,
         ]);
 
-        $exceptions->render(function (PHPUnit\Framework\ExpectationFailedException $exception) {
+        $exceptions->render(function (ExpectationFailedException $exception) {
             throw $exception;
         });
 
