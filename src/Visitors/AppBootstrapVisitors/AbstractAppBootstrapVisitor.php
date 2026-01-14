@@ -88,6 +88,6 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected function validateRenderBody(string $body): void
     {
-        (new ParserFactory())->createForHostVersion()->parse('<?php ' . $body);
+        new ParserFactory()->createForHostVersion()->parse('<?php ' . $body);
     }
 }
