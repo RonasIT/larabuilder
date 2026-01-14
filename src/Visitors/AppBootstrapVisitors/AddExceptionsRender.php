@@ -22,17 +22,14 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
+        $this->validateRenderBody($renderBody);
+
         $this->renderStatement = $this->buildRenderCall();
 
         parent::__construct(
             parentMethod: 'withExceptions',
             targetMethod: 'render',
         );
-    }
-
-    public function beforeTraverse(array $nodes): void
-    {
-        $this->validateRenderBody($this->renderBody);
     }
 
     protected function matchesCustomCriteria(Expression $stmt): bool
