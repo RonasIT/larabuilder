@@ -4,6 +4,9 @@ namespace RonasIT\Larabuilder\Nodes;
 
 use PhpParser\Node\Stmt;
 
+/**
+  * Used to insert code with saving original formatting
+  */
 class PreformattedCode extends Stmt
 {
     public function __construct(
