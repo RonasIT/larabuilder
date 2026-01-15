@@ -62,4 +62,4 @@ This builder has all the features described above and the special methods:
 Adds a new exception render to the `withExceptions` called method in case it does not exist yet. Does not modify already added
 render for the passed exception class.
 
-**Note** Need to provide the full exception class name (FQCN) to the method, it allows automatically imports it.
+**Note** Need to provide the full exception class name (FQCN) to the method, it automatically imports it.
