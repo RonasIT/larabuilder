@@ -61,4 +61,4 @@ This builder has all the features described above and the special methods:
 
 Adds a new exception render to the `withExceptions` called method in case it does not exist yet. Does not modify already added
 render for the passed exception class.
-Provide the full class `namespace` to `addExceptionsRender`, `imports` will be added automatically.
+Provide the full exception class name (FQCN) to `addExceptionsRender`, `imports` will be added automatically.
