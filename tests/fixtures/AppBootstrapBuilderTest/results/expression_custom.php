@@ -12,6 +12,9 @@ use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -39,7 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ValidationException::class,
         ]);
 
-        $exceptions->render(function (PHPUnit\Framework\ExpectationFailedException $exception) {
+        $exceptions->render(function (ExpectationFailedException $exception) {
             throw $exception;
         });
 
@@ -48,7 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'password_confirmation',
         ]);
 
-        $exceptions->render(function (Symfony\Component\HttpKernel\Exception\HttpException $exception, Illuminate\Http\Request $request) {
+        $exceptions->render(function (HttpException $exception, Request $request) {
             return ($request->expectsJson())
                 ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode())
                 : null;
