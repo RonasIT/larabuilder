@@ -23,11 +23,6 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     ) {
     }
 
-    public function insertNode(Node $node): Node
-    {
-        throw new NodeNotExistException('Method', $this->methodName);
-    }
-
     public function beforeTraverse(array $nodes): void
     {
         $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
