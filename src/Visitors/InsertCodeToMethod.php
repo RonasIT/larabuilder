@@ -14,7 +14,7 @@ use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 
-class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
+class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
     public function __construct(
         protected string $methodName,
@@ -30,9 +30,7 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function beforeTraverse(array $nodes): void
     {
-        $nodeFinder = new NodeFinder();
-
-        $node = $nodeFinder->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
+        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
 
         if (is_null($node)) {
             throw new NodeNotExistException('Method', $this->methodName);
@@ -54,7 +52,8 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
     {
         $newStmt = $this->parsePHPCode($this->code);
         $existingStmts = $node->stmts ?? [];
-        $separator = (!empty($existingStmts)) ? [new Nop()] : [];
+
+        $separator = (!empty($existingStmts) && !empty($newStmt)) ? [new Nop()] : [];
 
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
             ? [...$newStmt, ...$separator, ...$existingStmts]
@@ -72,7 +71,7 @@ class InsertToMethod extends InsertOrUpdateNodeAbstractVisitor
             $code = "<?php\n{$code}";
         }
 
-        $parser = (new ParserFactory())->createForHostVersion();
+        $parser = new ParserFactory()->createForHostVersion();
 
         try {
             $ast = $parser->parse($code);

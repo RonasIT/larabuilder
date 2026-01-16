@@ -39,7 +39,7 @@ Add new item to the `array` class property. Will add new property in case it doe
 
 Remove items from the `array` class property. If the property or item does not exist no action is taken.
 
-#### insertToMethod
+#### insertCodeToMethod
 
 Insert the provided code into the specified method body at the desired position - by default, to the end of the method.
 

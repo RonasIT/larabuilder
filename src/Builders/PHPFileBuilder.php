@@ -12,7 +12,7 @@ use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\AddImports;
-use RonasIT\Larabuilder\Visitors\InsertToMethod;
+use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
@@ -25,7 +25,7 @@ class PHPFileBuilder
     public function __construct(
         protected string $filePath,
     ) {
-        $parser = (new ParserFactory())->createForHostVersion();
+        $parser = new ParserFactory()->createForHostVersion();
 
         $code = file_get_contents($this->filePath);
 
@@ -63,7 +63,7 @@ class PHPFileBuilder
 
     public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
     {
-        $this->traverser->addVisitor(new InsertToMethod($methodName, $code, $position));
+        $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
 
         return $this;
     }
@@ -82,7 +82,7 @@ class PHPFileBuilder
         $oldSyntaxTree = $this->syntaxTree;
         $newSyntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
+        $fileContent = new Printer()->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
     }

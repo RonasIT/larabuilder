@@ -305,10 +305,16 @@ class PHPFileBuilderTest extends TestCase
             'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
             $this->callFilePutContent('some_file_path.php', 'class_without_properties_unchanged.php'),
+            $this->callFileGetContent('some_path.php', 'class_with_properties.php'),
+            $this->callFilePutContent('some_path.php', 'class_with_properties_unchanged.php'),
         );
 
         (new PHPFileBuilder('some_file_path.php'))
             ->insertCodeToMethod('someMethod', '')
+            ->save();
+
+        (new PHPFileBuilder('some_path.php'))
+            ->insertCodeToMethod('__construct', '')
             ->save();
     }
 
