@@ -53,6 +53,11 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
             && !($stmts[$index] instanceof $type);
     }
 
+    protected function addEmptyLine(array &$nodes, int $index): void
+    {
+        array_splice($nodes, $index, 0, [new Nop()]);
+    }
+
     protected function prepareNewNode(mixed $parent, mixed $child): mixed
     {
         $this->setParentForNode($child, $parent);

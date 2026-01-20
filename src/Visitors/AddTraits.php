@@ -6,14 +6,11 @@ use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
-use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 
 class AddTraits extends BaseNodeVisitorAbstract
 {
-    protected array $existingTraits = [];
-
     public function __construct(
         protected array $traits,
     ) {
@@ -24,9 +21,9 @@ class AddTraits extends BaseNodeVisitorAbstract
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
-            $this->existingTraits = $this->getExistingImports($node);
+            $existingTraits = $this->getExistingImports($node);
 
-            return $this->insertNodes($node);
+            return $this->insertNodes($node, $existingTraits);
         }
 
         return $node;
@@ -56,9 +53,9 @@ class AddTraits extends BaseNodeVisitorAbstract
     }
 
     /** @param Class_|Enum_|Trait_ $node */
-    protected function insertNodes(Node $node): Node
+    protected function insertNodes(Node $node, array $existingTraits): Node
     {
-        $newTraits = array_diff($this->traits, $this->existingTraits);
+        $newTraits = array_diff($this->traits, $existingTraits);
 
         if (empty($newTraits)) {
             return $node;
@@ -73,7 +70,7 @@ class AddTraits extends BaseNodeVisitorAbstract
         }
 
         if ($this->shouldAddEmptyLine($node->stmts, $insertIndex + 1, get_class($newNode))) {
-            array_splice($node->stmts, $insertIndex + 1, 0, [new Nop()]);
+            $this->addEmptyLine($node->stmts, $insertIndex + 1);
         }
 
         return $node;

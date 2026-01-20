@@ -4,7 +4,6 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
 
@@ -57,7 +56,7 @@ class AddImports extends BaseNodeVisitorAbstract
         }
 
         if ($this->shouldAddEmptyLine($nodes, $insertIndex + 1, get_class($newNode))) {
-            array_splice($nodes, $insertIndex + 1, 0, [new Nop()]);
+            $this->addEmptyLine($nodes, $insertIndex + 1);
         }
     }
 
