@@ -6,7 +6,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Trait_;
 
-abstract class InsertOrUpdateNodeAbstractVisitor extends AbstractNodeVisitor
+abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
 

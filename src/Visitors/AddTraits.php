@@ -10,7 +10,7 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 
-class AddTraits extends AbstractNodeVisitor
+class AddTraits extends BaseNodeVisitorAbstract
 {
     protected array $existingTraits = [];
 

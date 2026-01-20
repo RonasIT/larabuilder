@@ -16,7 +16,7 @@ use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 
-abstract class AbstractNodeVisitor extends NodeVisitorAbstract
+abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
     protected const TYPE_ORDER = [
         Namespace_::class,

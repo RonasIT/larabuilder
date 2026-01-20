@@ -8,7 +8,7 @@ use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
 
-class AddImports extends AbstractNodeVisitor
+class AddImports extends BaseNodeVisitorAbstract
 {
     public function __construct(
         protected array $imports,
