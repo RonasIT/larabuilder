@@ -3,13 +3,12 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
-use PhpParser\NodeVisitorAbstract;
 
-class AddImports extends NodeVisitorAbstract
+class AddImports extends AbstractNodeVisitor
 {
     public function __construct(
         protected array $imports,
@@ -34,7 +33,7 @@ class AddImports extends NodeVisitorAbstract
         $newImports = $this->getUniqueNewImports($targetNodes);
 
         if (!empty($newImports)) {
-            $this->injectImports($targetNodes, $newImports);
+            $this->insertNodes($targetNodes, $newImports);
         }
 
         return $nodes;
@@ -47,16 +46,19 @@ class AddImports extends NodeVisitorAbstract
         return array_diff($this->imports, $existing);
     }
 
-    protected function injectImports(array &$nodes, array $newImports): void
+    protected function insertNodes(array &$nodes, array $newImports): void
     {
-        $importNodes = array_map(
-            callback: fn ($import) => new Use_([new UseUse(new Name($import))]),
-            array: $newImports,
-        );
+        foreach ($newImports as $import) {
+            $newNode = new Use_([new UseUse(new Name($import))]);
 
-        $index = $this->findInsertionIndex($nodes);
+            $insertIndex = $this->getInsertIndex($nodes, get_class($newNode));
 
-        array_splice($nodes, $index, 0, $importNodes);
+            array_splice($nodes, $insertIndex, 0, [$newNode]);
+        }
+
+        if ($this->shouldAddEmptyLine($nodes, $insertIndex + 1, get_class($newNode))) {
+            array_splice($nodes, $insertIndex + 1, 0, [new Nop()]);
+        }
     }
 
     protected function getExistingImports(array $nodes): array
@@ -72,20 +74,5 @@ class AddImports extends NodeVisitorAbstract
         }
 
         return $imports;
-    }
-
-    protected function findInsertionIndex(array $nodes): int
-    {
-        $lastUseIndex = 0;
-
-        foreach ($nodes as $index => $node) {
-            if ($node instanceof Use_) {
-                $lastUseIndex = $index + 1;
-            } elseif ($node instanceof ClassLike) {
-                return max($lastUseIndex, $index);
-            }
-        }
-
-        return $lastUseIndex;
     }
 }

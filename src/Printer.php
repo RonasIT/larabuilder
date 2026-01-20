@@ -21,7 +21,10 @@ class Printer extends Standard
 
     protected function normalizeWhitespace(string $code): string
     {
-        return preg_replace('/[ \t]+(\r?\n)/', '$1', $code);
+        $codeWithoutTrailingWhitespace = preg_replace('/[ \t]+(\r?\n)/', '$1', $code);
+        $codeWithoutDuplicateEmptyLines = preg_replace("/(\r?\n){3,}/", "\n\n", $codeWithoutTrailingWhitespace);
+
+        return $codeWithoutDuplicateEmptyLines;
     }
 
     protected function pExpr_Array(Array_ $node): string

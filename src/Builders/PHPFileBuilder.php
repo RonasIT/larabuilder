@@ -11,6 +11,7 @@ use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\AddImports;
+use RonasIT\Larabuilder\Visitors\AddTraits;
 use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
@@ -62,6 +63,15 @@ class PHPFileBuilder
     public function addImports(array $imports): self
     {
         $this->traverser->addVisitor(new AddImports($imports));
+
+        return $this;
+    }
+
+    public function addTraits(array $traits): self
+    {
+        $this->traverser->addVisitor(new addTraits($traits));
+
+        $this->addImports($traits);
 
         return $this;
     }
