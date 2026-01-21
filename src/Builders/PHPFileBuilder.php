@@ -69,7 +69,7 @@ class PHPFileBuilder
 
     public function addTraits(array $traits): self
     {
-        $this->traverser->addVisitor(new addTraits($traits));
+        $this->traverser->addVisitor(new AddTraits($traits));
 
         $this->addImports($traits);
 

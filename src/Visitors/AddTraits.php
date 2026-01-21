@@ -21,7 +21,7 @@ class AddTraits extends BaseNodeVisitorAbstract
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
-            $existingTraits = $this->getExistingImports($node);
+            $existingTraits = $this->getExistingTraits($node);
 
             return $this->insertNodes($node, $existingTraits);
         }
@@ -34,7 +34,7 @@ class AddTraits extends BaseNodeVisitorAbstract
         return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
     }
 
-    protected function getExistingImports(Node $node): array
+    protected function getExistingTraits(Node $node): array
     {
         $existingTraits = [];
 
