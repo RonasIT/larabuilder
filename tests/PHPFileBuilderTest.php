@@ -340,8 +340,6 @@ class PHPFileBuilderTest extends TestCase
             ->addTraits([
                 'RonasIT\Support\Traits\FirstTrait',
                 'RonasIT\Support\Traits\SecondTrait',
-            ])
-            ->addTraits([
                 'RonasIT\Support\Traits\ThirdTrait',
             ])
             ->save();
