@@ -327,4 +327,23 @@ class PHPFileBuilderTest extends TestCase
             ])
             ->save();
     }
+
+    public function testAddTraitsWithMultipleTraitUse(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_traits_to_class_with_multiple_traits.php', 'add_traits_to_class_with_multiple_traits.php'),
+            $this->callFilePutContent('add_traits_to_class_with_multiple_traits.php', 'add_traits_to_class_with_multiple_traits.php'),
+        );
+
+        new PHPFileBuilder('add_traits_to_class_with_multiple_traits.php')
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+                'RonasIT\Support\Traits\SecondTrait',
+            ])
+            ->addTraits([
+                'RonasIT\Support\Traits\ThirdTrait',
+            ])
+            ->save();
+    }
 }

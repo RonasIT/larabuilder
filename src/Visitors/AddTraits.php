@@ -44,8 +44,10 @@ class AddTraits extends BaseNodeVisitorAbstract
                 continue;
             }
 
-            if (in_array($stmt->traits[0]->name, $this->traits)) {
-                $existingTraits[] = $stmt->traits[0]->name;
+            foreach ($stmt->traits as $trait) {
+                if (in_array($trait->name, $this->traits)) {
+                    $existingTraits[] = $trait->name;
+                }
             }
         }
 
