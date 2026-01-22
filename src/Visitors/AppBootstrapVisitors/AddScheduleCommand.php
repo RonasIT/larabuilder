@@ -12,16 +12,21 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
+use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
     protected Expression $renderStatement;
     protected static array $statements = [];
+    protected array $frequencyOptions;
 
     public function __construct(
         protected string $command,
         protected ?string $environment,
+        ScheduleFrequencyOptionsDTO ...$frequencyOptions,
     ) {
+        $this->frequencyOptions = $frequencyOptions;
+
         $this->renderStatement = $this->buildRenderCall();
 
         self::$statements[] = clone $this->renderStatement;
@@ -71,6 +76,18 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
                     new Arg(new String_($this->environment)),
                 ],
             );
+        }
+
+        if ($this->frequencyOptions) {
+            foreach ($this->frequencyOptions as $option) {
+                $args = array_map(fn ($arg) => $this->makeArg($arg), $option->attributes);
+
+                $call = new MethodCall(
+                    var: $call,
+                    name: new Identifier($option->method->value),
+                    args: $args,
+                );
+            }
         }
 
         return new Expression($call);

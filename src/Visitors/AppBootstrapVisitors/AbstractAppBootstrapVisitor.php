@@ -12,9 +12,12 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
+use RonasIT\Larabuilder\Traits\PropertyBuilderTrait;
 
 abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
+    use PropertyBuilderTrait;
+
     protected const array FORBIDDEN_NODES = [
         Class_::class,
         Trait_::class,

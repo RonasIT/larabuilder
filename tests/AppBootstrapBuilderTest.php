@@ -5,6 +5,8 @@ namespace RonasIT\Larabuilder\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
+use RonasIT\Larabuilder\Enums\ScheduleFrequencyMethodEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -130,8 +132,15 @@ class AppBootstrapBuilderTest extends TestCase
 
         new AppBootstrapBuilder()
             ->addScheduleCommand(
-                command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
-                environment: 'production',
+                'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                'production',
+                new ScheduleFrequencyOptionsDTO(
+                    method: ScheduleFrequencyMethodEnum::Daily,
+                ),
+                new ScheduleFrequencyOptionsDTO(
+                    method: ScheduleFrequencyMethodEnum::Timezone,
+                    attributes: ['America/New_York'],
+                ),
             )
             ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:12222',
