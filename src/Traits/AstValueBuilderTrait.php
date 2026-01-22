@@ -11,7 +11,7 @@ use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 
-trait PropertyBuilderTrait
+trait AstValueBuilderTrait
 {
     protected function makeArg(mixed $value): Arg
     {
