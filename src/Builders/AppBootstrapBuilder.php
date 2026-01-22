@@ -19,7 +19,7 @@ class AppBootstrapBuilder extends PHPFileBuilder
         $imports = [$exceptionClass];
 
         if ($includeRequestArg) {
-            $imports[] = 'Illuminate\Http\Request';
+            $imports[] = 'Illuminate\\Http\\Request';
         }
 
         $this->addImports($imports);
@@ -32,7 +32,7 @@ class AppBootstrapBuilder extends PHPFileBuilder
         $this->traverser->addVisitor(new AddScheduleCommand($command, $environment));
 
         $this->addImports([
-            'Illuminate\Support\Facades\Schedule'
+            'Illuminate\\Support\\Facades\\Schedule',
         ]);
 
         return $this;
