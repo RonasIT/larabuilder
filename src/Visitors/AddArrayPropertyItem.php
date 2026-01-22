@@ -20,7 +20,7 @@ class AddArrayPropertyItem extends SetPropertyValue
     ) {
         parent::__construct($name, $value);
 
-        list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+        list($propertyValue) = $this->getPropertyValue($value);
 
         $this->arrayItem = new ArrayItem($propertyValue);
         $arrayNode = new Array_([$this->arrayItem]);

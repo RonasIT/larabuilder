@@ -119,4 +119,72 @@ class AppBootstrapBuilderTest extends TestCase
             )
             ->save();
     }
+
+    public function testAddScheduleRenderEmpty(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'schedule.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                environment: 'production',
+            )
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:12222',
+            )
+            ->save();
+    }
+
+    public function testAddScheduleRenderWithScheduleExists(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'schedule_exists.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'schedule_exists.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                environment: 'production',
+            )
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:12222',
+            )
+            ->save();
+    }
+
+    public function testCombineRenderEmpty(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'combine_render.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                environment: 'production',
+            )
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return;',
+            )
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception_2',
+            )
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return;',
+            )
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception_3',
+            )
+            ->save();
+    }
 }

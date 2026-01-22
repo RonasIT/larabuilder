@@ -15,7 +15,7 @@ use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
 abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
-    protected const FORBIDDEN_NODES = [
+    protected const array FORBIDDEN_NODES = [
         Class_::class,
         Trait_::class,
         Interface_::class,
