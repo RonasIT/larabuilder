@@ -4,6 +4,8 @@ namespace RonasIT\Larabuilder;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\Closure;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
@@ -86,7 +88,7 @@ class Printer extends Standard
         $lines = explode("\n", $value);
 
         $lines = array_map(
-            callback: fn (string $line) => (str_starts_with($line, $indent)) ? substr($line, $indentLength) : $line,
+            callback: fn(string $line) => (str_starts_with($line, $indent)) ? substr($line, $indentLength) : $line,
             array: $lines,
         );
 
@@ -100,4 +102,29 @@ class Printer extends Standard
 
         return rtrim($value);
     }
-}
+
+    protected function pExpr_MethodCall(MethodCall $node): string
+    {
+        if ($node->getAttribute('isNewCall')) {
+            return $this->pDereferenceLhs($node->var)
+                . $this->nl
+                . "\t->"
+                . $this->pObjectProperty($node->name)
+                . '(' . $this->pMaybeMultiline($node->args) . ')';
+        }
+
+        return parent::pExpr_MethodCall($node);
+    }
+
+    protected function pExpr_Closure(Closure $node): string
+    {
+        $tab = $node
+            ->getAttribute('parent')
+            ?->getAttribute('isNewCall');
+
+        if (!empty($tab)) {
+            $this->indent();
+        }
+
+        return parent::pExpr_Closure($node);
+    }}

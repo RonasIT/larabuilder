@@ -12,10 +12,23 @@ class TestCase extends BaseTestCase
 
     public function getFixturePath(string $fixtureName): string
     {
-        $class = get_class($this);
-        $explodedClass = explode('\\', $class);
-        $className = Arr::last($explodedClass);
+        $className = $this->getTestName();
 
         return __DIR__ . "/fixtures/{$className}/{$fixtureName}";
+    }
+
+    protected function getOriginalFixture(string $fileName): string
+    {
+        $className = $this->getTestName();
+
+        return __DIR__ . "/fixtures/{$className}/original/{$fileName}.php";
+    }
+
+    protected function getTestName(): string
+    {
+        $class = get_class($this);
+        $explodedClass = explode('\\', $class);
+
+        return Arr::last($explodedClass);
     }
 }

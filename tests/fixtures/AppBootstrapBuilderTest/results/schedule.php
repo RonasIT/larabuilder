@@ -16,8 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->withSchedule(function (): void {
-    Schedule::command('telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336')->environments('production')->daily()->timezone('America/New_York');
+    })
+    ->withSchedule(function (): void {
+        Schedule::command('telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336')->environments('production')->daily()->timezone('America/New_York');
 
-    Schedule::command('telescope:prune --set-hours=resolved_exception:12222');
-})->create();
+        Schedule::command('telescope:prune --set-hours=resolved_exception:12222');
+    })->create();
