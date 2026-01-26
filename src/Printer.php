@@ -88,7 +88,7 @@ class Printer extends Standard
         $lines = explode("\n", $value);
 
         $lines = array_map(
-            callback: fn(string $line) => (str_starts_with($line, $indent)) ? substr($line, $indentLength) : $line,
+            callback: fn (string $line) => (str_starts_with($line, $indent)) ? substr($line, $indentLength) : $line,
             array: $lines,
         );
 
