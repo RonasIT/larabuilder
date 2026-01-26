@@ -1,12 +1,11 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
-use RonasIT\Larabuilder\Traits\AstValueBuilderTrait;
 
 abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
 {
