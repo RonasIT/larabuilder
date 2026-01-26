@@ -29,7 +29,7 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
         $this->renderStatement = $this->buildRenderCall();
 
-        self::$statements[] = clone $this->renderStatement;
+        self::$statements[] = $this->renderStatement;
 
         parent::__construct(
             parentMethod: 'withSchedule',
