@@ -48,7 +48,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     protected function shouldAddEmptyLine(array $stmts, int $index, string $type): bool
     {
-        return isset($stmts[$index])
+        return (isset($stmts[$index]))
             && !($stmts[$index] instanceof Nop)
             && !($stmts[$index] instanceof $type);
     }

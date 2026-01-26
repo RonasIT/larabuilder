@@ -47,16 +47,20 @@ class AddImports extends BaseNodeVisitorAbstract
 
     protected function insertNodes(array &$nodes, array $newImports): void
     {
+        $newNodeType = Use_::class;
+
+        $insertIndex = $this->getInsertIndex($nodes, $newNodeType);
+
         foreach ($newImports as $import) {
             $newNode = new Use_([new UseUse(new Name($import))]);
 
-            $insertIndex = $this->getInsertIndex($nodes, get_class($newNode));
-
             array_splice($nodes, $insertIndex, 0, [$newNode]);
+
+            $insertIndex++;
         }
 
-        if ($this->shouldAddEmptyLine($nodes, $insertIndex + 1, get_class($newNode))) {
-            $this->addEmptyLine($nodes, $insertIndex + 1);
+        if ($this->shouldAddEmptyLine($nodes, $insertIndex, $newNodeType)) {
+            $this->addEmptyLine($nodes, $insertIndex);
         }
     }
 
