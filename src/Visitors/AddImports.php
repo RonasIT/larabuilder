@@ -2,80 +2,62 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\Stmt\UseUse;
 
-class AddImports extends BaseNodeVisitorAbstract
+class AddImports extends InsertNodesAbstractVisitor
 {
-    public function __construct(
-        protected array $imports,
-    ) {
-        $this->imports = array_unique(array_filter($imports));
+    public function __construct(array $imports)
+    {
+        $nodesToInsert = collect($imports)
+            ->filter()
+            ->unique();
+
+        parent::__construct(
+            nodesToInsert: $nodesToInsert,
+            targetNodeClass: Use_::class,
+        );
     }
 
     public function afterTraverse(array $nodes): ?array
     {
-        if (empty($this->imports)) {
-            return $nodes;
-        }
-
         $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
 
         if (!is_null($targetNamespace)) {
+            /** @var Namespace_ $targetNamespace */
             $targetNodes = &$targetNamespace->stmts;
         } else {
             $targetNodes = &$nodes;
         }
 
-        $newImports = $this->getUniqueNewImports($targetNodes);
+        $this->importNodes($targetNodes);
 
-        if (!empty($newImports)) {
-            $this->insertNodes($targetNodes, $newImports);
+        return $nodes;
+    }
+
+    protected function &resolveTargetNodes(array &$nodes): array
+    {
+        foreach ($nodes as $node) {
+            if ($node instanceof Namespace_) {
+                /** @var Namespace_ $node */
+                return $node->stmts;
+            }
         }
 
         return $nodes;
     }
 
-    protected function getUniqueNewImports(array $nodes): array
+    /** @param Use_ $node */
+    protected function getChildNodes(Node $node): array
     {
-        $existing = $this->getExistingImports($nodes);
-
-        return array_diff($this->imports, $existing);
+        return $node->uses;
     }
 
-    protected function insertNodes(array &$nodes, array $newImports): void
+    protected function getInsertableNode(string $name): Node
     {
-        $newNodeType = Use_::class;
-
-        $insertIndex = $this->getInsertIndex($nodes, $newNodeType);
-
-        foreach ($newImports as $import) {
-            $newNode = new Use_([new UseUse(new Name($import))]);
-
-            array_splice($nodes, $insertIndex, 0, [$newNode]);
-
-            $insertIndex++;
-        }
-
-        if ($this->shouldAddEmptyLine($nodes, $insertIndex, $newNodeType)) {
-            $this->addEmptyLine($nodes, $insertIndex);
-        }
-    }
-
-    protected function getExistingImports(array $nodes): array
-    {
-        $imports = [];
-
-        foreach ($nodes as $node) {
-            if ($node instanceof Use_) {
-                foreach ($node->uses as $use) {
-                    $imports[] = $use->name->toString();
-                }
-            }
-        }
-
-        return $imports;
+        return new Use_([new UseUse(new Name($name))]);
     }
 }

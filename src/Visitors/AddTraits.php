@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use Illuminate\Support\Collection;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
@@ -10,26 +9,26 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 
-class AddTraits extends BaseNodeVisitorAbstract
+class AddTraits extends InsertNodesAbstractVisitor
 {
-    protected Collection $traits;
-
     public function __construct(array $traits)
     {
-        $this->traits = collect($traits)
+        $nodesToInsert = collect($traits)
             ->filter()
             ->unique()
             ->map(fn ($trait) => class_basename($trait));
+
+        parent::__construct(
+            nodesToInsert: $nodesToInsert,
+            targetNodeClass: TraitUse::class,
+        );
     }
 
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
-            $traitsToAdd = $this->getTraitsToAdd($node);
-
-            if (!empty($traitsToAdd)) {
-                return $this->insertNodes($node, $traitsToAdd);
-            }
+            /** @var Class_|Enum_|Trait_ $node */
+            $this->importNodes($node->stmts);
         }
 
         return $node;
@@ -40,47 +39,14 @@ class AddTraits extends BaseNodeVisitorAbstract
         return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
     }
 
-    protected function getTraitsToAdd(Node $node): Collection
+    /** @param TraitUse $node */
+    protected function getChildNodes(Node $node): array
     {
-        $existingTraits = [];
-
-        /** @var Class_|Enum_|Trait_ $node */
-        foreach ($node->stmts as $stmt) {
-            if (!($stmt instanceof TraitUse)) {
-                continue;
-            }
-
-            foreach ($stmt->traits as $trait) {
-                if ($this->traits->contains($trait->name)) {
-                    $existingTraits[] = $trait->name;
-                }
-            }
-        }
-
-        return $this->traits
-            ->diff($existingTraits)
-            ->values();
+        return $node->traits;
     }
 
-    /** @param Class_|Enum_|Trait_ $node */
-    protected function insertNodes(Node $node, Collection $newTraits): Node
+    protected function getInsertableNode(string $name): Node
     {
-        $newNodeType = TraitUse::class;
-
-        $insertIndex = $this->getInsertIndex($node->stmts, $newNodeType);
-
-        foreach ($newTraits as $trait) {
-            $newNode = new TraitUse([new Name($trait)]);
-
-            array_splice($node->stmts, $insertIndex, 0, [$newNode]);
-
-            $insertIndex++;
-        }
-
-        if ($this->shouldAddEmptyLine($node->stmts, $insertIndex, $newNodeType)) {
-            $this->addEmptyLine($node->stmts, $insertIndex);
-        }
-
-        return $node;
+        return new TraitUse([new Name($name)]);
     }
 }
