@@ -6,6 +6,8 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
+use RonasIT\Larabuilder\Traits\AstValueBuilderTrait;
+use RonasIT\Larabuilder\Visitors\InsertOrUpdateNodeAbstractVisitor;
 
 abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
 {
