@@ -108,7 +108,7 @@ class Printer extends Standard
         if ($node->getAttribute('isNewCall')) {
             return $this->pDereferenceLhs($node->var)
                 . $this->nl
-                . "\t->"
+                . "    ->"
                 . $this->pObjectProperty($node->name)
                 . '(' . $this->pMaybeMultiline($node->args) . ')';
         }
