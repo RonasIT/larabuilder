@@ -127,4 +127,5 @@ class Printer extends Standard
         }
 
         return parent::pExpr_Closure($node);
-    }}
+    }
+}

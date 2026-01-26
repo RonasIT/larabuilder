@@ -113,8 +113,7 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
     {
         $nodeVar = $node->var;
 
-        while ($nodeVar instanceof MethodCall)
-        {
+        while ($nodeVar instanceof MethodCall) {
             if ($nodeVar->name->toString() === $this->parentMethod) {
                 return false;
             }
