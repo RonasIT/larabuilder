@@ -9,11 +9,11 @@ use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
-use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
-use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
-use RonasIT\Larabuilder\Visitors\SetPropertyValue;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
