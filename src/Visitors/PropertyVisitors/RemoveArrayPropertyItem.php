@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 
 use Illuminate\Support\Arr;
 use PhpParser\ConstExprEvaluator;
