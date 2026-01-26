@@ -122,7 +122,7 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddScheduleRenderEmpty(): void
+    public function testAddScheduleCommandEmpty(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -148,7 +148,7 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddScheduleRenderWithScheduleExists(): void
+    public function testAddScheduleCommandWithScheduleExists(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -167,7 +167,7 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
-    public function testCombineRenderEmpty(): void
+    public function testCombineScheduleAndExceptionRenders(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
