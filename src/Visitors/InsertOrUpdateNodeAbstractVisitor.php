@@ -49,6 +49,10 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 
         array_splice($node->stmts, $insertIndex, 0, [$newNode]);
 
+        if ($this->shouldAddEmptyLine($node->stmts, $insertIndex + 1, get_class($newNode))) {
+            $this->addEmptyLine($node->stmts, $insertIndex + 1);
+        }
+
         return $node;
     }
 }
