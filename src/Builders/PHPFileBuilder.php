@@ -68,16 +68,13 @@ class PHPFileBuilder
 
     public function save(): void
     {
-        file_put_contents($this->filePath, $this->toSting());
-    }
-
-    public function toSting(): string
-    {
         $this->traverser->addVisitor(new CloningVisitor());
 
         $oldSyntaxTree = $this->syntaxTree;
         $newSyntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        return (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
+        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
+
+        file_put_contents($this->filePath, $fileContent);
     }
 }
