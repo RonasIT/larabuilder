@@ -19,7 +19,16 @@ class SomeClass implements Test, Some
 
     public function someMethod()
     {
-        $items = collect([1, 'dummy', 'words', 3, 4, 5, 6]);
+        $items = collect([
+            1,
+            'dummy',
+            'words',
+            3,
+            4,
+            5,
+            6,
+        ]);
+
         $items->map(function ($item) {
             if (is_int($item)) {
                 $item++;

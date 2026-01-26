@@ -253,19 +253,26 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethod(): void
+    public function testInsertCodeToMethodToTheEndPosition(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
             $this->callFilePutContent('some_file_path.php', 'class_with_method_code_added.php'),
-            $this->callFileGetContent('some_path.php', 'class_with_properties.php'),
-            $this->callFilePutContent('some_path.php', 'class_with_method_code.php'),
         );
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', $this->getFixture('sample_code.php'))
             ->save();
+    }
+
+    public function testInsertCodeToMethodToTheStartPosition(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_path.php', 'class_with_properties.php'),
+            $this->callFilePutContent('some_path.php', 'class_with_method_code.php'),
+        );
 
         new PHPFileBuilder('some_path.php')
             ->insertCodeToMethod('__construct', '$this->name = $name;', InsertPositionEnum::Start)
@@ -285,7 +292,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotExist(): void
+    public function testInsertCodeToMethodNotExists(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -325,7 +332,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, 'Cannot parse PHP code: Syntax error, unexpected T_PUBLIC on line 3');
+        $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected T_PUBLIC on line 3');
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', $this->getFixture('original/invalid_file.php'))
@@ -336,13 +343,13 @@ class PHPFileBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'add_imports_to_enum.php'),
+            $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
         $this->assertExceptionThrew(Exception::class, "Method 'someMethod' does not exist.");
 
         new PHPFileBuilder('some_file_path.php')
-            ->insertCodeToMethod('someMethod', '')
+            ->insertCodeToMethod('someMethod', '$this->name = $name;')
             ->save();
     }
 }

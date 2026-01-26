@@ -2,17 +2,15 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use Exception;
-use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeFinder;
-use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
+use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
@@ -45,7 +43,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     protected function updateNode(Node $node): void
     {
-        $newStmt = $this->parsePHPCode($this->code);
+        $newStmt = (!empty($this->code)) ? [new PreformattedCode($this->code)] : [];
         $existingStmts = $node->stmts ?? [];
 
         $separator = (!empty($existingStmts) && !empty($newStmt)) ? [new Nop()] : [];
@@ -58,22 +56,5 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     protected function getInsertableNode(): Node
     {
         return new Nop();
-    }
-
-    protected function parsePHPCode(string $code): array
-    {
-        if (!str_starts_with(trim($code), '<?php')) {
-            $code = "<?php\n{$code}";
-        }
-
-        $parser = new ParserFactory()->createForHostVersion();
-
-        try {
-            $ast = $parser->parse($code);
-        } catch (Error $error) {
-            throw new Exception("Cannot parse PHP code: {$error->getMessage()}");
-        }
-
-        return $ast;
     }
 }
