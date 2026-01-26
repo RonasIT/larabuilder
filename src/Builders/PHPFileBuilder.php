@@ -10,11 +10,11 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
-use RonasIT\Larabuilder\Visitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\AddImports;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetPropertyValue;
 use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
-use RonasIT\Larabuilder\Visitors\RemoveArrayPropertyItem;
-use RonasIT\Larabuilder\Visitors\SetPropertyValue;
 
 class PHPFileBuilder
 {
@@ -54,16 +54,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function removeArrayPropertyItem(string $propertyName, array $values): self
+    public function removeArrayPropertyItem(string $propertyName, array $value): self
     {
-        $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $values));
-
-        return $this;
-    }
-
-    public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
-    {
-        $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
+        $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $value));
 
         return $this;
     }
@@ -71,6 +64,13 @@ class PHPFileBuilder
     public function addImports(array $imports): self
     {
         $this->traverser->addVisitor(new AddImports($imports));
+
+        return $this;
+    }
+
+    public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
+    {
+        $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
 
         return $this;
     }
