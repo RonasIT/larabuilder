@@ -107,12 +107,11 @@ class Printer extends Standard
         if ($node->getAttribute('wasCreated')) {
             $this->indent();
 
-            $newCall = $this->nl  . '->' . $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';
+            $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';
 
             $this->outdent();
 
             return $this->pDereferenceLhs($node->var) . $newCall;
-
         }
 
         return parent::pExpr_MethodCall($node);
