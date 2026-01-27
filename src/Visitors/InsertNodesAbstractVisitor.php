@@ -47,7 +47,8 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
             }
         }
 
-        return $this->nodesToInsert
+        return $this
+            ->nodesToInsert
             ->diff($existingNodes)
             ->values();
     }
