@@ -137,8 +137,6 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
             ->value
             ->setAttribute('parent', $scheduleCall);
 
-        $createCall = new MethodCall($scheduleCall, new Identifier('create'));
-
-        return $createCall;
+        return new MethodCall($scheduleCall, new Identifier('create'));
     }
 }
