@@ -11,6 +11,7 @@ use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddImports;
+use RonasIT\Larabuilder\Visitors\AddTraits;
 use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
@@ -64,6 +65,15 @@ class PHPFileBuilder
     public function addImports(array $imports): self
     {
         $this->traverser->addVisitor(new AddImports($imports));
+
+        return $this;
+    }
+
+    public function addTraits(array $traits): self
+    {
+        $this->traverser->addVisitor(new AddTraits($traits));
+
+        $this->addImports($traits);
 
         return $this;
     }
