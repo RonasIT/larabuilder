@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Use_;
 
 abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
 {
+    // TODO: remove duplicated abstract method from here and/or from InsertOrUpdateNodeAbstractVisitor as part of architecture refactoring 
     abstract protected function getInsertableNode(string $name): Node;
 
     abstract protected function getChildNodes(Node $node): array;
