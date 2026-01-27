@@ -17,7 +17,6 @@ use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
     protected Expression $renderStatement;
-    protected static array $statements = [];
     protected array $frequencyOptions;
 
     public function __construct(
@@ -29,8 +28,6 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
         $this->renderStatement = $this->buildRenderCall();
 
-        self::$statements[] = $this->renderStatement;
-
         parent::__construct(
             parentMethod: 'withSchedule',
             targetMethod: 'command',
@@ -39,8 +36,6 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
     protected function insertNode(MethodCall $node): MethodCall
     {
-        self::$statements = [];
-
         $currentStatements = $node->args[0]->value->stmts;
 
         if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
@@ -95,8 +90,14 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
     public function leaveNode(Node $node): Node
     {
-        if ($this->shouldInsertParentNode($node)) {
-            $node = $this->insertParentNode($node);
+        if ($node instanceof MethodCall) {
+            if ($this->shouldInsertParentNode($node)) {
+                $node = $this->insertParentNode($node);
+            }
+
+            if ($node->var->getAttribute('wasCreated')) {
+                $node->var = parent::leaveNode($node->var);
+            }
         }
 
         return parent::leaveNode($node);
@@ -104,8 +105,7 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
     protected function shouldInsertParentNode(Node $node): bool
     {
-        return ($node instanceof MethodCall)
-            && ($node->name->toString() === 'create')
+        return ($node->name->toString() === 'create')
             && $this->isParentMethodMissing($node);
     }
 
@@ -126,25 +126,19 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
     protected function insertParentNode(Node $node): Node
     {
-        $statements = [];
-
-        foreach (self::$statements as $statement) {
-            $statements[] = $statement;
-            $statements[] = new Nop();
-        }
-
-        array_pop($statements);
-
         $closure = new Closure([
             'returnType' => new Identifier('void'),
-            'stmts' => $statements,
         ]);
 
         $scheduleCall = new MethodCall($node->var, new Identifier($this->parentMethod), [new Arg($closure)]);
+        $scheduleCall->setAttribute('wasCreated', true);
+        $scheduleCall
+            ->args[0]
+            ->value
+            ->setAttribute('parent', $scheduleCall);
 
-        $scheduleCall->setAttribute('isNewCall', true);
-        $scheduleCall->args[0]->value->setAttribute('parent', $scheduleCall);
+        $createCall = new MethodCall($scheduleCall, new Identifier('create'));
 
-        return new MethodCall($scheduleCall, new Identifier('create'));
+        return $createCall;
     }
 }
