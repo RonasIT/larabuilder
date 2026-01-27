@@ -16,7 +16,7 @@ use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
-    protected Expression $renderStatement;
+    protected Expression $scheduleStatement;
     protected array $frequencyOptions;
 
     public function __construct(
@@ -26,7 +26,7 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
     ) {
         $this->frequencyOptions = $frequencyOptions;
 
-        $this->renderStatement = $this->buildRenderCall();
+        $this->scheduleStatement = $this->buildScheduleCall();
 
         parent::__construct(
             parentMethod: 'withSchedule',
@@ -39,21 +39,21 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         $currentStatements = $node->args[0]->value->stmts;
 
         if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
-            $node->args[0]->value->stmts = [$this->renderStatement];
+            $node->args[0]->value->stmts = [$this->scheduleStatement];
 
             return $node;
         }
 
         $lastExistingStatement = end($currentStatements);
 
-        $this->renderStatement->setAttribute('previous', $lastExistingStatement);
+        $this->scheduleStatement->setAttribute('previous', $lastExistingStatement);
 
-        $node->args[0]->value->stmts[] = $this->renderStatement;
+        $node->args[0]->value->stmts[] = $this->scheduleStatement;
 
         return $node;
     }
 
-    protected function buildRenderCall(): Expression
+    protected function buildScheduleCall(): Expression
     {
         $call = new StaticCall(
             class: new Name('Schedule'),
