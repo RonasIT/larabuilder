@@ -257,12 +257,12 @@ class PHPFileBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
             $this->callFilePutContent('some_file_path.php', 'class_with_method_code_added.php'),
         );
 
         new PHPFileBuilder('some_file_path.php')
-            ->insertCodeToMethod('someMethod', $this->getFixture('sample_code.php'))
+            ->insertCodeToMethod('__construct', $this->getFixture('sample_code.php'))
             ->save();
     }
 
@@ -289,6 +289,19 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder('trait.php')
             ->insertCodeToMethod('method1', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
+            ->save();
+    }
+
+    public function testInsertCodeToEnum(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('enum.php', 'add_imports_to_enum.php'),
+            $this->callFilePutContent('enum.php', 'add_imports_to_enum_code_added.php'),
+        );
+
+        new PHPFileBuilder('enum.php')
+            ->insertCodeToMethod('toArray', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
             ->save();
     }
 

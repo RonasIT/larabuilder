@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeFinder;
@@ -14,11 +15,16 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
+    protected array $preformattedCode = [];
+
     public function __construct(
         protected string $methodName,
         protected string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
+        if (!empty($this->code)) {
+            $this->preformattedCode = [new PreformattedCode($this->code)];
+        }
     }
 
     public function beforeTraverse(array $nodes): void
@@ -38,19 +44,18 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     protected function isParentNode(Node $node): bool
     {
-        return $node instanceof Class_ || $node instanceof Trait_;
+        return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
     }
 
     protected function updateNode(Node $node): void
     {
-        $newStmt = (!empty($this->code)) ? [new PreformattedCode($this->code)] : [];
         $existingStmts = $node->stmts ?? [];
 
-        $separator = (!empty($existingStmts) && !empty($newStmt)) ? [new Nop()] : [];
+        $separator = (!empty($existingStmts) && !empty($this->preformattedCode)) ? [new Nop()] : [];
 
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
-            ? [...$newStmt, ...$separator, ...$existingStmts]
-            : [...$existingStmts, ...$separator, ...$newStmt];
+            ? [...$this->preformattedCode, ...$separator, ...$existingStmts]
+            : [...$existingStmts, ...$separator, ...$this->preformattedCode];
     }
 
     protected function getInsertableNode(): Node
