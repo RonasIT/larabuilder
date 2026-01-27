@@ -38,18 +38,6 @@ class AddImports extends InsertNodesAbstractVisitor
         return $nodes;
     }
 
-    protected function &resolveTargetNodes(array &$nodes): array
-    {
-        foreach ($nodes as $node) {
-            if ($node instanceof Namespace_) {
-                /** @var Namespace_ $node */
-                return $node->stmts;
-            }
-        }
-
-        return $nodes;
-    }
-
     /** @param Use_ $node */
     protected function getChildNodes(Node $node): array
     {
