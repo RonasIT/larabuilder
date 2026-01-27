@@ -249,4 +249,99 @@ class PHPFileBuilderTest extends TestCase
             ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
             ->save();
     }
+
+    public static function provideAddTraitsFiles(): array
+    {
+        return [
+            [
+                'fixture' => 'add_traits_to_class.php',
+            ],
+            [
+                'fixture' => 'add_traits_to_trait.php',
+            ],
+            [
+                'fixture' => 'add_traits_to_enum.php',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideAddTraitsFiles')]
+    public function testAddTraits(string $fixture): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent($fixture, $fixture),
+            $this->callFilePutContent($fixture, $fixture),
+        );
+
+        new PHPFileBuilder($fixture)
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+                'RonasIT\Support\Traits\SecondTrait',
+                'RonasIT\Support\Traits\ThirdTrait',
+            ])
+            ->save();
+    }
+
+    public function testAddTraitsEmptyList(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_traits_to_class.php', 'add_traits_to_class.php'),
+            $this->callFilePutContent('add_traits_to_class.php', 'add_traits_to_class_without_change.php'),
+        );
+
+        new PHPFileBuilder('add_traits_to_class.php')
+            ->addTraits([])
+            ->save();
+    }
+
+    public function testAddTraitsAlreadyImported(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_traits_to_class.php', 'add_traits_to_class.php'),
+            $this->callFilePutContent('add_traits_to_class.php', 'add_traits_to_class_without_change.php'),
+        );
+
+        new PHPFileBuilder('add_traits_to_class.php')
+            ->addTraits(['RonasIT\Support\Traits\FirstTrait'])
+            ->save();
+    }
+
+    public function testAddTraitsWithDoubleCalls(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_traits_to_class.php', 'add_traits_to_class.php'),
+            $this->callFilePutContent('add_traits_to_class.php', 'add_traits_to_class.php'),
+        );
+
+        new PHPFileBuilder('add_traits_to_class.php')
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+                'RonasIT\Support\Traits\SecondTrait',
+            ])
+            ->addTraits([
+                'RonasIT\Support\Traits\ThirdTrait',
+            ])
+            ->save();
+    }
+
+    public function testAddTraitsWithMultipleTraitUse(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('add_traits_to_class_with_multiple_traits.php', 'add_traits_to_class_with_multiple_traits.php'),
+            $this->callFilePutContent('add_traits_to_class_with_multiple_traits.php', 'add_traits_to_class_with_multiple_traits.php'),
+        );
+
+        new PHPFileBuilder('add_traits_to_class_with_multiple_traits.php')
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+                'RonasIT\Support\Traits\SecondTrait',
+                'RonasIT\Support\Traits\ThirdTrait',
+            ])
+            ->save();
+    }
 }
