@@ -28,7 +28,7 @@ class AddTraits extends InsertNodesAbstractVisitor
     {
         if ($this->isParentNode($node)) {
             /** @var Class_|Enum_|Trait_ $node */
-            $this->importNodes($node->stmts);
+            $this->insertNodes($node->stmts);
         }
 
         return $node;

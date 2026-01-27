@@ -33,7 +33,7 @@ class AddImports extends InsertNodesAbstractVisitor
             $targetNodes = &$nodes;
         }
 
-        $this->importNodes($targetNodes);
+        $this->insertNodes($targetNodes);
 
         return $nodes;
     }

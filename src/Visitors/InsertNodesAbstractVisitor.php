@@ -19,12 +19,12 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
     ) {
     }
 
-    protected function importNodes(array &$nodes): void
+    protected function insertNodes(array &$nodes): void
     {
         $newNodes = $this->getNodesToAdd($nodes);
 
         if (!empty($newNodes)) {
-            $nodes = $this->insertNodes($nodes, $newNodes);
+            $nodes = $this->addNodes($nodes, $newNodes);
         }
     }
 
@@ -52,7 +52,7 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
             ->values();
     }
 
-    protected function insertNodes(array $nodes, Collection $newNodes): array
+    protected function addNodes(array $nodes, Collection $newNodes): array
     {
         $insertIndex = $this->getInsertIndex($nodes, $this->targetNodeClass);
 
