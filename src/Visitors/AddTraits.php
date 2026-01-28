@@ -8,6 +8,8 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
+use PhpParser\NodeFinder;
+use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 class AddTraits extends InsertNodesAbstractVisitor
 {
@@ -22,6 +24,19 @@ class AddTraits extends InsertNodesAbstractVisitor
             nodesToInsert: $nodesToInsert,
             targetNodeClass: TraitUse::class,
         );
+    }
+
+    public function beforeTraverse(array $nodes): void
+    {
+        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
+
+        if (is_null($node)) {
+            throw new InvalidTargetTypeException('addTraits', [
+                'Class',
+                'Enum',
+                'Trait',
+            ]);
+        }
     }
 
     public function leaveNode(Node $node): Node

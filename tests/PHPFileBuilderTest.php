@@ -8,6 +8,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
+use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -344,6 +345,22 @@ class PHPFileBuilderTest extends TestCase
                 'RonasIT\Support\Traits\FirstTrait',
                 'RonasIT\Support\Traits\SecondTrait',
                 'RonasIT\Support\Traits\ThirdTrait',
+            ])
+            ->save();
+    }
+
+    public function testAddTraitsNotClassTraitEnum(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'addTraits' may be used only for Class, Enum, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
             ])
             ->save();
     }
