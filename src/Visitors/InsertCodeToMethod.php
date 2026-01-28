@@ -11,6 +11,7 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
+use Exception;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
@@ -29,11 +30,16 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function beforeTraverse(array $nodes): void
     {
-        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
+        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
 
         if (is_null($node)) {
-            throw new NodeNotExistException('Method', $this->methodName);
+            throw new Exception('Method may be modified only for Class, Trait or Enum');
         }
+    }
+
+    public function insertNode(Node $node): Node
+    {
+        throw new NodeNotExistException('Method', $this->methodName);
     }
 
     protected function shouldUpdateNode(Node $node): bool
