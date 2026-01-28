@@ -440,7 +440,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected T_PUBLIC on line 3');
+        $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected T_PUBLIC on line 4');
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', $this->getFixture('original/invalid_file.php'))

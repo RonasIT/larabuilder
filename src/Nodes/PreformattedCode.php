@@ -17,9 +17,9 @@ class PreformattedCode extends Stmt
     ) {
         parent::__construct($this->attributes);
 
-        $body = $this->prepareRenderBody($value);
+        $this->value = Str::chopStart($this->value, '<?php');
 
-        $this->validateRenderBody($body);
+        $this->validateRenderBody($this->value);
     }
 
     public function getSubNodeNames(): array
@@ -34,17 +34,6 @@ class PreformattedCode extends Stmt
 
     protected function validateRenderBody(string $body): void
     {
-        new ParserFactory()->createForHostVersion()->parse($body);
-    }
-
-    protected function prepareRenderBody(string $body): string
-    {
-        if (Str::startsWith($body, '<?php')) {
-            $this->value = Str::chopStart($body, '<?php');
-        } else {
-            $body = "<?php\n{$body}";
-        }
-
-        return $body;
+        new ParserFactory()->createForHostVersion()->parse("<?php\n{$body}");
     }
 }
