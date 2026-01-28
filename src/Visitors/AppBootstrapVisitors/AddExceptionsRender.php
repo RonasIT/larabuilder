@@ -22,8 +22,6 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
-        $this->validateRenderBody($renderBody);
-
         $this->renderStatement = $this->buildRenderCall();
 
         parent::__construct(
