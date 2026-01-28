@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Exception;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -11,7 +12,6 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
-use Exception;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
