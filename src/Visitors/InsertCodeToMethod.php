@@ -8,7 +8,6 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
@@ -27,13 +26,9 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         }
     }
 
-    public function beforeTraverse(array $nodes): void
+    public function insertNode(Node $node): Node
     {
-        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
-
-        if (is_null($node)) {
-            throw new NodeNotExistException('Method', $this->methodName);
-        }
+        throw new NodeNotExistException('Method', $this->methodName);
     }
 
     protected function shouldUpdateNode(Node $node): bool
@@ -42,9 +37,18 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
             && $this->methodName === $node->name->name;
     }
 
-    protected function isParentNode(Node $node): bool
+    protected function getParentNodeTypes(): array
     {
-        return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
+        return [
+            Class_::class,
+            Trait_::class,
+            Enum_::class,
+        ];
+    }
+
+    protected function getMethodName(): string
+    {
+        return 'insertCodeToMethod';
     }
 
     protected function updateNode(Node $node): void

@@ -47,6 +47,12 @@ Insert the provided code into the specified method body at the desired position 
 
 Add new imports to the file. This method will add a new import only in case it does not exist yet, preventing duplicate `use` statements.
 
+#### addTraits
+
+Add new `use TraitName;` statements to a class, trait, or enum. This method automatically adds the corresponding `use` imports at the top of the file and prevents duplicate trait usages.
+
+**Note** Need to provide the full trait class name (FQCN) to the method, it automatically imports it.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app

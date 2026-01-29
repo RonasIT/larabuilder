@@ -48,4 +48,18 @@ class AddImports extends InsertNodesAbstractVisitor
     {
         return new Use_([new UseUse(new Name($name))]);
     }
+
+    public function beforeTraverse(array $nodes): void
+    {
+    }
+
+    protected function getParentNodeTypes(): array
+    {
+        return [];
+    }
+
+    protected function getMethodName(): string
+    {
+        return '';
+    }
 }
