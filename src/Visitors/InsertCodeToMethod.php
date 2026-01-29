@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Exception;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -29,11 +30,16 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function beforeTraverse(array $nodes): void
     {
-        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
+        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
 
         if (is_null($node)) {
-            throw new NodeNotExistException('Method', $this->methodName);
+            throw new Exception('Method may be modified only for Class, Trait or Enum');
         }
+    }
+
+    public function insertNode(Node $node): Node
+    {
+        throw new NodeNotExistException('Method', $this->methodName);
     }
 
     protected function shouldUpdateNode(Node $node): bool
