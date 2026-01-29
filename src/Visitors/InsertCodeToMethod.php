@@ -42,9 +42,13 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
             && $this->methodName === $node->name->name;
     }
 
-    protected function isParentNode(Node $node): bool
+    protected function parentNodeTypes(): array
     {
-        return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
+        return [
+            Class_::class,
+            Trait_::class,
+            Enum_::class,
+        ];
     }
 
     protected function updateNode(Node $node): void
