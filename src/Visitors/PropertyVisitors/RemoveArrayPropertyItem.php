@@ -78,4 +78,9 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
     {
         return $node;
     }
+
+    protected function getMethodName(): string
+    {
+        return 'removeArrayPropertyItem';
+    }
 }

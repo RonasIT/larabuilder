@@ -43,4 +43,9 @@ class AddArrayPropertyItem extends SetPropertyValue
 
         $node->props[0]->default->items[] = $this->arrayItem;
     }
+
+    protected function getMethodName(): string
+    {
+        return 'addArrayPropertyItem';
+    }
 }

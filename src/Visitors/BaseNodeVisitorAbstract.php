@@ -32,28 +32,30 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         ClassMethod::class,
     ];
 
-    abstract protected function parentNodeTypes(): array;
+    abstract protected function getParentNodeTypes(): array;
+
+    abstract protected function getMethodName(): string;
 
     public function beforeTraverse(array $nodes): void
     {
         $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
 
         if (is_null($node)) {
-            throw new InvalidTargetTypeException('addTraits', $this->getReadableParentNodeTypes());
+            throw new InvalidTargetTypeException($this->getMethodName(), $this->getReadablegetParentNodeTypes());
         }
     }
 
-    protected function getReadableParentNodeTypes(): array
+    protected function getReadablegetParentNodeTypes(): array
     {
         return array_map(
             fn (string $class) => trim(class_basename($class), '_'),
-            $this->parentNodeTypes(),
+            $this->getParentNodeTypes(),
         );
     }
 
     protected function isParentNode(Node $node): bool
     {
-        foreach ($this->parentNodeTypes() as $type) {
+        foreach ($this->getParentNodeTypes() as $type) {
             if ($node instanceof $type) {
                 return true;
             }

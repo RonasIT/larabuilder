@@ -22,11 +22,6 @@ class AddImports extends InsertNodesAbstractVisitor
         );
     }
 
-    public function beforeTraverse(array $nodes): void
-    {
-        return;
-    }
-
     public function afterTraverse(array $nodes): ?array
     {
         $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
@@ -54,8 +49,17 @@ class AddImports extends InsertNodesAbstractVisitor
         return new Use_([new UseUse(new Name($name))]);
     }
 
-    protected function parentNodeTypes(): array
+    public function beforeTraverse(array $nodes): void
+    {
+    }
+
+    protected function getParentNodeTypes(): array
     {
         return [];
+    }
+
+    protected function getMethodName(): string
+    {
+        return '';
     }
 }

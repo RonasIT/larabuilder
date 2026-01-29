@@ -28,9 +28,12 @@ abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
             && $this->name === $node->props[0]->name->name;
     }
 
-    protected function isParentNode(Node $node): bool
+    protected function getParentNodeTypes(): array
     {
-        return $node instanceof Class_ || $node instanceof Trait_;
+        return [
+            Class_::class,
+            Trait_::class,
+        ];
     }
 
     protected function getPropertyValue(mixed $value): array

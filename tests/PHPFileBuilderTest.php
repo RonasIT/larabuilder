@@ -55,6 +55,20 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testSetPropertyNotClassTrait(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'enum.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'setProperty' may be used only for Class, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
+
     public function testAddArrayPropertyItem(): void
     {
         $this->mockNativeFunction(
@@ -86,6 +100,20 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder('some_file_path.php')
             ->addArrayPropertyItem('notArray', 'value')
+            ->save();
+    }
+
+    public function testAddArrayPropertyItemNotClassTrait(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'enum.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'addArrayPropertyItem' may be used only for Class, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->addArrayPropertyItem('fillable', 'age')
             ->save();
     }
 
@@ -176,6 +204,20 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder('some_file_path.php')
             ->removeArrayPropertyItem('nullProperty', ['value'])
+            ->save();
+    }
+
+    public function testRemoveArrayPropertyNotClassTrait(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'enum.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'removeArrayPropertyItem' may be used only for Class, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeArrayPropertyItem('fillable', ['name', 'age'])
             ->save();
     }
 
@@ -356,7 +398,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'addTraits' may be used only for Class, Enum, Trait.");
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'addTraits' may be used only for Class, Trait, Enum.");
 
         new PHPFileBuilder('some_file_path.php')
             ->addTraits([
@@ -471,7 +513,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, 'Method may be modified only for Class, Trait or Enum');
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'insertCodeToMethod' may be used only for Class, Trait, Enum.");
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', '$this->name = $name;')

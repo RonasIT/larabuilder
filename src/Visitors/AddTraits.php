@@ -45,12 +45,17 @@ class AddTraits extends InsertNodesAbstractVisitor
         return new TraitUse([new Name($name)]);
     }
 
-    protected function parentNodeTypes(): array
+    protected function getParentNodeTypes(): array
     {
         return [
             Class_::class,
             Trait_::class,
             Enum_::class,
         ];
+    }
+
+    protected function getMethodName(): string
+    {
+        return 'addTraits';
     }
 }
