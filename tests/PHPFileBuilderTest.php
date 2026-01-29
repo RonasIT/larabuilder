@@ -447,7 +447,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotParentNode(): void
+    public function testInsertCodeToMethodNotClassTraitEnum(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -461,14 +461,14 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotMethod(): void
+    public function testInsertCodeToMethodWhenMethodNotExist(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, "Method 'noMethod' does not exist.");
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('noMethod', '$this->name = $name;')
