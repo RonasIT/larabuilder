@@ -41,11 +41,11 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
 
         if (is_null($node)) {
-            throw new InvalidTargetTypeException($this->getMethodName(), $this->getReadablegetParentNodeTypes());
+            throw new InvalidTargetTypeException($this->getMethodName(), $this->getReadableParentNodeTypes());
         }
     }
 
-    protected function getReadablegetParentNodeTypes(): array
+    protected function getReadableParentNodeTypes(): array
     {
         return array_map(
             fn (string $class) => trim(class_basename($class), '_'),
