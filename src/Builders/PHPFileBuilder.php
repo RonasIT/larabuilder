@@ -6,11 +6,13 @@ use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
+use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetPropertyValue;
@@ -24,7 +26,7 @@ class PHPFileBuilder
     public function __construct(
         protected string $filePath,
     ) {
-        $parser = (new ParserFactory())->createForHostVersion();
+        $parser = new ParserFactory()->createForHostVersion();
 
         $code = file_get_contents($this->filePath);
 
@@ -53,9 +55,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function removeArrayPropertyItem(string $propertyName, array $value): self
+    public function removeArrayPropertyItem(string $propertyName, array $values): self
     {
-        $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $value));
+        $this->traverser->addVisitor(new RemoveArrayPropertyItem($propertyName, $values));
 
         return $this;
     }
@@ -76,6 +78,13 @@ class PHPFileBuilder
         return $this;
     }
 
+    public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
+    {
+        $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
+
+        return $this;
+    }
+
     public function save(): void
     {
         $this->traverser->addVisitor(new CloningVisitor());
@@ -83,7 +92,7 @@ class PHPFileBuilder
         $oldSyntaxTree = $this->syntaxTree;
         $newSyntaxTree = $this->traverser->traverse($this->syntaxTree);
 
-        $fileContent = (new Printer())->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
+        $fileContent = new Printer()->printFormatPreserving($newSyntaxTree, $oldSyntaxTree, $this->oldTokens);
 
         file_put_contents($this->filePath, $fileContent);
     }
