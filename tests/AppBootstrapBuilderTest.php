@@ -131,7 +131,7 @@ class AppBootstrapBuilderTest extends TestCase
         );
 
         new AppBootstrapBuilder()
-            ->addSchedule(
+            ->addScheduleCommand(
                 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 new ScheduleOptionDTO('environments', ['production']),
                 new ScheduleOptionDTO('evenInMaintenanceMode'),
@@ -141,7 +141,7 @@ class AppBootstrapBuilderTest extends TestCase
                     attributes: ['America/New_York'],
                 ),
             )
-            ->addSchedule('telescope:prune --set-hours=resolved_exception:12222')
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
             ->save();
     }
 
@@ -154,11 +154,11 @@ class AppBootstrapBuilderTest extends TestCase
         );
 
         new AppBootstrapBuilder()
-            ->addSchedule(
+            ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 options: new ScheduleOptionDTO('environments', ['production']),
             )
-            ->addSchedule('telescope:prune --set-hours=resolved_exception:12222')
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
             ->save();
     }
 
@@ -171,7 +171,7 @@ class AppBootstrapBuilderTest extends TestCase
         );
 
         new AppBootstrapBuilder()
-            ->addSchedule(
+            ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 options: new ScheduleOptionDTO('environments', ['production']),
             )
@@ -179,12 +179,12 @@ class AppBootstrapBuilderTest extends TestCase
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
             )
-            ->addSchedule('telescope:prune --set-hours=resolved_exception_2')
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception_2')
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
             )
-            ->addSchedule('telescope:prune --set-hours=resolved_exception_3')
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception_3')
             ->save();
     }
 

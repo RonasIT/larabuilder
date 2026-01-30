@@ -14,7 +14,7 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
 use RonasIT\Larabuilder\DTO\ScheduleOptionDTO;
 
-class AddSchedule extends AbstractAppBootstrapVisitor
+class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
     protected Expression $scheduleStatement;
     protected array $options;
