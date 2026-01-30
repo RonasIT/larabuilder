@@ -19,14 +19,10 @@ class TestCase extends BaseTestCase
         return __DIR__ . "/fixtures/{$className}/{$fixtureName}";
     }
 
-    public function threwException(string $class, string $fixtureName): void
+    public function getExceptionFixture(string $fixtureName): string
     {
-        $this->expectException($class);
-
         $fixtureName = (str_contains($fixtureName, '.')) ? $fixtureName : "{$fixtureName}.txt";
 
-        $message = $this->getFixture("exceptions/{$fixtureName}");
-
-        $this->expectExceptionMessage($message);
+        return $this->getFixture("exceptions/{$fixtureName}");
     }
 }

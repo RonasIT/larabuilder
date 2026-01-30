@@ -190,7 +190,10 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testScheduleOptionDTOInvalidMethod(): void
     {
-        $this->threwException(InvalidArgumentException::class, 'invalid_schedule_option');
+        $this->assertExceptionThrew(
+            expectedClassName: InvalidArgumentException::class,
+            expectedMessage: $this->getExceptionFixture('invalid_schedule_option'),
+        );
 
         new ScheduleOptionDTO('invalid_frequency');
     }
