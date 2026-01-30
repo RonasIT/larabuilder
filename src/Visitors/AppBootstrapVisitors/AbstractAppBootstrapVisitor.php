@@ -9,7 +9,6 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
