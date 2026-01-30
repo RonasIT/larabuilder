@@ -18,4 +18,11 @@ class TestCase extends BaseTestCase
 
         return __DIR__ . "/fixtures/{$className}/{$fixtureName}";
     }
+
+    public function getExceptionFixture(string $fixtureName): string
+    {
+        $fixtureName = (str_contains($fixtureName, '.')) ? $fixtureName : "{$fixtureName}.txt";
+
+        return $this->getFixture("exceptions/{$fixtureName}");
+    }
 }

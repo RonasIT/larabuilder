@@ -2,9 +2,11 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use RonasIT\Larabuilder\DTO\ScheduleOptionDTO;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -118,5 +120,78 @@ class AppBootstrapBuilderTest extends TestCase
                 renderBody: 'return;',
             )
             ->save();
+    }
+
+    public function testAddScheduleCommandEmpty(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'schedule.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addScheduleCommand(
+                'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                new ScheduleOptionDTO('environments', ['production']),
+                new ScheduleOptionDTO('evenInMaintenanceMode'),
+                new ScheduleOptionDTO('daily'),
+                new ScheduleOptionDTO('timezone', ['America/New_York']),
+            )
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
+            ->save();
+    }
+
+    public function testAddScheduleCommandWithScheduleExists(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'schedule_exists.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'schedule_exists.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                options: new ScheduleOptionDTO('environments', ['production']),
+            )
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
+            ->save();
+    }
+
+    public function testCombineScheduleAndExceptionRenders(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'combine_render.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addScheduleCommand(
+                command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
+                options: new ScheduleOptionDTO('environments', ['production']),
+            )
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return;',
+            )
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception_2')
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return;',
+            )
+            ->addScheduleCommand('telescope:prune --set-hours=resolved_exception_3')
+            ->save();
+    }
+
+    public function testScheduleOptionDTOInvalidMethod(): void
+    {
+        $this->assertExceptionThrew(
+            expectedClassName: InvalidArgumentException::class,
+            expectedMessage: $this->getExceptionFixture('invalid_schedule_option'),
+        );
+
+        new ScheduleOptionDTO('invalid_frequency');
     }
 }
