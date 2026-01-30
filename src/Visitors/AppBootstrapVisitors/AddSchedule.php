@@ -14,7 +14,7 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
 use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
 
-class AddScheduleCommand extends AbstractAppBootstrapVisitor
+class AddSchedule extends AbstractAppBootstrapVisitor
 {
     protected Expression $scheduleStatement;
     protected array $frequencyOptions;
@@ -132,10 +132,6 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
         $scheduleCall = new MethodCall($node->var, new Identifier($this->parentMethod), [new Arg($closure)]);
         $scheduleCall->setAttribute('wasCreated', true);
-        $scheduleCall
-            ->args[0]
-            ->value
-            ->setAttribute('parent', $scheduleCall);
 
         return new MethodCall($scheduleCall, new Identifier('create'));
     }
