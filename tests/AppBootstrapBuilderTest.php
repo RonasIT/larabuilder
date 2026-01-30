@@ -136,10 +136,7 @@ class AppBootstrapBuilderTest extends TestCase
                 new ScheduleOptionDTO('environments', ['production']),
                 new ScheduleOptionDTO('evenInMaintenanceMode'),
                 new ScheduleOptionDTO('daily'),
-                new ScheduleOptionDTO(
-                    method: 'timezone',
-                    attributes: ['America/New_York'],
-                ),
+                new ScheduleOptionDTO('timezone', ['America/New_York']),
             )
             ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
             ->save();
