@@ -12,15 +12,10 @@ use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
-use RonasIT\Larabuilder\Traits\ParserTrait;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
-    use ParserTrait;
-
     protected PreformattedCode $preformattedCode;
-
-    protected array $parsedCode;
 
     public function __construct(
         protected string $methodName,
@@ -28,8 +23,6 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         protected InsertPositionEnum $insertPosition,
     ) {
         $this->preformattedCode = new PreformattedCode($this->code);
-
-        $this->parsedCode = $this->parsePHPCode($this->code);
     }
 
     public function beforeTraverse(array $nodes): void
@@ -56,7 +49,10 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     {
         $existingStmts = $node->stmts ?? [];
 
-        if (empty($this->preformattedCode->value) || $this->isCodeDuplicated($existingStmts, $this->parsedCode)) {
+        if (
+            empty($this->preformattedCode->value)
+            || $this->isCodeDuplicated($existingStmts, $this->preformattedCode->parsedCode)
+        ) {
             return;
         }
 

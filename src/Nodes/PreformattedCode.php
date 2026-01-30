@@ -4,14 +4,14 @@ namespace RonasIT\Larabuilder\Nodes;
 
 use Illuminate\Support\Str;
 use PhpParser\Node\Stmt;
-use RonasIT\Larabuilder\Traits\ParserTrait;
+use PhpParser\ParserFactory;
 
 /**
  * Used to insert code with saving original formatting
  */
 class PreformattedCode extends Stmt
 {
-    use ParserTrait;
+    public array $parsedCode;
 
     public function __construct(
         public string $value,
@@ -21,7 +21,7 @@ class PreformattedCode extends Stmt
 
         $this->value = Str::chopStart($this->value, '<?php');
 
-        $this->parsePHPCode($this->value);
+        $this->parsedCode = $this->parsePHPCode($this->value);
     }
 
     public function getSubNodeNames(): array
@@ -32,5 +32,10 @@ class PreformattedCode extends Stmt
     public function getType(): string
     {
         return 'Stmt_PreformattedCode';
+    }
+
+    protected function parsePHPCode(string $code): array
+    {
+        return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}");
     }
 }
