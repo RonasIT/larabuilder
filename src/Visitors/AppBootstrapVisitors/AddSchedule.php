@@ -12,19 +12,18 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
+use RonasIT\Larabuilder\DTO\ScheduleOptionDTO;
 
 class AddSchedule extends AbstractAppBootstrapVisitor
 {
     protected Expression $scheduleStatement;
-    protected array $frequencyOptions;
+    protected array $options;
 
     public function __construct(
         protected string $command,
-        protected ?string $environment,
-        ScheduleFrequencyOptionsDTO ...$frequencyOptions,
+        ScheduleOptionDTO ...$options,
     ) {
-        $this->frequencyOptions = $frequencyOptions;
+        $this->options = $options;
 
         $this->scheduleStatement = $this->buildScheduleCall();
 
@@ -63,23 +62,13 @@ class AddSchedule extends AbstractAppBootstrapVisitor
             ],
         );
 
-        if ($this->environment) {
-            $call = new MethodCall(
-                var: $call,
-                name: new Identifier('environments'),
-                args: [
-                    new Arg(new String_($this->environment)),
-                ],
-            );
-        }
-
-        if ($this->frequencyOptions) {
-            foreach ($this->frequencyOptions as $option) {
+        if ($this->options) {
+            foreach ($this->options as $option) {
                 $args = array_map(fn ($arg) => $this->makeArg($arg), $option->attributes);
 
                 $call = new MethodCall(
                     var: $call,
-                    name: new Identifier($option->method->value),
+                    name: new Identifier($option->method),
                     args: $args,
                 );
             }

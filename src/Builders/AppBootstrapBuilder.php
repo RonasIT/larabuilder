@@ -2,7 +2,7 @@
 
 namespace RonasIT\Larabuilder\Builders;
 
-use RonasIT\Larabuilder\DTO\ScheduleFrequencyOptionsDTO;
+use RonasIT\Larabuilder\DTO\ScheduleOptionDTO;
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddSchedule;
 
@@ -28,9 +28,9 @@ class AppBootstrapBuilder extends PHPFileBuilder
         return $this;
     }
 
-    public function addSchedule(string $command, ?string $environment = null, ScheduleFrequencyOptionsDTO ...$frequencyOptions): self
+    public function addSchedule(string $command, ScheduleOptionDTO ...$options): self
     {
-        $this->traverser->addVisitor(new AddSchedule($command, $environment, ...$frequencyOptions));
+        $this->traverser->addVisitor(new AddSchedule($command, ...$options));
 
         $this->addImports([
             'Illuminate\Console\Scheduling\Schedule',
