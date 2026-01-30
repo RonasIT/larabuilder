@@ -70,20 +70,20 @@ render for the passed exception class.
 
 #### addScheduleCommand
 
-Adds a scheduled command to the `withSchedule` method. If `withSchedule` does not exist, it will be created first; 
-the new scheduled command will then be inserted into its closure.
+Adds a scheduled command into the `withSchedule` method closure. 
+If `withSchedule` does not exist, it will be created first; the new scheduled command will then be inserted into its closure.
 
 Example usage:
 ```php
 new AppBootstrapBuilder()
     ->addScheduleCommand(
         'command', 
-                new ScheduleOptionDTO('environments', ['production']),
-                new ScheduleOptionDTO('daily'),
-                new ScheduleOptionDTO(
-                    method: 'timezone',
-                    attributes: ['America/New_York'],
-                ),
+        new ScheduleOptionDTO('environments', ['production']),
+        new ScheduleOptionDTO('daily'),
+        new ScheduleOptionDTO(
+            method: 'timezone',
+            attributes: ['America/New_York'],
+        ),
     )
     ->save();
 ```
