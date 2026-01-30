@@ -2,7 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
- use Illuminate\Support\Arr;
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt;
