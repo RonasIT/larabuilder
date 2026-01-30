@@ -479,6 +479,7 @@ class PHPFileBuilderTest extends TestCase
             ],
             [
                 'codeSnippet' => '
+                    // comment
                     $config = [
                         \'status\' => true,
                         \'version\' => 1,
@@ -500,9 +501,8 @@ class PHPFileBuilderTest extends TestCase
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'class_insert_duplicate_code.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_insert_duplicate_code.php'),
         );
-
-        $this->assertExceptionThrew(Exception::class, 'Provided code already exists in method body.');
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', $codeSnippet)

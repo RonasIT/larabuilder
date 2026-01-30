@@ -2,12 +2,15 @@
 
 namespace RonasIT\Larabuilder\Traits;
 
+use Illuminate\Support\Str;
 use PhpParser\ParserFactory;
 
 trait ParserTrait
 {
     public function parsePHPCode(string $code): array
     {
-        return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}");
+        $code = Str::start($code, "<?php\n");
+
+        return new ParserFactory()->createForHostVersion()->parse($code);
     }
 }
