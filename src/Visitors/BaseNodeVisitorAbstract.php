@@ -45,6 +45,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         if (empty($this->parentNodeTypes)) {
             return;
         }
+
         $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
 
         if (is_null($node)) {

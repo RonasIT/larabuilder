@@ -78,9 +78,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
+    public function insertCodeToMethod(string $targetMethodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
     {
-        $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
+        $this->traverser->addVisitor(new InsertCodeToMethod($targetMethodName, $code, $position));
 
         return $this;
     }

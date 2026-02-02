@@ -25,7 +25,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     protected array $preformattedCode = [];
 
     public function __construct(
-        protected string $method,
+        protected string $targetMethodName,
         protected string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
@@ -36,13 +36,13 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function insertNode(Node $node): Node
     {
-        throw new NodeNotExistException('Method', $this->method);
+        throw new NodeNotExistException('Method', $this->targetMethodName);
     }
 
     protected function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof ClassMethod
-            && $this->method === $node->name->name;
+            && $this->targetMethodName === $node->name->name;
     }
 
     protected function updateNode(Node $node): void
