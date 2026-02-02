@@ -11,6 +11,8 @@ use PhpParser\Node\Stmt\TraitUse;
 
 class AddTraits extends InsertNodesAbstractVisitor
 {
+    protected string $methodName = 'addTraits';
+
     protected array $parentNodeTypes = [
         Class_::class,
         Trait_::class,
@@ -19,8 +21,6 @@ class AddTraits extends InsertNodesAbstractVisitor
 
     public function __construct(array $traits)
     {
-        $this->methodName = 'addTraits';
-
         $nodesToInsert = collect($traits)
             ->filter()
             ->unique()

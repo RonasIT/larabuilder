@@ -12,14 +12,14 @@ use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
 class AddArrayPropertyItem extends SetPropertyValue
 {
+    protected string $methodName = 'addArrayPropertyItem';
+
     protected ArrayItem $arrayItem;
 
     public function __construct(
         string $name,
         mixed $value,
     ) {
-        $this->methodName = 'addArrayPropertyItem';
-
         parent::__construct($name, $value);
 
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);

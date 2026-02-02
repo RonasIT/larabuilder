@@ -20,11 +20,13 @@ use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
-    abstract protected array $parentNodeTypes {
+    abstract protected string $methodName {
         get;
     }
 
-    protected ?string $methodName = null;
+    abstract protected array $parentNodeTypes {
+        get;
+    }
 
     protected const TYPE_ORDER = [
         Namespace_::class,

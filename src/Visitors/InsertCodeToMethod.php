@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
-    protected array $preformattedCode = [];
+    protected string $methodName = 'insertCodeToMethod';
 
     protected array $parentNodeTypes = [
         Class_::class,
@@ -22,13 +22,13 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         Enum_::class,
     ];
 
+    protected array $preformattedCode = [];
+
     public function __construct(
         protected string $method,
         protected string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
-        $this->methodName = 'insertCodeToMethod';
-
         if (!empty($this->code)) {
             $this->preformattedCode = [new PreformattedCode($this->code)];
         }

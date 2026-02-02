@@ -13,12 +13,12 @@ use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
 class RemoveArrayPropertyItem extends AbstractPropertyVisitor
 {
+    protected string $methodName = 'removeArrayPropertyItem';
+
     public function __construct(
         string $name,
         protected array $valuesToRemove,
     ) {
-        $this->methodName = 'removeArrayPropertyItem';
-
         parent::__construct($name);
     }
 
