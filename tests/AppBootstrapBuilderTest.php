@@ -15,13 +15,14 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testAddExceptionsRenderEmpty(): void
     {
+        $originalFixturePath = $this->generateOriginalFixturePath('expression_empty.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFilePutContent($originalFixturePath, 'expression_empty.php'),
         );
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($originalFixturePath)
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: $this->getJsonFixture('render_body'),
@@ -38,13 +39,14 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testAddExceptionsRenderCustom(): void
     {
+        $originalFixturePath = $this->generateOriginalFixturePath('expression_custom.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
+            $this->callFilePutContent($originalFixturePath, 'expression_custom.php'),
         );
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($originalFixturePath)
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: '
@@ -65,13 +67,14 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testAddExceptionsRenderExist(): void
     {
+        $originalFixturePath = $this->generateOriginalFixturePath('expression_exist.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_exist.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
+            $this->callFilePutContent($originalFixturePath, 'expression_exist.php'),
         );
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($originalFixturePath)
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: $this->getJsonFixture('render_body'),
@@ -105,14 +108,11 @@ class AppBootstrapBuilderTest extends TestCase
     #[DataProvider('provideForbiddenFiles')]
     public function testInvalidBootstrapAppFileException(string $fixture, string $type): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $fixture),
-        );
+        $originalFixturePath = $this->generateOriginalFixturePath($fixture);
 
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($originalFixturePath)
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
