@@ -46,9 +46,4 @@ class SetPropertyValue extends AbstractPropertyVisitor
             type: $this->typeIdentifier,
         );
     }
-
-    protected function getMethodName(): string
-    {
-        return 'setProperty';
-    }
 }

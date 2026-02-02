@@ -16,11 +16,19 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
     protected array $preformattedCode = [];
 
+    protected array $parentNodeTypes = [
+        Class_::class,
+        Trait_::class,
+        Enum_::class,
+    ];
+
     public function __construct(
-        protected string $methodName,
+        protected string $method,
         protected string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
+        $this->methodName = 'insertCodeToMethod';
+
         if (!empty($this->code)) {
             $this->preformattedCode = [new PreformattedCode($this->code)];
         }
@@ -28,27 +36,13 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function insertNode(Node $node): Node
     {
-        throw new NodeNotExistException('Method', $this->methodName);
+        throw new NodeNotExistException('Method', $this->method);
     }
 
     protected function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof ClassMethod
-            && $this->methodName === $node->name->name;
-    }
-
-    protected function getParentNodeTypes(): array
-    {
-        return [
-            Class_::class,
-            Trait_::class,
-            Enum_::class,
-        ];
-    }
-
-    protected function getMethodName(): string
-    {
-        return 'insertCodeToMethod';
+            && $this->method === $node->name->name;
     }
 
     protected function updateNode(Node $node): void

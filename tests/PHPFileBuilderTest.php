@@ -62,7 +62,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'enum.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'setProperty' may be used only for Class, Trait.");
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, 'Method may be used only for Class, Trait.');
 
         new PHPFileBuilder('some_file_path.php')
             ->setProperty('newString', 'some string')

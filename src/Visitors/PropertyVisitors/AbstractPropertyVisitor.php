@@ -17,6 +17,11 @@ use RonasIT\Larabuilder\Visitors\InsertOrUpdateNodeAbstractVisitor;
 
 abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
 {
+    protected array $parentNodeTypes = [
+        Class_::class,
+        Trait_::class,
+    ];
+
     public function __construct(
         protected string $name,
     ) {
@@ -26,14 +31,6 @@ abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
     {
         return $node instanceof Property
             && $this->name === $node->props[0]->name->name;
-    }
-
-    protected function getParentNodeTypes(): array
-    {
-        return [
-            Class_::class,
-            Trait_::class,
-        ];
     }
 
     protected function getPropertyValue(mixed $value): array

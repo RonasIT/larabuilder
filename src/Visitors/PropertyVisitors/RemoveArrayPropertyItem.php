@@ -17,6 +17,8 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
         string $name,
         protected array $valuesToRemove,
     ) {
+        $this->methodName = 'removeArrayPropertyItem';
+
         parent::__construct($name);
     }
 
@@ -77,10 +79,5 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
     protected function insertNode(Node $node): Node
     {
         return $node;
-    }
-
-    protected function getMethodName(): string
-    {
-        return 'removeArrayPropertyItem';
     }
 }

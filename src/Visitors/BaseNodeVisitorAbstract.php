@@ -20,6 +20,12 @@ use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
+    abstract protected array $parentNodeTypes {
+        get;
+    }
+
+    protected ?string $methodName = null;
+
     protected const TYPE_ORDER = [
         Namespace_::class,
         Use_::class,
@@ -32,16 +38,15 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         ClassMethod::class,
     ];
 
-    abstract protected function getParentNodeTypes(): array;
-
-    abstract protected function getMethodName(): string;
-
     public function beforeTraverse(array $nodes): void
     {
+        if (empty($this->parentNodeTypes)) {
+            return;
+        }
         $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
 
         if (is_null($node)) {
-            throw new InvalidTargetTypeException($this->getMethodName(), $this->getReadableParentNodeTypes());
+            throw new InvalidTargetTypeException($this->methodName, $this->getReadableParentNodeTypes());
         }
     }
 
@@ -49,13 +54,13 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     {
         return array_map(
             fn (string $class) => trim(class_basename($class), '_'),
-            $this->getParentNodeTypes(),
+            $this->parentNodeTypes,
         );
     }
 
     protected function isParentNode(Node $node): bool
     {
-        foreach ($this->getParentNodeTypes() as $type) {
+        foreach ($this->parentNodeTypes as $type) {
             if ($node instanceof $type) {
                 return true;
             }

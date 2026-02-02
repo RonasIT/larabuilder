@@ -18,6 +18,8 @@ class AddArrayPropertyItem extends SetPropertyValue
         string $name,
         mixed $value,
     ) {
+        $this->methodName = 'addArrayPropertyItem';
+
         parent::__construct($name, $value);
 
         list($propertyValue, $propertyType) = $this->getPropertyValue($value);
@@ -42,10 +44,5 @@ class AddArrayPropertyItem extends SetPropertyValue
         }
 
         $node->props[0]->default->items[] = $this->arrayItem;
-    }
-
-    protected function getMethodName(): string
-    {
-        return 'addArrayPropertyItem';
     }
 }

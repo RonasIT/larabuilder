@@ -10,6 +10,8 @@ use PhpParser\Node\Stmt\UseUse;
 
 class AddImports extends InsertNodesAbstractVisitor
 {
+    protected array $parentNodeTypes = [];
+
     public function __construct(array $imports)
     {
         $nodesToInsert = collect($imports)
@@ -47,19 +49,5 @@ class AddImports extends InsertNodesAbstractVisitor
     protected function getInsertableNode(string $name): Node
     {
         return new Use_([new UseUse(new Name($name))]);
-    }
-
-    public function beforeTraverse(array $nodes): void
-    {
-    }
-
-    protected function getParentNodeTypes(): array
-    {
-        return [];
-    }
-
-    protected function getMethodName(): string
-    {
-        return '';
     }
 }
