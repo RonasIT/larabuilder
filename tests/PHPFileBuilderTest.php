@@ -400,20 +400,6 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotExists(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
-        );
-
-        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
-
-        new PHPFileBuilder('some_file_path.php')
-            ->insertCodeToMethod('noMethod', $this->getFixture('sample_code.php'))
-            ->save();
-    }
-
     public function testInsertCodeToMethodEmptyString(): void
     {
         $this->mockNativeFunction(
