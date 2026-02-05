@@ -4,6 +4,7 @@ namespace RonasIT\Larabuilder;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
@@ -112,5 +113,20 @@ class Printer extends Standard
         $value = ltrim($value, "\n");
 
         return rtrim($value);
+    }
+
+    protected function pExpr_MethodCall(MethodCall $node): string
+    {
+        if ($node->getAttribute('wasCreated')) {
+            $this->indent();
+
+            $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';
+
+            $this->outdent();
+
+            return $this->pDereferenceLhs($node->var) . $newCall;
+        }
+
+        return parent::pExpr_MethodCall($node);
     }
 }

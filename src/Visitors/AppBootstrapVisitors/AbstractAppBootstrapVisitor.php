@@ -9,12 +9,12 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
+use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
-abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
+abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
 {
-    protected const FORBIDDEN_NODES = [
+    protected const array FORBIDDEN_NODES = [
         Class_::class,
         Trait_::class,
         Interface_::class,
