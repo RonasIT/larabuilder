@@ -74,6 +74,7 @@ Adds a scheduled command into the `withSchedule` method closure.
 If `withSchedule` does not exist, it will be created first; the new scheduled command will then be inserted into its closure.
 
 Example usage:
+
 ```php
 new AppBootstrapBuilder()
     ->addScheduleCommand(
