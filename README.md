@@ -71,7 +71,7 @@ render for the passed exception class.
 #### addScheduleCommand
 
 Adds a scheduled command into the `withSchedule` method closure. 
-If `withSchedule` does not exist, it will be created first; the new scheduled command will then be inserted into its closure.
+If `withSchedule` does not exist, it will be automatically created. The new scheduled command will then be inserted into its closure.
 
 Example usage:
 
