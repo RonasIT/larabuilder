@@ -85,6 +85,10 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     protected function isCodeDuplicated(array $existingStmts, array $newStmts): bool
     {
+        if (empty($existingStmts) || empty($newStmts)) {
+            return false;
+        }
+
         $haystack = $this->normalizeStatements($existingStmts);
         $needle = $this->normalizeStatements($newStmts);
 
