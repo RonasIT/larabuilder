@@ -460,4 +460,52 @@ class PHPFileBuilderTest extends TestCase
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
             ->save();
     }
+
+    public static function provideInsertDuplicateCodeFiles(): array
+    {
+        return [
+            [
+                'codeSnippet' => '$a=1; $b=2;',
+            ],
+            [
+                'codeSnippet' => '
+                    if ( $a === $b ) {
+                        return true;
+                    }
+                ',
+            ],
+            [
+                'codeSnippet' => '$user->save();',
+            ],
+            [
+                'codeSnippet' => '
+                    // comment
+                    $config = [
+                        \'status\' => true,
+                        \'version\' => 1,
+                    ];
+                ',
+            ],
+            [
+                'codeSnippet' => '$db->table(\'users\')->where(\'id\', 1)->first();',
+            ],
+            [
+                'codeSnippet' => 'Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideInsertDuplicateCodeFiles')]
+    public function testInsertDuplicateCodeToMethod(string $codeSnippet): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_insert_duplicate_code.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_insert_duplicate_code.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->insertCodeToMethod('someMethod', $codeSnippet)
+            ->save();
+    }
 }

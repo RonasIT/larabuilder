@@ -15,16 +15,14 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
-    protected array $preformattedCode = [];
+    protected PreformattedCode $preformattedCode;
 
     public function __construct(
         protected string $methodName,
         protected string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
-        if (!empty($this->code)) {
-            $this->preformattedCode = [new PreformattedCode($this->code)];
-        }
+        $this->preformattedCode = new PreformattedCode($this->code);
     }
 
     public function beforeTraverse(array $nodes): void
@@ -51,11 +49,18 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     {
         $existingStmts = $node->stmts ?? [];
 
-        $separator = (!empty($existingStmts) && !empty($this->preformattedCode)) ? [new Nop()] : [];
+        if (
+            empty($this->preformattedCode->value)
+            || $this->isCodeDuplicated($existingStmts, $this->preformattedCode->parsedCode)
+        ) {
+            return;
+        }
+
+        $separator = (!empty($existingStmts)) ? [new Nop()] : [];
 
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
-            ? [...$this->preformattedCode, ...$separator, ...$existingStmts]
-            : [...$existingStmts, ...$separator, ...$this->preformattedCode];
+            ? [$this->preformattedCode, ...$separator, ...$existingStmts]
+            : [...$existingStmts, ...$separator, $this->preformattedCode];
     }
 
     protected function getInsertableNode(): Node
