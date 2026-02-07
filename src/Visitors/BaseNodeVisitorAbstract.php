@@ -62,6 +62,8 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     {
         foreach ($this->parentNodeTypes as $type) {
             if ($node instanceof $type) {
+                $this->hasParentNode = true;
+
                 return true;
             }
         }

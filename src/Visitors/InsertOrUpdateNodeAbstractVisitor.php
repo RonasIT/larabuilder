@@ -19,8 +19,6 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
-            $this->hasParentNode = true;
-
             /** @var Class_|Trait_ $node */
             foreach ($node->stmts as $stmt) {
                 if ($this->shouldUpdateNode($stmt)) {
