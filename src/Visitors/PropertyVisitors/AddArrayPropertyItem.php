@@ -12,6 +12,8 @@ use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
 class AddArrayPropertyItem extends SetPropertyValue
 {
+    protected string $methodName = 'addArrayPropertyItem';
+
     protected ArrayItem $arrayItem;
 
     public function __construct(

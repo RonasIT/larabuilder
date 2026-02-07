@@ -10,6 +10,8 @@ use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
 class SetPropertyValue extends AbstractPropertyVisitor
 {
+    protected string $methodName = 'setProperty';
+
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 

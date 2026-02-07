@@ -15,9 +15,20 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
+use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
+    abstract protected string $methodName {
+        get;
+    }
+
+    abstract protected array $parentNodeTypes {
+        get;
+    }
+
+    protected bool $hasParentNode = false;
+
     protected const TYPE_ORDER = [
         Namespace_::class,
         Use_::class,
@@ -29,6 +40,36 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         Property::class,
         ClassMethod::class,
     ];
+
+    public function afterTraverse(array $nodes): ?array
+    {
+        if (!$this->hasParentNode) {
+            throw new InvalidTargetTypeException($this->methodName, $this->getReadableParentNodeTypes());
+        }
+
+        return null;
+    }
+
+    protected function getReadableParentNodeTypes(): array
+    {
+        return array_map(
+            fn (string $class) => trim(class_basename($class), '_'),
+            $this->parentNodeTypes,
+        );
+    }
+
+    protected function isParentNode(Node $node): bool
+    {
+        foreach ($this->parentNodeTypes as $type) {
+            if ($node instanceof $type) {
+                $this->hasParentNode = true;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     protected function getInsertIndex(array $statements, string $insertType): int
     {

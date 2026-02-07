@@ -8,6 +8,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
+use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -54,6 +55,20 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testSetPropertyNotClassTrait(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'enum.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'setProperty' may be used only for Class, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
+
     public function testAddArrayPropertyItem(): void
     {
         $this->mockNativeFunction(
@@ -85,6 +100,20 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder('some_file_path.php')
             ->addArrayPropertyItem('notArray', 'value')
+            ->save();
+    }
+
+    public function testAddArrayPropertyItemNotClassTrait(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'enum.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'addArrayPropertyItem' may be used only for Class, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->addArrayPropertyItem('fillable', 'age')
             ->save();
     }
 
@@ -175,6 +204,20 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder('some_file_path.php')
             ->removeArrayPropertyItem('nullProperty', ['value'])
+            ->save();
+    }
+
+    public function testRemoveArrayPropertyNotClassTrait(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'enum.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'removeArrayPropertyItem' may be used only for Class, Trait.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeArrayPropertyItem('fillable', ['name', 'age'])
             ->save();
     }
 
@@ -348,6 +391,22 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddTraitsNotClassTraitEnum(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
+        );
+
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'addTraits' may be used only for Class, Trait, Enum.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+            ])
+            ->save();
+    }
+
     public function testInsertCodeToMethodToTheEndPosition(): void
     {
         $this->mockNativeFunction(
@@ -400,20 +459,6 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotExists(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
-        );
-
-        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
-
-        new PHPFileBuilder('some_file_path.php')
-            ->insertCodeToMethod('noMethod', $this->getFixture('sample_code.php'))
-            ->save();
-    }
-
     public function testInsertCodeToMethodEmptyString(): void
     {
         $this->mockNativeFunction(
@@ -447,17 +492,31 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotClass(): void
+    public function testInsertCodeToMethodNotClassTraitEnum(): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
             $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, "Method 'someMethod' does not exist.");
+        $this->assertExceptionThrew(InvalidTargetTypeException::class, "Method 'insertCodeToMethod' may be used only for Class, Trait, Enum.");
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
+            ->save();
+    }
+
+    public function testInsertCodeToMethodWhenMethodNotExist(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
+        );
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->insertCodeToMethod('noMethod', '$this->name = $name;')
             ->save();
     }
 }
