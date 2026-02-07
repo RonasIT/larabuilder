@@ -8,8 +8,6 @@ use PhpParser\Node\Stmt\Trait_;
 
 abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
-    public bool $hasParentNode = false;
-
     abstract protected function shouldUpdateNode(Node $node): bool;
 
     abstract protected function updateNode(Node $node): void;
