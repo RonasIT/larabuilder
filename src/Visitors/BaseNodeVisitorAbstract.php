@@ -14,7 +14,6 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
-use PhpParser\NodeFinder;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
@@ -28,6 +27,8 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         get;
     }
 
+    protected bool $hasParentNode = false;
+
     protected const TYPE_ORDER = [
         Namespace_::class,
         Use_::class,
@@ -40,17 +41,13 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         ClassMethod::class,
     ];
 
-    public function beforeTraverse(array $nodes): void
+    public function afterTraverse(array $nodes): ?array
     {
-        if (empty($this->parentNodeTypes)) {
-            return;
-        }
-
-        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->isParentNode($node));
-
-        if (is_null($node)) {
+        if (!$this->hasParentNode) {
             throw new InvalidTargetTypeException($this->methodName, $this->getReadableParentNodeTypes());
         }
+
+        return null;
     }
 
     protected function getReadableParentNodeTypes(): array
