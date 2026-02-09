@@ -22,6 +22,10 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 
     abstract protected function getInsertableNode(): Node;
 
+    public function parentNodeNotFoundHook(): void
+    {
+    }
+
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
@@ -40,6 +44,13 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
         }
 
         return $node;
+    }
+
+    public function afterTraverse(array $nodes): void
+    {
+        if (!$this->hasParentNode) {
+            $this->parentNodeNotFoundHook();
+        }
     }
 
     /** @param Class_|Trait_ $node */

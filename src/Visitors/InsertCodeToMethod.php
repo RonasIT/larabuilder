@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use Exception;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -10,6 +9,7 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidNodeTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
@@ -27,11 +27,9 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         }
     }
 
-    public function afterTraverse(array $nodes): void
+    public function parentNodeNotFoundHook(): void
     {
-        if (!$this->hasParentNode) {
-            throw new Exception('Method may be modified only for Class, Trait or Enum');
-        }
+        throw new InvalidNodeTypeException(['Class', 'Trait', 'Enum']);
     }
 
     public function insertNode(Node $node): Node
