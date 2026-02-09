@@ -8,22 +8,33 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Scalar;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\Trait_;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
+use RonasIT\Larabuilder\Traits\PropertyTrait;
+use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
-class RemoveArrayPropertyItem extends AbstractPropertyVisitor
+class RemoveArrayPropertyItem extends BaseNodeVisitorAbstract implements UpdateNodeContract
 {
+    use PropertyTrait;
+
     protected string $methodName = 'removeArrayPropertyItem';
 
+    protected array $parentNodeTypes = [
+        Class_::class,
+        Trait_::class,
+    ];
+
     public function __construct(
-        string $name,
+        protected string $name,
         protected array $valuesToRemove,
     ) {
-        parent::__construct($name);
     }
 
     /** @param Property $node */
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         $arrayProperty = $node->props[0]->default;
 
@@ -69,15 +80,5 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor
             array: $this->valuesToRemove,
             callback: fn (mixed $removeValue) => $this->areNodesEqual($item->value, $removeValue),
         );
-    }
-
-    protected function getInsertableNode(): Node
-    {
-        return new Node\Stmt\Nop();
-    }
-
-    protected function insertNode(Node $node): Node
-    {
-        return $node;
     }
 }

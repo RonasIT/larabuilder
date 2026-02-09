@@ -32,16 +32,6 @@ class AddTraits extends InsertNodesAbstractVisitor
         );
     }
 
-    public function leaveNode(Node $node): Node
-    {
-        if ($this->isParentNode($node)) {
-            /** @var Class_|Enum_|Trait_ $node */
-            $this->insertNodes($node->stmts);
-        }
-
-        return $node;
-    }
-
     /** @param TraitUse $node */
     protected function getChildNodes(Node $node): array
     {

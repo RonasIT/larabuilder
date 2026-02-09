@@ -8,11 +8,12 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
-class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
+class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeContract
 {
     protected string $methodName = 'insertCodeToMethod';
 
@@ -34,18 +35,13 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         }
     }
 
-    public function insertNode(Node $node): Node
-    {
-        throw new NodeNotExistException('Method', $this->targetMethodName);
-    }
-
-    protected function shouldUpdateNode(Node $node): bool
+    public function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof ClassMethod
             && $this->targetMethodName === $node->name->name;
     }
 
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         $existingStmts = $node->stmts ?? [];
 
@@ -56,8 +52,8 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
             : [...$existingStmts, ...$separator, ...$this->preformattedCode];
     }
 
-    protected function getInsertableNode(): Node
+    public function insertNode(Node $node): Node
     {
-        return new Nop();
+        throw new NodeNotExistException('Method', $this->targetMethodName);
     }
 }

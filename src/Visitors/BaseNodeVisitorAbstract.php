@@ -15,6 +15,8 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
@@ -40,6 +42,26 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         Property::class,
         ClassMethod::class,
     ];
+
+    public function leaveNode(Node $node): Node
+    {
+        if ($this->isParentNode($node)) {
+            if ($this instanceof UpdateNodeContract) {
+                /** @var Class_|Trait_|Enum_ $node */
+                foreach ($node->stmts as $stmt) {
+                    if ($this->shouldUpdateNode($stmt)) {
+                        $this->updateNode($stmt);
+
+                        return $node;
+                    }
+                }
+            }
+
+            return $this->insertNode($node);
+        }
+
+        return $node;
+    }
 
     public function afterTraverse(array $nodes): ?array
     {
@@ -69,6 +91,28 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         }
 
         return false;
+    }
+
+    /** @param Class_|Trait_|Enum_ $node */
+    public function insertNode(Node $node): Node
+    {
+        if (!($this instanceof InsertNodeContract)) {
+            return $node;
+        }
+
+        $newNode = $this->getInsertableNode();
+
+        $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
+
+        $newNode->setAttribute('previous', $node->stmts[$insertIndex - 1] ?? null);
+
+        array_splice($node->stmts, $insertIndex, 0, [$newNode]);
+
+        if ($this->shouldAddEmptyLine($node->stmts, $insertIndex + 1, get_class($newNode))) {
+            $this->addEmptyLine($node->stmts, $insertIndex + 1);
+        }
+
+        return $node;
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int
