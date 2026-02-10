@@ -9,19 +9,18 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\DTO\ScheduleOptionDTO;
+use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
     protected Expression $scheduleStatement;
-    protected array $options;
+    protected array $options = [];
 
     public function __construct(
         protected string $command,
-        ScheduleOptionDTO ...$options,
+        ScheduleOption ...$options,
     ) {
         $this->options = $options;
 
@@ -58,20 +57,18 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
             class: new Name('Schedule'),
             name: new Identifier('command'),
             args: [
-                new Arg(new String_($this->command)),
+                $this->makeArg($this->command),
             ],
         );
 
-        if ($this->options) {
-            foreach ($this->options as $option) {
-                $args = array_map(fn ($arg) => $this->makeArg($arg), $option->attributes);
+        foreach ($this->options as $option) {
+            $args = array_map(fn ($arg) => $this->makeArg($arg), $option->attributes);
 
-                $call = new MethodCall(
-                    var: $call,
-                    name: new Identifier($option->method),
-                    args: $args,
-                );
-            }
+            $call = new MethodCall(
+                var: $call,
+                name: new Identifier($option->method),
+                args: $args,
+            );
         }
 
         return new Expression($call);

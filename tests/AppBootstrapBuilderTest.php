@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
-use RonasIT\Larabuilder\DTO\ScheduleOptionDTO;
+use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -133,10 +133,10 @@ class AppBootstrapBuilderTest extends TestCase
         new AppBootstrapBuilder()
             ->addScheduleCommand(
                 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
-                new ScheduleOptionDTO('environments', ['production']),
-                new ScheduleOptionDTO('evenInMaintenanceMode'),
-                new ScheduleOptionDTO('daily'),
-                new ScheduleOptionDTO('timezone', ['America/New_York']),
+                new ScheduleOption('environments', ['production']),
+                new ScheduleOption('evenInMaintenanceMode'),
+                new ScheduleOption('daily'),
+                new ScheduleOption('timezone', ['America/New_York']),
             )
             ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
             ->save();
@@ -153,7 +153,7 @@ class AppBootstrapBuilderTest extends TestCase
         new AppBootstrapBuilder()
             ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
-                options: new ScheduleOptionDTO('environments', ['production']),
+                options: new ScheduleOption('environments', ['production']),
             )
             ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
             ->save();
@@ -170,7 +170,7 @@ class AppBootstrapBuilderTest extends TestCase
         new AppBootstrapBuilder()
             ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
-                options: new ScheduleOptionDTO('environments', ['production']),
+                options: new ScheduleOption('environments', ['production']),
             )
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
@@ -192,6 +192,6 @@ class AppBootstrapBuilderTest extends TestCase
             expectedMessage: $this->getExceptionFixture('invalid_schedule_option'),
         );
 
-        new ScheduleOptionDTO('invalid_frequency');
+        new ScheduleOption('invalid_frequency');
     }
 }

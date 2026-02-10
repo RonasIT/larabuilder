@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Larabuilder\DTO;
+namespace RonasIT\Larabuilder\ValueOptions;
 
 use Illuminate\Console\Scheduling\ManagesAttributes;
 use Illuminate\Console\Scheduling\ManagesFrequencies;
@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 
-readonly class ScheduleOptionDTO
+readonly class ScheduleOption
 {
     public function __construct(
         public string $method,
