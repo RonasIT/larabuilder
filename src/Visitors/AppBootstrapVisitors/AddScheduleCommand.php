@@ -76,8 +76,8 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
 
     public function leaveNode(Node $node): Node
     {
-        if ($node instanceof MethodCall) {
-            if ($this->shouldInsertParentNode($node)) {
+        if ($node instanceof MethodCall && $node->name->toString() === 'create') {
+            if ($this->isParentMethodMissing($node)) {
                 $node = $this->insertParentNode($node);
             }
 
@@ -87,12 +87,6 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         }
 
         return parent::leaveNode($node);
-    }
-
-    protected function shouldInsertParentNode(Node $node): bool
-    {
-        return ($node->name->toString() === 'create')
-            && $this->isParentMethodMissing($node);
     }
 
     protected function isParentMethodMissing(Node $node): bool
