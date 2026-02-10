@@ -6,9 +6,9 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
-use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
+use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AppBootstrapBuilderTest extends TestCase
