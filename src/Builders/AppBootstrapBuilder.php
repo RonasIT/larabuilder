@@ -33,7 +33,7 @@ class AppBootstrapBuilder extends PHPFileBuilder
         $this->traverser->addVisitor(new AddScheduleCommand($command, ...$options));
 
         $this->addImports([
-            'Illuminate\Console\Scheduling\Schedule',
+            'Illuminate\Support\Facades\Schedule',
         ]);
 
         return $this;
