@@ -19,8 +19,8 @@ class TestCase extends BaseTestCase
         return __DIR__ . "/fixtures/{$className}/{$fixtureName}";
     }
 
-    protected function generateOriginalFixturePath(string $fixtureName): string
+    protected function generateOriginalStructurePath(string $name): string
     {
-        return __DIR__ . "/Support/OriginStructures/{$fixtureName}";
+        return __DIR__ . "/Support/OriginStructures/{$name}";
     }
 }

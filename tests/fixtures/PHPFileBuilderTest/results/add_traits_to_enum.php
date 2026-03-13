@@ -6,11 +6,17 @@ use RonasIT\Support\Traits\FirstTrait;
 use RonasIT\Support\Traits\SecondTrait;
 use RonasIT\Support\Traits\ThirdTrait;
 
-enum SomeEnum:string
+enum SomeEnum
 {
     use FirstTrait;
     use SecondTrait;
     use ThirdTrait;
 
-    case Public = 'public';
+    case First;
+    case Second;
+
+    public static function toArray(): array
+    {
+        return self::cases();
+    }
 }

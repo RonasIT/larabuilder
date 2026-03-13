@@ -18,14 +18,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetProperty(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_with_properties.php'),
+            $this->callFilePutContent($file, 'class_with_properties.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->setProperty('intProperty', 1.23)
             ->setProperty('arrayProperty', ['id' => 123])
             ->setProperty('floatProperty', 56)
@@ -43,14 +43,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyWithoutExistingProperties(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_without_properties.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_without_properties.php'),
+            $this->callFilePutContent($file, 'class_with_new_properties.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->setProperty('newString', 'some string')
             ->setProperty('newString', 'update string')
             ->save();
@@ -58,14 +58,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddArrayPropertyItem(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_array_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_with_array_properties.php'),
+            $this->callFilePutContent($file, 'class_with_array_properties.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addArrayPropertyItem('fillable', 'age')
             ->addArrayPropertyItem('role', 'admin')
             ->addArrayPropertyItem('bool', true)
@@ -79,34 +79,34 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddArrayPropertyItemThrowsException(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_array_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
-        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'boolProperty' has unexpected type. Expected 'array', actual 'bool'.");
 
-        new PHPFileBuilder($originalFixturePath)
-            ->addArrayPropertyItem('notArray', 'value')
+        new PHPFileBuilder($file)
+            ->addArrayPropertyItem('boolProperty', 'value')
             ->save();
     }
 
     public function testInvalidPhpFileThrowsException(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('invalid_file.php');
+        $file = $this->generateOriginalStructurePath('invalid_file.php');
 
-        $this->assertExceptionThrew(InvalidPHPFileException::class, "Cannot parse PHP file: {$originalFixturePath}");
+        $this->assertExceptionThrew(InvalidPHPFileException::class, "Cannot parse PHP file: {$file}");
 
-        new PHPFileBuilder($originalFixturePath);
+        new PHPFileBuilder($file);
     }
 
     public function testSetPropertyInTrait(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('trait.php');
+        $file = $this->generateOriginalStructurePath('trait.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'trait.php'),
+            $this->callFilePutContent($file, 'trait.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->setProperty('floatProperty', 56)
             ->addArrayPropertyItem('tags', 'three')
             ->addArrayPropertyItem('tags', 4)
@@ -117,14 +117,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testRemoveArrayPropertyItem(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_array_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_with_array_properties_removed.php'),
+            $this->callFilePutContent($file, 'class_with_array_properties_removed.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->removeArrayPropertyItem('fillable', ['name', 'age'])
             ->removeArrayPropertyItem('tags', ['two', 3, 5.5, true])
             ->removeArrayPropertyItem('newMultiArrayProperty', ['string1'])
@@ -138,36 +138,36 @@ class PHPFileBuilderTest extends TestCase
 
     public function testRemoveArrayPropertyItemThrowsException(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_array_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
-        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'boolProperty' has unexpected type. Expected 'array', actual 'bool'.");
 
-        new PHPFileBuilder($originalFixturePath)
-            ->removeArrayPropertyItem('notArray', ['value'])
+        new PHPFileBuilder($file)
+            ->removeArrayPropertyItem('boolProperty', ['value'])
             ->save();
     }
 
     public function testRemoveArrayPropertyItemNoProperty(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_without_properties.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_without_properties_unchanged.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->removeArrayPropertyItem('notProperty', ['value'])
             ->save();
     }
 
     public function testRemoveArrayPropertyUnexpectedPropertyExceptionNull(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'nullProperty' has unexpected type. Expected 'array', actual 'null'.");
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->removeArrayPropertyItem('nullProperty', ['value'])
             ->save();
     }
@@ -176,16 +176,16 @@ class PHPFileBuilderTest extends TestCase
     {
         return [
             [
-                'fixture' => 'add_imports_to_class.php',
+                'fixture' => 'class.php',
             ],
             [
-                'fixture' => 'add_imports_to_trait.php',
+                'fixture' => 'trait.php',
             ],
             [
-                'fixture' => 'add_imports_to_interface.php',
+                'fixture' => 'interface.php',
             ],
             [
-                'fixture' => 'add_imports_to_enum.php',
+                'fixture' => 'enum.php',
             ],
         ];
     }
@@ -193,14 +193,14 @@ class PHPFileBuilderTest extends TestCase
     #[DataProvider('provideAddImportsFiles')]
     public function testAddImports(string $fixture): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath($fixture);
+        $file = $this->generateOriginalStructurePath($fixture);
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, $fixture),
+            $this->callFilePutContent($file, "add_imports_to_{$fixture}"),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addImports([
                 'RonasIT\Larabuilder\Tests\Support\FirstClass',
                 'RonasIT\Larabuilder\Tests\Support\SecondClass',
@@ -211,42 +211,42 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddImportsEmptyList(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_imports_to_class.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_imports_to_class_empty_list.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addImports([])
             ->save();
     }
 
     public function testAddImportsAlreadyImported(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_imports_to_class.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_imports_to_class_empty_list.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
             ->save();
     }
 
     public function testAddImportsToFileWithoutNamespace(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_imports_to_file_without_namespace.php');
+        $file = $this->generateOriginalStructurePath('empty_php_file.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_imports_to_file_without_namespace.php'),
+            $this->callFilePutContent($file, 'empty_php_file.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
             ->save();
     }
@@ -255,13 +255,13 @@ class PHPFileBuilderTest extends TestCase
     {
         return [
             [
-                'fixture' => 'add_traits_to_class.php',
+                'fixture' => 'class.php',
             ],
             [
-                'fixture' => 'add_traits_to_trait.php',
+                'fixture' => 'trait.php',
             ],
             [
-                'fixture' => 'add_traits_to_enum.php',
+                'fixture' => 'enum.php',
             ],
         ];
     }
@@ -269,14 +269,14 @@ class PHPFileBuilderTest extends TestCase
     #[DataProvider('provideAddTraitsFiles')]
     public function testAddTraits(string $fixture): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath($fixture);
+        $file = $this->generateOriginalStructurePath($fixture);
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, $fixture),
+            $this->callFilePutContent($file, "add_traits_to_{$fixture}"),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addTraits([
                 'RonasIT\Support\Traits\FirstTrait',
                 'RonasIT\Support\Traits\SecondTrait',
@@ -285,67 +285,36 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddTraitsEmptyList(): void
+    public function testAddTraitsWithoutChanges(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_traits_to_class.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_traits_to_class_without_change.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addTraits([])
-            ->save();
-    }
-
-    public function testAddTraitsAlreadyImported(): void
-    {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_traits_to_class.php');
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_traits_to_class_without_change.php'),
-        );
-
-        new PHPFileBuilder($originalFixturePath)
             ->addTraits(['RonasIT\Support\Traits\FirstTrait'])
             ->save();
     }
 
     public function testAddTraitsWithDoubleCalls(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_traits_to_class.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_traits_to_class.php'),
+            $this->callFilePutContent($file, 'add_traits_to_class.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->addTraits([
                 'RonasIT\Support\Traits\FirstTrait',
                 'RonasIT\Support\Traits\SecondTrait',
             ])
             ->addTraits([
-                'RonasIT\Support\Traits\ThirdTrait',
-            ])
-            ->save();
-    }
-
-    public function testAddTraitsWithMultipleTraitUse(): void
-    {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_traits_to_class_with_multiple_traits.php');
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_traits_to_class_with_multiple_traits.php'),
-        );
-
-        new PHPFileBuilder($originalFixturePath)
-            ->addTraits([
-                'RonasIT\Support\Traits\FirstTrait',
-                'RonasIT\Support\Traits\SecondTrait',
                 'RonasIT\Support\Traits\ThirdTrait',
             ])
             ->save();
@@ -353,103 +322,103 @@ class PHPFileBuilderTest extends TestCase
 
     public function testInsertCodeToMethodToTheEndPosition(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_with_method_code_added.php'),
+            $this->callFilePutContent($file, 'class_with_method_code_added.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('__construct', $this->getFixture('sample_code.php'))
             ->save();
     }
 
     public function testInsertCodeToMethodToTheStartPosition(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_with_method_code.php'),
+            $this->callFilePutContent($file, 'class_with_method_code.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('__construct', '$this->name = $name;', InsertPositionEnum::Start)
             ->save();
     }
 
     public function testInsertCodeToTraitMethod(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('trait.php');
+        $file = $this->generateOriginalStructurePath('trait.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'trait_with_method_code_added.php'),
+            $this->callFilePutContent($file, 'trait_with_method_code_added.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('method1', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
             ->save();
     }
 
     public function testInsertCodeToEnum(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_imports_to_enum.php');
+        $file = $this->generateOriginalStructurePath('enum.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'add_imports_to_enum_code_added.php'),
+            $this->callFilePutContent($file, 'add_imports_to_enum_code_added.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('toArray', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
             ->save();
     }
 
     public function testInsertCodeToMethodNotExists(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_without_properties.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('noMethod', $this->getFixture('sample_code.php'))
             ->save();
     }
 
     public function testInsertCodeToMethodEmptyString(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($originalFixturePath, 'class_with_properties_unchanged.php'),
+            $this->callFilePutContent($file, 'class_with_properties_unchanged.php'),
         );
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', '')
             ->save();
     }
 
     public function testInsertCodeToMethodInvalidCode(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('class_without_properties.php');
+        $file = $this->generateOriginalStructurePath('class.php');
 
         $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected T_PUBLIC on line 4');
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', $this->getFixture('invalid_file.php'))
             ->save();
     }
 
     public function testInsertCodeToMethodNotClass(): void
     {
-        $originalFixturePath = $this->generateOriginalFixturePath('add_imports_to_interface.php');
+        $file = $this->generateOriginalStructurePath('interface.php');
 
         $this->assertExceptionThrew(Exception::class, "Method 'someMethod' does not exist.");
 
-        new PHPFileBuilder($originalFixturePath)
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
             ->save();
     }

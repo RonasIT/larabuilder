@@ -8,5 +8,5 @@ use RonasIT\Larabuilder\Tests\Support\ThirdClass;
 
 interface SomeInterface
 {
-
+    //
 }

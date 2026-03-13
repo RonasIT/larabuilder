@@ -8,6 +8,9 @@ use RonasIT\Larabuilder\Tests\Support\ThirdClass;
 
 enum SomeEnum
 {
+    case First;
+    case Second;
+
     public static function toArray(): array
     {
         return self::cases();

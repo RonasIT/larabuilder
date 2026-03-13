@@ -19,6 +19,11 @@ class SomeClass extends Some
     public float $intProperty = 1.23;
     public int $floatProperty = 56;
     public string $nullProperty = 'Changed to String';
+    protected array $tags = ['one', 'two', 3, true, 5.5, 78.4];
+    protected array $fillable = [
+        'name',
+        'email',
+    ];
     public array $newMultiArrayProperty = [
         'arrayProperty' => [
             0 => 1,
@@ -27,6 +32,7 @@ class SomeClass extends Some
         ],
         'someKey' => 1,
     ];
+    public array $notArray = [];
     public string $newString = 'some string';
 
     public function __construct()

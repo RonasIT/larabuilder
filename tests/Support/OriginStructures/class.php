@@ -2,7 +2,22 @@
 
 namespace RonasIT\Larabuilder\Tests\Support;
 
-class SomeClass
+use RonasIT\Larabuilder\Tests\Support\FirstClass;
+use Some\SomeTrait;
+use RonasIT\Support\Traits\FirstTrait;
+
+/**
+ * Test
+ */
+class SomeClass implements Test, Some
 {
-    //
+    use FirstTrait, SecondTrait;
+
+    public function __construct()
+    {
+    }
+
+    public function someMethod()
+    {
+    }
 }
