@@ -11,7 +11,7 @@ use PhpParser\ParserFactory;
  */
 class PreformattedCode extends Stmt
 {
-    public array $parsedCode;
+    readonly public array $code;
 
     public function __construct(
         public string $value,
@@ -21,7 +21,7 @@ class PreformattedCode extends Stmt
 
         $this->value = Str::chopStart($this->value, '<?php');
 
-        $this->parsedCode = $this->parsePHPCode($this->value);
+        $this->code = $this->parsePHPCode($this->value);
     }
 
     public function getSubNodeNames(): array

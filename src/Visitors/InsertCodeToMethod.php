@@ -8,36 +8,46 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
-    protected PreformattedCode $preformattedCode;
+    protected PreformattedCode $code;
+    protected bool $hasTargetMethod = false;
 
     public function __construct(
         protected string $methodName,
-        protected string $code,
+        string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
-        $this->preformattedCode = new PreformattedCode($this->code);
+        $this->code = new PreformattedCode($code);
     }
 
-    public function beforeTraverse(array $nodes): void
+    public function afterTraverse(array $nodes): void
     {
-        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
-
-        if (is_null($node)) {
+        if (!$this->hasTargetMethod) {
             throw new NodeNotExistException('Method', $this->methodName);
         }
     }
 
+    public function insertNode(Node $node): Node
+    {
+        return $node;
+    }
+
     protected function shouldUpdateNode(Node $node): bool
     {
-        return $node instanceof ClassMethod
-            && $this->methodName === $node->name->name;
+        $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
+
+        if ($isTargetMethod) {
+            $this->hasTargetMethod = true;
+        }
+
+        return !empty($this->code->value)
+            && $isTargetMethod
+            && !$this->isCodeDuplicated($node->stmts ?? [], $this->code->code);
     }
 
     protected function isParentNode(Node $node): bool
@@ -49,18 +59,11 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     {
         $existingStmts = $node->stmts ?? [];
 
-        if (
-            empty($this->preformattedCode->value)
-            || $this->isCodeDuplicated($existingStmts, $this->preformattedCode->parsedCode)
-        ) {
-            return;
-        }
-
         $separator = (!empty($existingStmts)) ? [new Nop()] : [];
 
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
-            ? [$this->preformattedCode, ...$separator, ...$existingStmts]
-            : [...$existingStmts, ...$separator, $this->preformattedCode];
+            ? [$this->code, ...$separator, ...$existingStmts]
+            : [...$existingStmts, ...$separator, $this->code];
     }
 
     protected function getInsertableNode(): Node

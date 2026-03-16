@@ -461,24 +461,24 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public static function provideInsertDuplicateCodeFiles(): array
+    public static function provideInsertDuplicateCode(): array
     {
         return [
             [
-                'codeSnippet' => '$a=1; $b=2;',
+                'code' => '$a=1; $b=2;',
             ],
             [
-                'codeSnippet' => '
+                'code' => '
                     if ( $a === $b ) {
                         return true;
                     }
                 ',
             ],
             [
-                'codeSnippet' => '$user->save();',
+                'code' => '$user->save();',
             ],
             [
-                'codeSnippet' => '
+                'code' => '
                     // comment
                     $config = [
                         \'status\' => true,
@@ -487,16 +487,16 @@ class PHPFileBuilderTest extends TestCase
                 ',
             ],
             [
-                'codeSnippet' => '$db->table(\'users\')->where(\'id\', 1)->first();',
+                'code' => '$db->table(\'users\')->where(\'id\', 1)->first();',
             ],
             [
-                'codeSnippet' => 'Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
+                'code' => 'Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
             ],
         ];
     }
 
-    #[DataProvider('provideInsertDuplicateCodeFiles')]
-    public function testInsertDuplicateCodeToMethod(string $codeSnippet): void
+    #[DataProvider('provideInsertDuplicateCode')]
+    public function testInsertDuplicateCodeToMethod(string $code): void
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -505,7 +505,7 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder('some_file_path.php')
-            ->insertCodeToMethod('someMethod', $codeSnippet)
+            ->insertCodeToMethod('someMethod', $code)
             ->save();
     }
 }

@@ -83,24 +83,24 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         }
     }
 
-    protected function isCodeDuplicated(array $existingStmts, array $newStmts): bool
+    protected function isCodeDuplicated(array $existingStatements, array $statementsToCheck): bool
     {
-        if (empty($existingStmts) || empty($newStmts)) {
+        if (empty($existingStatements) || empty($statementsToCheck)) {
             return false;
         }
 
-        $haystack = $this->normalizeStatements($existingStmts);
-        $needle = $this->normalizeStatements($newStmts);
+        $haystack = $this->normalizeStatements($existingStatements);
+        $needle = $this->normalizeStatements($statementsToCheck);
 
         return $this->isSubsequence($haystack, $needle);
     }
 
-    protected function normalizeStatements(array $stmts): array
+    protected function normalizeStatements(array $statements): array
     {
         $printer = new Standard();
 
-        return Arr::map($stmts, function (Stmt $stmt) use ($printer) {
-            $stmtCopy = clone $stmt;
+        return Arr::map($statements, function (Stmt $statement) use ($printer) {
+            $stmtCopy = clone $statement;
 
             $stmtCopy->setAttribute('comments', []);
 
@@ -108,13 +108,13 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         });
     }
 
-    private function isSubsequence(array $haystack, array $needle): bool
+    private function isSubsequence(array $haystackStatements, array $needleStatements): bool
     {
-        $needleCount = count($needle);
-        $haystackCount = count($haystack);
+        $needleCount = count($needleStatements);
+        $haystackCount = count($haystackStatements);
 
         for ($i = 0; $i <= $haystackCount - $needleCount; $i++) {
-            if (array_slice($haystack, $i, $needleCount) === $needle) {
+            if (array_slice($haystackStatements, $i, $needleCount) === $needleStatements) {
                 return true;
             }
         }
