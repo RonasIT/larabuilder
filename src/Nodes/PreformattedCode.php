@@ -11,7 +11,7 @@ use PhpParser\ParserFactory;
  */
 class PreformattedCode extends Stmt
 {
-    readonly public array $code;
+    public readonly array $code;
 
     public function __construct(
         public string $value,
