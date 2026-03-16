@@ -31,17 +31,12 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         throw new InvalidNodeTypeException('Class', 'Trait', 'Enum');
     }
 
-    public function afterTraverse(array $nodes): void
+    public function insertNode(Node $node): Node
     {
-        parent::afterTraverse($nodes);
-
         if (!$this->hasTargetMethod) {
             throw new NodeNotExistException('Method', $this->methodName);
         }
-    }
 
-    public function insertNode(Node $node): Node
-    {
         return $node;
     }
 
