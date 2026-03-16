@@ -6,10 +6,10 @@ use Exception;
 
 class InvalidNodeTypeException extends Exception
 {
-    public function __construct(array $nodes)
+    public function __construct(string ...$availableTypes)
     {
-        $nodes = implode(', ', $nodes);
+        $nodes = implode(', ', $availableTypes);
 
-        parent::__construct("Only {$nodes} node(s) can be modified");
+        parent::__construct("Only nodes with the next types can be modified: {$nodes}");
     }
 }

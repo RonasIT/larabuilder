@@ -29,7 +29,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function parentNodeNotFoundHook(): void
     {
-        throw new InvalidNodeTypeException(['Class', 'Trait', 'Enum']);
+        throw new InvalidNodeTypeException('Class', 'Trait', 'Enum');
     }
 
     public function insertNode(Node $node): Node

@@ -440,7 +440,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
-        $this->assertExceptionThrew(Exception::class, 'Only Class, Trait, Enum node(s) can be modified');
+        $this->assertExceptionThrew(Exception::class, 'Only nodes with the next types can be modified: Class, Trait, Enum');
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
