@@ -87,7 +87,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         }
     }
 
-    protected function makeArg(mixed $value): Arg
+    protected function makeArgument(mixed $value): Arg
     {
         list($value) = $this->getPropertyValue($value);
 

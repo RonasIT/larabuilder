@@ -2,15 +2,11 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
-use PhpParser\Node;
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Expression;
-use PhpParser\Node\Stmt\Nop;
 use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
@@ -32,87 +28,31 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         );
     }
 
-    protected function insertNode(MethodCall $node): MethodCall
-    {
-        $currentStatements = $node->args[0]->value->stmts;
-
-        if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
-            $node->args[0]->value->stmts = [$this->scheduleStatement];
-
-            return $node;
-        }
-
-        $lastExistingStatement = end($currentStatements);
-
-        $this->scheduleStatement->setAttribute('previous', $lastExistingStatement);
-
-        $node->args[0]->value->stmts[] = $this->scheduleStatement;
-
-        return $node;
-    }
-
     protected function buildScheduleCall(): Expression
     {
         $call = new StaticCall(
             class: new Name('Schedule'),
             name: new Identifier('command'),
             args: [
-                $this->makeArg($this->command),
+                $this->makeArgument($this->command),
             ],
         );
 
         foreach ($this->options as $option) {
-            $args = array_map(fn ($arg) => $this->makeArg($arg), $option->attributes);
+            $arguments = array_map(fn ($argument) => $this->makeArgument($argument), $option->arguments);
 
             $call = new MethodCall(
                 var: $call,
                 name: new Identifier($option->method),
-                args: $args,
+                args: $arguments,
             );
         }
 
         return new Expression($call);
     }
 
-    public function leaveNode(Node $node): Node
+    protected function getInsertableNode(): Expression
     {
-        if ($node instanceof MethodCall && $node->name->toString() === 'create') {
-            if ($this->isParentMethodMissing($node)) {
-                $node = $this->insertParentNode($node);
-            }
-
-            if ($node->var->getAttribute('wasCreated')) {
-                $node->var = parent::leaveNode($node->var);
-            }
-        }
-
-        return parent::leaveNode($node);
-    }
-
-    protected function isParentMethodMissing(Node $node): bool
-    {
-        $nodeVar = $node->var;
-
-        while ($nodeVar instanceof MethodCall) {
-            if ($nodeVar->name->toString() === $this->parentMethod) {
-                return false;
-            }
-
-            $nodeVar = $nodeVar->var;
-        }
-
-        return true;
-    }
-
-    protected function insertParentNode(Node $node): Node
-    {
-        $closure = new Closure([
-            'returnType' => new Identifier('void'),
-        ]);
-
-        $scheduleCall = new MethodCall($node->var, new Identifier($this->parentMethod), [new Arg($closure)]);
-        $scheduleCall->setAttribute('wasCreated', true);
-
-        return new MethodCall($scheduleCall, new Identifier('create'));
+        return $this->scheduleStatement;
     }
 }

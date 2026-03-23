@@ -12,7 +12,7 @@ readonly class ScheduleOption
 {
     public function __construct(
         public string $method,
-        public array $attributes = [],
+        public array $arguments = [],
     ) {
         $this->validateMethod($this->method);
     }
