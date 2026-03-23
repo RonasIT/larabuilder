@@ -8,8 +8,8 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidNodeTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
@@ -27,13 +27,14 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         }
     }
 
-    public function beforeTraverse(array $nodes): void
+    public function parentNodeNotFoundHook(): void
     {
-        $node = new NodeFinder()->findFirst($nodes, fn (Node $node) => $this->shouldUpdateNode($node));
+        throw new InvalidNodeTypeException('Class', 'Trait', 'Enum');
+    }
 
-        if (is_null($node)) {
-            throw new NodeNotExistException('Method', $this->methodName);
-        }
+    public function insertNode(Node $node): Node
+    {
+        throw new NodeNotExistException('Method', $this->methodName);
     }
 
     protected function shouldUpdateNode(Node $node): bool
