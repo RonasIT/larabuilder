@@ -412,14 +412,28 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testInsertCodeToMethodNotClass(): void
+    public function testInsertCodeToMethodNotClassTraitEnum(): void
     {
         $file = $this->generateOriginalStructurePath('interface.php');
 
-        $this->assertExceptionThrew(Exception::class, "Method 'someMethod' does not exist.");
+        $this->assertExceptionThrew(Exception::class, 'Only nodes with the next types can be modified: Class, Trait, Enum');
 
         new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
+            ->save();
+    }
+
+    public function testInsertCodeToMethodWhenMethodNotExist(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
+        );
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->insertCodeToMethod('noMethod', '$this->name = $name;')
             ->save();
     }
 }

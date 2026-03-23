@@ -8,6 +8,8 @@ use PhpParser\Node\Stmt\Trait_;
 
 abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
+    public bool $hasParentNode = false;
+
     abstract protected function shouldUpdateNode(Node $node): bool;
 
     /**
@@ -20,9 +22,15 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 
     abstract protected function getInsertableNode(): Node;
 
+    public function parentNodeNotFoundHook(): void
+    {
+    }
+
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
+            $this->hasParentNode = true;
+
             /** @var Class_|Trait_ $node */
             foreach ($node->stmts as $stmt) {
                 if ($this->shouldUpdateNode($stmt)) {
@@ -36,6 +44,13 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
         }
 
         return $node;
+    }
+
+    public function afterTraverse(array $nodes): void
+    {
+        if (!$this->hasParentNode) {
+            $this->parentNodeNotFoundHook();
+        }
     }
 
     /** @param Class_|Trait_ $node */
