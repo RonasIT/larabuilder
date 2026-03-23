@@ -26,6 +26,12 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         parent::__construct(
             parentMethod: 'withExceptions',
             targetMethod: 'render',
+            closureParams: [
+                new Param(
+                    var: new Variable('exceptions'),
+                    type: new Name('Exceptions'),
+                ),
+            ],
         );
     }
 

@@ -30,6 +30,7 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
     public function __construct(
         protected string $parentMethod,
         protected string $targetMethod,
+        protected array $closureParams = [],
     ) {
     }
 
@@ -83,6 +84,7 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
     protected function insertParentNode(Node $node): Node
     {
         $closure = new Closure([
+            'params' => $this->closureParams,
             'returnType' => new Identifier('void'),
         ]);
 

@@ -38,6 +38,23 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddExceptionsRenderMissingWithExceptions(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'without_exceptions.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'without_exceptions.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
+            )
+            ->save();
+    }
+
     public function testAddExceptionsRenderCustom(): void
     {
         $this->mockNativeFunction(
