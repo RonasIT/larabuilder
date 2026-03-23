@@ -25,6 +25,8 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
         Enum_::class,
     ];
 
+    protected static array $existingParentNodes = [];
+
     abstract protected function getInsertableNode(): Expression;
 
     public function __construct(
@@ -34,6 +36,13 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
     ) {
     }
 
+    public function afterTraverse(array $nodes): ?array
+    {
+        static::$existingParentNodes = [];
+
+        return null;
+    }
+
     public function enterNode(Node $node): void
     {
         $isBootstrapAppFile = array_any(self::FORBIDDEN_NODES, fn ($type) => $node instanceof $type);
@@ -41,12 +50,16 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
         if ($isBootstrapAppFile) {
             throw new InvalidBootstrapAppFileException(class_basename($node));
         }
+
+        if ($node instanceof MethodCall && $node->name->toString() === $this->parentMethod) {
+            static::$existingParentNodes[] = $this->parentMethod;
+        }
     }
 
     public function leaveNode(Node $node): Node
     {
         if ($node instanceof MethodCall && $node->name->toString() === 'create') {
-            if ($this->isParentMethodMissing($node)) {
+            if (!in_array($this->parentMethod, static::$existingParentNodes)) {
                 $node = $this->insertParentNode($node);
             }
 
@@ -66,23 +79,10 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
         return $node;
     }
 
-    protected function isParentMethodMissing(Node $node): bool
-    {
-        $nodeVar = $node->var;
-
-        while ($nodeVar instanceof MethodCall) {
-            if ($nodeVar->name->toString() === $this->parentMethod) {
-                return false;
-            }
-
-            $nodeVar = $nodeVar->var;
-        }
-
-        return true;
-    }
-
     protected function insertParentNode(Node $node): Node
     {
+        static::$existingParentNodes[] = $this->parentMethod;
+
         $closure = new Closure([
             'params' => $this->closureParams,
             'returnType' => new Identifier('void'),
