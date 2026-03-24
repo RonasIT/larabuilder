@@ -15,16 +15,15 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
-    protected array $preformattedCode = [];
+    protected PreformattedCode $code;
+    protected bool $hasTargetMethod = false;
 
     public function __construct(
         protected string $methodName,
-        protected string $code,
+        string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
-        if (!empty($this->code)) {
-            $this->preformattedCode = [new PreformattedCode($this->code)];
-        }
+        $this->code = new PreformattedCode($code);
     }
 
     public function parentNodeNotFoundHook(): void
@@ -34,13 +33,24 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     public function insertNode(Node $node): Node
     {
-        throw new NodeNotExistException('Method', $this->methodName);
+        if (!$this->hasTargetMethod) {
+            throw new NodeNotExistException('Method', $this->methodName);
+        }
+
+        return $node;
     }
 
     protected function shouldUpdateNode(Node $node): bool
     {
-        return $node instanceof ClassMethod
-            && $this->methodName === $node->name->name;
+        $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
+
+        if ($isTargetMethod) {
+            $this->hasTargetMethod = true;
+        }
+
+        return !empty($this->code->value)
+            && $isTargetMethod
+            && !$this->isCodeDuplicated($node->stmts ?? [], $this->code->code);
     }
 
     protected function isParentNode(Node $node): bool
@@ -52,11 +62,11 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     {
         $existingStmts = $node->stmts ?? [];
 
-        $separator = (!empty($existingStmts) && !empty($this->preformattedCode)) ? [new Nop()] : [];
+        $separator = (!empty($existingStmts)) ? [new Nop()] : [];
 
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
-            ? [...$this->preformattedCode, ...$separator, ...$existingStmts]
-            : [...$existingStmts, ...$separator, ...$this->preformattedCode];
+            ? [$this->code, ...$separator, ...$existingStmts]
+            : [...$existingStmts, ...$separator, $this->code];
     }
 
     protected function getInsertableNode(): Node

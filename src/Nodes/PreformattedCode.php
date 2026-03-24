@@ -11,6 +11,8 @@ use PhpParser\ParserFactory;
  */
 class PreformattedCode extends Stmt
 {
+    public readonly array $code;
+
     public function __construct(
         public string $value,
         public array $attributes = [],
@@ -19,7 +21,7 @@ class PreformattedCode extends Stmt
 
         $this->value = Str::chopStart($this->value, '<?php');
 
-        $this->validateRenderBody($this->value);
+        $this->code = $this->parsePHPCode($this->value);
     }
 
     public function getSubNodeNames(): array
@@ -32,8 +34,8 @@ class PreformattedCode extends Stmt
         return 'Stmt_PreformattedCode';
     }
 
-    protected function validateRenderBody(string $body): void
+    protected function parsePHPCode(string $code): array
     {
-        new ParserFactory()->createForHostVersion()->parse("<?php\n{$body}");
+        return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}");
     }
 }
