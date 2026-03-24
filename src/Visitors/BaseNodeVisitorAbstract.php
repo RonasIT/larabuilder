@@ -2,8 +2,10 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -15,6 +17,7 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\PrettyPrinter\Standard;
 use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
@@ -119,5 +122,44 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
                 }
             }
         }
+    }
+
+    protected function isCodeDuplicated(array $existingStatements, array $statementsToCheck): bool
+    {
+        if (empty($existingStatements) || empty($statementsToCheck)) {
+            return false;
+        }
+
+        $haystack = $this->normalizeStatements($existingStatements);
+        $needle = $this->normalizeStatements($statementsToCheck);
+
+        return $this->isSubsequence($haystack, $needle);
+    }
+
+    protected function normalizeStatements(array $statements): array
+    {
+        $printer = new Standard();
+
+        return Arr::map($statements, function (Stmt $statement) use ($printer) {
+            $stmtCopy = clone $statement;
+
+            $stmtCopy->setAttribute('comments', []);
+
+            return $printer->prettyPrint([$stmtCopy]);
+        });
+    }
+
+    private function isSubsequence(array $haystackStatements, array $needleStatements): bool
+    {
+        $needleCount = count($needleStatements);
+        $haystackCount = count($haystackStatements);
+
+        for ($i = 0; $i <= $haystackCount - $needleCount; $i++) {
+            if (array_slice($haystackStatements, $i, $needleCount) === $needleStatements) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
