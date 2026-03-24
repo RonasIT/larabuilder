@@ -11,6 +11,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
@@ -55,7 +56,7 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
 
         $lastExistingStatement = end($currentStatements);
 
-        $this->renderStatement->setAttribute('previous', $lastExistingStatement);
+        $this->renderStatement->setAttribute(StatementAttributeEnum::Previous->value, $lastExistingStatement);
 
         $node->args[0]->value->stmts[] = $this->renderStatement;
 
