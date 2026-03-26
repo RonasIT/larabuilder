@@ -142,6 +142,7 @@ class PHPFileBuilderTest extends TestCase
             ->addArrayPropertyItem('tags', 'three')
             ->addArrayPropertyItem('tags', 4)
             ->setProperty('newString', 'some string')
+            ->setProperty('default', null)
             ->removeArrayPropertyItem('fillable', ['name'])
             ->save();
     }

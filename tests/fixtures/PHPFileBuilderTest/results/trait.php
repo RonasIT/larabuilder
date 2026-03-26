@@ -15,6 +15,7 @@ trait SomeTrait {
         4,
     ];
     public string $newString = 'some string';
+    public null $default = null;
 
     public function method1()
     {
