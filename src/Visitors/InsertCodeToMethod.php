@@ -14,8 +14,6 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
-    protected string $methodName = 'insertCodeToMethod';
-
     protected array $parentNodeTypes = [
         Class_::class,
         Trait_::class,
@@ -26,7 +24,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     protected bool $hasTargetMethod = false;
 
     public function __construct(
-        protected string $targetMethodName,
+        protected string $methodName,
         string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
@@ -36,7 +34,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
     public function insertNode(Node $node): Node
     {
         if (!$this->hasTargetMethod) {
-            throw new NodeNotExistException('Method', $this->targetMethodName);
+            throw new NodeNotExistException('Method', $this->methodName);
         }
 
         return $node;
@@ -44,7 +42,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
     protected function shouldUpdateNode(Node $node): bool
     {
-        $isTargetMethod = $node instanceof ClassMethod && $this->targetMethodName === $node->name->name;
+        $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
 
         if ($isTargetMethod) {
             $this->hasTargetMethod = true;

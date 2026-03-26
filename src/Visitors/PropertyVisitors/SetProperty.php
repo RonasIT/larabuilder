@@ -8,10 +8,8 @@ use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 
-class SetPropertyValue extends AbstractPropertyVisitor
+class SetProperty extends AbstractPropertyVisitor
 {
-    protected string $methodName = 'setProperty';
-
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 

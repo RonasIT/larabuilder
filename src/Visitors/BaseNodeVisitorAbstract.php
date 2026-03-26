@@ -22,10 +22,6 @@ use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
-    abstract protected string $methodName {
-        get;
-    }
-
     abstract protected array $parentNodeTypes {
         get;
     }
@@ -47,7 +43,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     public function afterTraverse(array $nodes): ?array
     {
         if (!$this->hasParentNode) {
-            throw new InvalidTargetTypeException($this->methodName, $this->getReadableParentNodeTypes());
+            throw new InvalidTargetTypeException(class_basename(get_called_class()), $this->getReadableParentNodeTypes());
         }
 
         return null;

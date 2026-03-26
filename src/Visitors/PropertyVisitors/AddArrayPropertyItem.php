@@ -10,10 +10,8 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
-class AddArrayPropertyItem extends SetPropertyValue
+class AddArrayPropertyItem extends SetProperty
 {
-    protected string $methodName = 'addArrayPropertyItem';
-
     protected ArrayItem $arrayItem;
 
     public function __construct(
