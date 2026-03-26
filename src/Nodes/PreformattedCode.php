@@ -2,8 +2,8 @@
 
 namespace RonasIT\Larabuilder\Nodes;
 
-use PhpParser\Error;
 use Illuminate\Support\Str;
+use PhpParser\Error;
 use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
