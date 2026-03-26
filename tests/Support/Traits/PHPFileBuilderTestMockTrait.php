@@ -10,6 +10,6 @@ trait PHPFileBuilderTestMockTrait
 
     protected function callFilePutContent(string $fileName, string $resultFixture, int $flags = 0): array
     {
-        return $this->functionCall('file_put_contents', [$fileName, $this->getFixture("results/{$resultFixture}"), $flags]);
+        return $this->functionCall('file_put_contents', [$fileName, $this->getFixture($resultFixture), $flags]);
     }
 }
