@@ -2,9 +2,11 @@
 
 namespace RonasIT\Larabuilder\Nodes;
 
+use PhpParser\Error;
 use Illuminate\Support\Str;
 use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 
 /**
  * Used to insert code with saving original formatting
@@ -36,6 +38,12 @@ class PreformattedCode extends Stmt
 
     protected function parsePHPCode(string $code): array
     {
-        return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}");
+        try {
+            return new ParserFactory()
+                ->createForHostVersion()
+                ->parse("<?php\n{$code}");
+        } catch (Error) {
+            throw new InvalidPHPCodeException($code);
+        }
     }
 }

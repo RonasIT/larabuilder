@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -75,6 +76,27 @@ class AppBootstrapBuilderTest extends TestCase
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
+            )
+            ->save();
+    }
+
+    public function testAddExceptionsRenderInvalidBody()
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
+        );
+
+        $this->assertExceptionThrew(
+            expectedClassName: InvalidPHPCodeException::class,
+            expectedMessage: 'Cannot parse provided code: return ($request->expectsJson()',
+        );
+
+        new AppBootstrapBuilder()
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return ($request->expectsJson()',
                 includeRequestArg: true,
             )
             ->save();
