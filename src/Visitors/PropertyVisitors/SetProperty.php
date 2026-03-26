@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Traits\PropertyTrait;
 use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
-class SetPropertyValue extends BaseNodeVisitorAbstract implements InsertNodeContract, UpdateNodeContract
+class SetProperty extends BaseNodeVisitorAbstract implements InsertNodeContract, UpdateNodeContract
 {
     use PropertyTrait;
 

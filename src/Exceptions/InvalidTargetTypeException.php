@@ -6,12 +6,10 @@ use Exception;
 
 class InvalidTargetTypeException extends Exception
 {
-    public function __construct(string $methodName, array $allowedTargets)
+    public function __construct(string $visitorName, array $allowedTargets)
     {
-        $methodName = empty($methodName) ? '' : "'{$methodName}' ";
-
         $targetsList = implode(', ', $allowedTargets);
 
-        parent::__construct("Method {$methodName}may be used only for {$targetsList}.");
+        parent::__construct("'{$visitorName}' operation may only be applied to: {$targetsList}.");
     }
 }
