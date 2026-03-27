@@ -503,7 +503,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'class_insert_duplicate_code.php'),
         );
 
-        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'$this->name\'');
+        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'$this->name\'.');
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', '$this->name')

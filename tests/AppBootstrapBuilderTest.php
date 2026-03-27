@@ -90,7 +90,7 @@ class AppBootstrapBuilderTest extends TestCase
 
         $this->assertExceptionThrew(
             expectedClassName: InvalidPHPCodeException::class,
-            expectedMessage: 'Cannot parse provided code: \'return ($request->expectsJson()\'',
+            expectedMessage: 'Cannot parse provided code: \'return ($request->expectsJson()\'.',
         );
 
         new AppBootstrapBuilder()

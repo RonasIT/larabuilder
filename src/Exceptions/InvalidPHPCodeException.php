@@ -10,6 +10,6 @@ class InvalidPHPCodeException extends Exception
     {
         $invalidCode = trim($invalidCode);
 
-        parent::__construct("Cannot parse provided code: '{$invalidCode}'");
+        parent::__construct("Cannot parse provided code: '{$invalidCode}'.");
     }
 }
