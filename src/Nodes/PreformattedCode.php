@@ -39,9 +39,7 @@ class PreformattedCode extends Stmt
     protected function parsePHPCode(string $code): array
     {
         try {
-            return new ParserFactory()
-                ->createForHostVersion()
-                ->parse("<?php\n{$code}");
+            return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}");
         } catch (Error) {
             throw new InvalidPHPCodeException($code);
         }

@@ -6,10 +6,10 @@ use Exception;
 
 class InvalidPHPCodeException extends Exception
 {
-    public function __construct(string $code)
+    public function __construct(string $invalidCode)
     {
-        $code = trim($code);
+        $invalidCode = trim($invalidCode);
 
-        parent::__construct("Cannot parse provided code: {$code}");
+        parent::__construct("Cannot parse provided code: '{$invalidCode}'");
     }
 }
