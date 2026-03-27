@@ -45,9 +45,9 @@ abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        $isBootstrapAppFile = array_any(self::FORBIDDEN_NODES, fn ($type) => $node instanceof $type);
+        $isNotBootstrapAppFile = array_any(self::FORBIDDEN_NODES, fn ($type) => $node instanceof $type);
 
-        if ($isBootstrapAppFile) {
+        if ($isNotBootstrapAppFile) {
             throw new InvalidBootstrapAppFileException(class_basename($node));
         }
 
