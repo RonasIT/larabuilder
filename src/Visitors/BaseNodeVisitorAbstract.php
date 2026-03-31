@@ -18,6 +18,7 @@ use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
@@ -70,11 +71,11 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     protected function setParentForNode(Node $child, Node $parent): void
     {
-        $child->setAttribute('parent', $parent);
+        $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
 
         if ($child instanceof Array_) {
             foreach ($child->items as $item) {
-                $item->setAttribute('parent', $child);
+                $item->setAttribute(StatementAttributeEnum::Parent->value, $child);
 
                 if ($item->value instanceof Array_) {
                     $this->setParentForNode($item->value, $item);
@@ -102,7 +103,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         return Arr::map($statements, function (Stmt $statement) use ($printer) {
             $stmtCopy = clone $statement;
 
-            $stmtCopy->setAttribute('comments', []);
+            $stmtCopy->setAttribute(StatementAttributeEnum::Comments->value, []);
 
             return $printer->prettyPrint([$stmtCopy]);
         });
