@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder\Visitors;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Trait_;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
@@ -39,7 +40,7 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 
         $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
 
-        $newNode->setAttribute('previous', $node->stmts[$insertIndex - 1] ?? null);
+        $newNode->setAttribute(StatementAttributeEnum::Previous->value, $node->stmts[$insertIndex - 1] ?? null);
 
         array_splice($node->stmts, $insertIndex, 0, [$newNode]);
 
