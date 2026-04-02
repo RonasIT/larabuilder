@@ -55,6 +55,7 @@ monthly
 monthlyOn
 twiceMonthly
 lastDayOfMonth
+daysOfMonth
 quarterly
 quarterlyOn
 yearly
