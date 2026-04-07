@@ -11,13 +11,12 @@
     ],
     "require": {
         "laravel/framework": ">=12.28",
-        "php": "^8.4.1",
+        "php": "^8.4",
         "nikic/php-parser": "^5.6"
     },
     "require-dev": {
-        "orchestra/testbench": "^10.6",
-        "php-coveralls/php-coveralls": "^2.8",
-        "phpunit/phpunit": "^13",
+        "phpunit/phpunit": ">=11.5.5",
+        "orchestra/testbench": ">=9.5.1",
         "ronasit/laravel-helpers": ">=3.5.8",
         "laravel/pint": "^1.25"
     },
