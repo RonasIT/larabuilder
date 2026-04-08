@@ -9,8 +9,6 @@ use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
-    public bool $hasParentNode = false;
-
     abstract protected function shouldUpdateNode(Node $node): bool;
 
     /**
@@ -22,10 +20,6 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
     abstract protected function updateNode(Node $node): void;
 
     abstract protected function getInsertableNode(): Node;
-
-    public function parentNodeNotFoundHook(): void
-    {
-    }
 
     public function leaveNode(Node $node): Node
     {
@@ -45,13 +39,6 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
         }
 
         return $node;
-    }
-
-    public function afterTraverse(array $nodes): void
-    {
-        if (!$this->hasParentNode) {
-            $this->parentNodeNotFoundHook();
-        }
     }
 
     /** @param Class_|Trait_ $node */

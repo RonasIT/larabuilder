@@ -22,6 +22,8 @@ use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
+    public bool $hasParentNode = false;
+
     protected const TYPE_ORDER = [
         Namespace_::class,
         Use_::class,
@@ -33,6 +35,19 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         Property::class,
         ClassMethod::class,
     ];
+
+    public function parentNodeNotFoundHook(): void
+    {
+    }
+
+    public function afterTraverse(array $nodes): ?array
+    {
+        if (!$this->hasParentNode) {
+            $this->parentNodeNotFoundHook();
+        }
+
+        return null;
+    }
 
     protected function getInsertIndex(array $statements, string $insertType): int
     {
