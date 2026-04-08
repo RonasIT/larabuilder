@@ -508,4 +508,85 @@ class PHPFileBuilderTest extends TestCase
             ->insertCodeToMethod('someMethod', $code)
             ->save();
     }
+
+    public function testRemoveClassAttributeNotClass(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
+        );
+
+        $this->assertExceptionThrew(Exception::class, 'Only nodes with the next types can be modified: Class');
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeClassAttribute('SomeClass', 'someAttribute')
+            ->save();
+    }
+
+    public function testRemoveClassAttributeWhenClassNotExist(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
+        );
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Class 'AnotherClass' does not exist.");
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeClassAttribute('AnotherClass', 'someAttribute')
+            ->save();
+    }
+
+    public function testRemoveClassAttribute(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_attributes.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_attributes.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeClassAttribute('SomeClass', 'MyAttribute')
+            ->removeClassAttribute('SomeClass', 'AnotherAttribute')
+            ->save();
+    }
+
+    public function testRemoveClassAttributeFromGroupedAttributes(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_grouped_attributes.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_grouped_attributes_one_removed.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeClassAttribute('SomeClass', 'MyAttribute')
+            ->save();
+    }
+
+    public function testRemoveClassAttributeMultipleSameNameAttributes(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_multiple_same_attributes.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_without_attributes.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeClassAttribute('SomeClass', 'MyAttribute')
+            ->save();
+    }
+
+    public function testRemoveClassAttributeNoMatchingAttribute(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'class_with_attributes.php'),
+            $this->callFilePutContent('some_file_path.php', 'class_with_attributes_unchanged.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeClassAttribute('SomeClass', 'NonExistentAttribute')
+            ->save();
+    }
 }
