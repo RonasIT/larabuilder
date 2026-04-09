@@ -23,6 +23,8 @@ use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
+    protected const array SKIP_PARENT_NODE_VALIDATION = [];
+
     abstract protected array $parentNodeTypes {
         get;
     }
@@ -43,7 +45,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if (!$this->hasParentNode) {
+        if (!$this->hasParentNode && $this->parentNodeTypes !== self::SKIP_PARENT_NODE_VALIDATION) {
             throw new InvalidTargetTypeException(class_basename(get_called_class()), $this->getReadableParentNodeTypes());
         }
 

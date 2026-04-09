@@ -10,7 +10,7 @@ use PhpParser\Node\Stmt\UseUse;
 
 class AddImports extends InsertNodesAbstractVisitor
 {
-    protected array $parentNodeTypes = [];
+    protected array $parentNodeTypes = self::SKIP_PARENT_NODE_VALIDATION;
 
     public function __construct(array $imports)
     {
