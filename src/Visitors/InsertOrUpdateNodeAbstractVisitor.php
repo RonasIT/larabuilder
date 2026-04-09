@@ -15,22 +15,18 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 
     abstract protected function getInsertableNode(): Node;
 
-    public function leaveNode(Node $node): Node
+    protected function handleParentNode(Node $node): Node
     {
-        if ($this->isParentNode($node)) {
-            /** @var Class_|Trait_ $node */
-            foreach ($node->stmts as $stmt) {
-                if ($this->shouldUpdateNode($stmt)) {
-                    $this->updateNode($stmt);
+        /** @var Class_|Trait_ $node */
+        foreach ($node->stmts as $stmt) {
+            if ($this->shouldUpdateNode($stmt)) {
+                $this->updateNode($stmt);
 
-                    return $node;
-                }
+                return $node;
             }
-
-            return $this->insertNode($node);
         }
 
-        return $node;
+        return $this->insertNode($node);
     }
 
     /** @param Class_|Trait_ $node */

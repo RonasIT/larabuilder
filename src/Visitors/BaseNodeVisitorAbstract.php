@@ -43,6 +43,17 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         ClassMethod::class,
     ];
 
+    public function leaveNode(Node $node): Node
+    {
+        if ($this->isParentNode($node)) {
+            $this->hasParentNode = true;
+
+            return $this->handleParentNode($node);
+        }
+
+        return $node;
+    }
+
     public function afterTraverse(array $nodes): ?array
     {
         if (!empty($this->allowedParentNodesTypes) && !$this->hasParentNode) {
@@ -62,13 +73,12 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     protected function isParentNode(Node $node): bool
     {
-        if (array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type)) {
-            $this->hasParentNode = true;
+        return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
+    }
 
-            return true;
-        }
-
-        return false;
+    protected function handleParentNode(Node $node): Node
+    {
+        return $node;
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int
