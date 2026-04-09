@@ -23,11 +23,9 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
     }
 
     /** @param Class_|Enum_|Trait_ $node */
-    public function leaveNode(Node $node): Node
+    protected function modify(Node $node): Node
     {
-        if ($this->isParentNode($node)) {
-            $this->insertNodes($node->stmts);
-        }
+        $this->insertNodes($node->stmts);
 
         return $node;
     }

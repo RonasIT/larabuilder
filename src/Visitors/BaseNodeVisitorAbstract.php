@@ -18,10 +18,10 @@ use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
-use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
-use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
@@ -48,18 +48,9 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
-            if ($this instanceof UpdateNodeContract) {
-                /** @var Class_|Trait_|Enum_ $node */
-                foreach ($node->stmts as $stmt) {
-                    if ($this->shouldUpdateNode($stmt)) {
-                        $this->updateNode($stmt);
+            $this->hasParentNode = true;
 
-                        return $node;
-                    }
-                }
-            }
-
-            return $this->insertNode($node);
+            return $this->modify($node);
         }
 
         return $node;
@@ -89,11 +80,22 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     protected function modify(Node $node): Node
     {
-        return $node;
+        if ($this instanceof UpdateNodeContract) {
+            /** @var Class_|Trait_|Enum_ $node */
+            foreach ($node->stmts as $stmt) {
+                if ($this->shouldUpdateNode($stmt)) {
+                    $this->updateNode($stmt);
+
+                    return $node;
+                }
+            }
+        }
+
+        return $this->insertNode($node);
     }
 
     /** @param Class_|Trait_|Enum_ $node */
-    public function insertNode(Node $node): Node
+    protected function insertNode(Node $node): Node
     {
         if (!($this instanceof InsertNodeContract)) {
             return $node;
@@ -189,7 +191,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         });
     }
 
-    private function isSubsequence(array $haystackStatements, array $needleStatements): bool
+    protected function isSubsequence(array $haystackStatements, array $needleStatements): bool
     {
         $needleCount = count($needleStatements);
         $haystackCount = count($haystackStatements);

@@ -18,9 +18,7 @@ class SetProperty extends BaseNodeVisitorAbstract implements InsertNodeContract,
 {
     use PropertyTrait;
 
-    protected string $methodName = 'setProperty';
-
-    protected array $parentNodeTypes = [
+    protected array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
     ];

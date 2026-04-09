@@ -20,9 +20,7 @@ class RemoveArrayPropertyItem extends BaseNodeVisitorAbstract implements UpdateN
 {
     use PropertyTrait;
 
-    protected string $methodName = 'removeArrayPropertyItem';
-
-    protected array $parentNodeTypes = [
+    protected array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
     ];

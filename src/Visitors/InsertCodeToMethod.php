@@ -32,15 +32,6 @@ class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeCo
         $this->code = new PreformattedCode($code);
     }
 
-    public function insertNode(Node $node): Node
-    {
-        if (!$this->hasTargetMethod) {
-            throw new NodeNotExistException('Method', $this->methodName);
-        }
-
-        return $node;
-    }
-
     public function shouldUpdateNode(Node $node): bool
     {
         $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
@@ -63,5 +54,14 @@ class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeCo
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
             ? [$this->code, ...$separator, ...$existingStmts]
             : [...$existingStmts, ...$separator, $this->code];
+    }
+
+    protected function insertNode(Node $node): Node
+    {
+        if (!$this->hasTargetMethod) {
+            throw new NodeNotExistException('Method', $this->methodName);
+        }
+
+        return $node;
     }
 }
