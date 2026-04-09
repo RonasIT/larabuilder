@@ -8,7 +8,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
-use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
+use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -62,7 +62,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'enum.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "'SetProperty' operation may only be applied to: Class, Trait.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'SetProperty' operation may only be applied to: Class, Trait.");
 
         new PHPFileBuilder('some_file_path.php')
             ->setProperty('newString', 'some string')
@@ -110,7 +110,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'enum.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "'AddArrayPropertyItem' operation may only be applied to: Class, Trait.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddArrayPropertyItem' operation may only be applied to: Class, Trait.");
 
         new PHPFileBuilder('some_file_path.php')
             ->addArrayPropertyItem('fillable', 'age')
@@ -215,7 +215,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'enum.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "'RemoveArrayPropertyItem' operation may only be applied to: Class, Trait.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'RemoveArrayPropertyItem' operation may only be applied to: Class, Trait.");
 
         new PHPFileBuilder('some_file_path.php')
             ->removeArrayPropertyItem('fillable', ['name', 'age'])
@@ -399,7 +399,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "'AddTraits' operation may only be applied to: Class, Trait, Enum.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTraits' operation may only be applied to: Class, Trait, Enum.");
 
         new PHPFileBuilder('some_file_path.php')
             ->addTraits([
@@ -500,7 +500,7 @@ class PHPFileBuilderTest extends TestCase
             $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
         );
 
-        $this->assertExceptionThrew(InvalidTargetTypeException::class, "'InsertCodeToMethod' operation may only be applied to: Class, Trait, Enum.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'InsertCodeToMethod' operation may only be applied to: Class, Trait, Enum.");
 
         new PHPFileBuilder('some_file_path.php')
             ->insertCodeToMethod('someMethod', '$this->name = $name;')

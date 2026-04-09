@@ -4,7 +4,7 @@ namespace RonasIT\Larabuilder\Exceptions;
 
 use Exception;
 
-class InvalidTargetTypeException extends Exception
+class InvalidStructureTypeException extends Exception
 {
     public function __construct(string $visitorName, array $allowedTargets)
     {

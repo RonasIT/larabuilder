@@ -15,7 +15,7 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeContract
 {
-    protected array $parentNodeTypes = [
+    protected array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
         Enum_::class,
