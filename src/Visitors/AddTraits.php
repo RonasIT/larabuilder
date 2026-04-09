@@ -30,7 +30,7 @@ class AddTraits extends InsertNodesAbstractVisitor
         );
     }
 
-    protected function handleParentNode(Node $node): Node
+    protected function modify(Node $node): Node
     {
         $this->insertNodes($node->stmts);
 

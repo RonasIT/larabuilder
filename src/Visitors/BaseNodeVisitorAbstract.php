@@ -48,7 +48,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         if ($this->isParentNode($node)) {
             $this->hasParentNode = true;
 
-            return $this->handleParentNode($node);
+            return $this->modify($node);
         }
 
         return $node;
@@ -76,7 +76,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 
-    protected function handleParentNode(Node $node): Node
+    protected function modify(Node $node): Node
     {
         return $node;
     }
