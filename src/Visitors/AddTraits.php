@@ -11,7 +11,7 @@ use PhpParser\Node\Stmt\TraitUse;
 
 class AddTraits extends InsertNodesAbstractVisitor
 {
-    protected array $parentNodeTypes = [
+    protected array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
         Enum_::class,

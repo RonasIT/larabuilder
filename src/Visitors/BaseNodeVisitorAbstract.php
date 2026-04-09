@@ -19,13 +19,13 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
-use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
+use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
-    protected const array SKIP_PARENT_NODE_VALIDATION = [];
+    protected const array ANY_TYPE = [];
 
-    abstract protected array $parentNodeTypes {
+    abstract protected array $allowedParentNodesTypes {
         get;
     }
 
@@ -45,29 +45,27 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if (!$this->hasParentNode && $this->parentNodeTypes !== self::SKIP_PARENT_NODE_VALIDATION) {
-            throw new InvalidTargetTypeException(class_basename(get_called_class()), $this->getReadableParentNodeTypes());
+        if (!empty($this->allowedParentNodesTypes) && !$this->hasParentNode) {
+            throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
         }
 
         return null;
     }
 
-    protected function getReadableParentNodeTypes(): array
+    protected function getReadableAllowedParentNodesTypes(): array
     {
         return array_map(
             fn (string $class) => trim(class_basename($class), '_'),
-            $this->parentNodeTypes,
+            $this->allowedParentNodesTypes,
         );
     }
 
     protected function isParentNode(Node $node): bool
     {
-        foreach ($this->parentNodeTypes as $type) {
-            if ($node instanceof $type) {
-                $this->hasParentNode = true;
+        if (array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type)) {
+            $this->hasParentNode = true;
 
-                return true;
-            }
+            return true;
         }
 
         return false;
