@@ -20,6 +20,7 @@ use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidTargetTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
@@ -151,11 +152,11 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
     protected function setParentForNode(Node $child, Node $parent): void
     {
-        $child->setAttribute('parent', $parent);
+        $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
 
         if ($child instanceof Array_) {
             foreach ($child->items as $item) {
-                $item->setAttribute('parent', $child);
+                $item->setAttribute(StatementAttributeEnum::Parent->value, $child);
 
                 if ($item->value instanceof Array_) {
                     $this->setParentForNode($item->value, $item);
@@ -183,7 +184,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         return Arr::map($statements, function (Stmt $statement) use ($printer) {
             $stmtCopy = clone $statement;
 
-            $stmtCopy->setAttribute('comments', []);
+            $stmtCopy->setAttribute(StatementAttributeEnum::Comments->value, []);
 
             return $printer->prettyPrint([$stmtCopy]);
         });
