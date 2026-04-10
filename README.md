@@ -47,6 +47,10 @@ Insert the provided code into the specified method body at the desired position 
 
 Add new imports to the file. This method will add a new import only in case it does not exist yet, preventing duplicate `use` statements.
 
+#### removeImports
+
+Remove imports from the file. By default, only removes imports that are not used in the code, preventing breaking changes. Pass `true` as the second argument to force removal regardless of usage.
+
 #### addTraits
 
 Add new `use TraitName;` statements to a class, trait, or enum. This method automatically adds the corresponding `use` imports at the top of the file and prevents duplicate trait usages.
