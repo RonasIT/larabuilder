@@ -43,6 +43,8 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         ClassMethod::class,
     ];
 
+    abstract protected function modify(Node $node): Node;
+
     public function leaveNode(Node $node): Node
     {
         if ($this->isParentNode($node)) {
@@ -74,11 +76,6 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     protected function isParentNode(Node $node): bool
     {
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
-    }
-
-    protected function modify(Node $node): Node
-    {
-        return $node;
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int
