@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Traits;
 
 use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\ParserFactory;
 
 trait PreformattedNodesHelperTrait
@@ -18,6 +19,12 @@ trait PreformattedNodesHelperTrait
 
     protected function parsePHPCode(string $code): array
     {
-        return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code};");
+        $nodes = new ParserFactory()->createForHostVersion()->parse("<?php\n{$code};");
+
+        if (end($nodes) instanceof Nop) {
+            array_pop($nodes);
+        }
+
+        return $nodes;
     }
 }
