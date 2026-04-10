@@ -44,17 +44,12 @@ class RemoveClassAttribute extends BaseNodeVisitorAbstract
                 continue;
             }
 
-            $attrGroup->attrs = array_filter($attrGroup->attrs, fn (Attribute $attr) => !$this->shouldRemoveAttribute($attr));
+            $attrGroup->attrs = array_filter($attrGroup->attrs, fn (Attribute $attr) => $attr->name->name !== $this->attributeName);
 
             // Replace with Nop to avoid leftover `#[]` and preserve original blank lines (full removal shifts token offsets in Printer)
             if (empty($attrGroup->attrs)) {
                 $node->attrGroups[$key] = new Nop();
             }
         }
-    }
-
-    protected function shouldRemoveAttribute(Attribute $node): bool
-    {
-        return $this->attributeName === $node->name->name;
     }
 }
