@@ -15,7 +15,7 @@ use RonasIT\Larabuilder\Visitors\AddTraits;
 use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
-use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetPropertyValue;
+use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
 
 class PHPFileBuilder
 {
@@ -43,7 +43,7 @@ class PHPFileBuilder
 
     public function setProperty(string $name, mixed $value, AccessModifierEnum $accessModifier = AccessModifierEnum::Public): self
     {
-        $this->traverser->addVisitor(new SetPropertyValue($name, $value, $accessModifier));
+        $this->traverser->addVisitor(new SetProperty($name, $value, $accessModifier));
 
         return $this;
     }
