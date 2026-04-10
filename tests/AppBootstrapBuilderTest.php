@@ -278,6 +278,22 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddExceptionsRenderWithMultipleCreateCalls(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'multiple_create_calls.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'multiple_create_calls.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return;',
+            )
+            ->save();
+    }
+
     public function testAddRoutingOptionInvalidKey(): void
     {
         $this->mockNativeFunction(

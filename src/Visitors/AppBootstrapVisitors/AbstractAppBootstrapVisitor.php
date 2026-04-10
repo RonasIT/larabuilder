@@ -6,7 +6,9 @@ use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Expression;
@@ -55,13 +57,19 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof MethodCall && $node->name->toString() === $this->parentMethod) {
-            static::$existingParentNodes[] = $this->parentMethod;
+            if ($this->isApplicationBootstrapChain($node)) {
+                static::$existingParentNodes[] = $this->parentMethod;
+            }
         }
     }
 
     public function leaveNode(Node $node): Node
     {
         if ($node instanceof MethodCall && $node->name->toString() === 'create') {
+            if (!$this->isApplicationBootstrapChain($node)) {
+                return $node;
+            }
+
             if (!in_array($this->parentMethod, static::$existingParentNodes)) {
                 $node = $this->insertParentNode($node);
             }
@@ -153,6 +161,21 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         $node->args[0]->value->stmts[] = $statement;
 
         return $node;
+    }
+
+    protected function isApplicationBootstrapChain(MethodCall $node): bool
+    {
+        $current = $node->var;
+
+        while ($current instanceof MethodCall) {
+            $current = $current->var;
+        }
+
+        return $current instanceof StaticCall
+            && $current->class instanceof Name
+            && $current->class->toString() === 'Application'
+            && $current->name instanceof Identifier
+            && $current->name->toString() === 'configure';
     }
 
     protected function matchesCustomCriteria(Expression $statement): bool
