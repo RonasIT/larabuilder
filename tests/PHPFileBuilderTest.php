@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use Exception;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
