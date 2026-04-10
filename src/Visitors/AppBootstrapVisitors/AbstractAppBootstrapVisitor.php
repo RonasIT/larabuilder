@@ -13,11 +13,14 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
-use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
+use RonasIT\Larabuilder\Traits\VisitorHelperTrait;
 
-abstract class AbstractAppBootstrapVisitor extends BaseNodeVisitorAbstract
+abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
+    use VisitorHelperTrait;
+
     protected const array FORBIDDEN_NODES = [
         Class_::class,
         Trait_::class,

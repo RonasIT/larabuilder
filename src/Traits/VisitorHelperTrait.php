@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder\Traits;
 use Illuminate\Support\Arr;
 use PhpParser\ConstExprEvaluator;
 use PhpParser\Node;
+use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ConstFetch;
@@ -128,6 +129,13 @@ trait VisitorHelperTrait
         }
 
         return false;
+    }
+
+    protected function makeArgument(mixed $value): Arg
+    {
+        list($value) = $this->getPropertyValue($value);
+
+        return new Arg($value);
     }
 
     protected function getPropertyValue(mixed $value): array
