@@ -507,6 +507,75 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testRemoveImportsUnused(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'remove_imports_from_class.php'),
+            $this->callFilePutContent('some_file_path.php', 'remove_unused_import.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeImports([
+                'App\Service\UserService',
+                'App\Support\Traits\SecondTrait',
+            ])
+            ->save();
+    }
+
+    public function testRemoveImportsUsedSkipped(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'remove_imports_from_class.php'),
+            $this->callFilePutContent('some_file_path.php', 'remove_imports_from_class_unchanged.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeImports([
+                'App\SomeClass',
+                'App\Models\User',
+                'RonasIT\Support\Traits\SecondTrait',
+            ])
+            ->save();
+    }
+
+    public function testRemoveImportsForce(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'remove_imports_from_class.php'),
+            $this->callFilePutContent('some_file_path.php', 'remove_imports_force.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->removeImports([
+                'App\SomeClass',
+                'App\Models\User',
+                'App\Support\Traits\SecondTrait',
+                'App\Service\UserService',
+                'App\Support\Classname',
+            ], force: true)
+            ->save();
+    }
+
+    public function testRemoveImportsAfterChanges(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('some_file_path.php', 'remove_imports_from_class.php'),
+            $this->callFilePutContent('some_file_path.php', 'remove_imports_after_changes.php'),
+        );
+
+        new PHPFileBuilder('some_file_path.php')
+            ->insertCodeToMethod('someMethod', 'app(UserService::class)->doSomething();')
+            ->removeImports([
+                'App\Service\UserService',
+                'App\Support\Classname',
+            ])
+            ->save();
+    }
+
     public function testInsertCodeToMethodWhenMethodNotExist(): void
     {
         $this->mockNativeFunction(

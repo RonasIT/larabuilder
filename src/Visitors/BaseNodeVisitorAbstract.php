@@ -204,4 +204,15 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
         return false;
     }
+
+    protected function &getNamespaceStatements(array &$nodes): array
+    {
+        $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
+
+        if (!is_null($targetNamespace)) {
+            return $targetNamespace->stmts;
+        }
+
+        return $nodes;
+    }
 }
