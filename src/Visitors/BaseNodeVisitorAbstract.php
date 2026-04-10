@@ -19,9 +19,18 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
+    protected const array ANY_TYPE = [];
+
+    abstract protected array $allowedParentNodesTypes {
+        get;
+    }
+
+    protected bool $hasParentNode = false;
+
     protected const TYPE_ORDER = [
         Namespace_::class,
         Use_::class,
@@ -33,6 +42,41 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         Property::class,
         ClassMethod::class,
     ];
+
+    abstract protected function modify(Node $node): Node;
+
+    public function leaveNode(Node $node): Node
+    {
+        if ($this->isParentNode($node)) {
+            $this->hasParentNode = true;
+
+            return $this->modify($node);
+        }
+
+        return $node;
+    }
+
+    public function afterTraverse(array $nodes): ?array
+    {
+        if (!empty($this->allowedParentNodesTypes) && !$this->hasParentNode) {
+            throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
+        }
+
+        return null;
+    }
+
+    protected function getReadableAllowedParentNodesTypes(): array
+    {
+        return array_map(
+            fn (string $class) => trim(class_basename($class), '_'),
+            $this->allowedParentNodesTypes,
+        );
+    }
+
+    protected function isParentNode(Node $node): bool
+    {
+        return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
+    }
 
     protected function getInsertIndex(array $statements, string $insertType): int
     {

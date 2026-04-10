@@ -8,6 +8,7 @@ use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
+use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -56,6 +57,17 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testSetPropertyNotClassTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'SetProperty' operation may only be applied to: Class, Trait.");
+
+        new PHPFileBuilder($file)
+            ->setProperty('newString', 'some string')
+            ->save();
+    }
+
     public function testAddArrayPropertyItem(): void
     {
         $file = $this->generateOriginalStructurePath('class_with_properties.php');
@@ -85,6 +97,17 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addArrayPropertyItem('boolProperty', 'value')
+            ->save();
+    }
+
+    public function testAddArrayPropertyItemNotClassTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddArrayPropertyItem' operation may only be applied to: Class, Trait.");
+
+        new PHPFileBuilder($file)
+            ->addArrayPropertyItem('fillable', 'age')
             ->save();
     }
 
@@ -166,6 +189,17 @@ class PHPFileBuilderTest extends TestCase
         $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'nullProperty' has unexpected type. Expected 'array', actual 'null'.");
+
+        new PHPFileBuilder($file)
+            ->removeArrayPropertyItem('nullProperty', ['value'])
+            ->save();
+    }
+
+    public function testRemoveArrayPropertyNotClassTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'RemoveArrayPropertyItem' operation may only be applied to: Class, Trait.");
 
         new PHPFileBuilder($file)
             ->removeArrayPropertyItem('nullProperty', ['value'])
@@ -320,6 +354,19 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddTraitsNotClassTraitEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('interface.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTraits' operation may only be applied to: Class, Trait, Enum.");
+
+        new PHPFileBuilder($file)
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+            ])
+            ->save();
+    }
+
     public function testInsertCodeToMethodToTheEndPosition(): void
     {
         $file = $this->generateOriginalStructurePath('class_with_properties.php');
@@ -416,7 +463,7 @@ class PHPFileBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('interface.php');
 
-        $this->assertExceptionThrew(Exception::class, 'Only nodes with the next types can be modified: Class, Trait, Enum');
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'InsertCodeToMethod' operation may only be applied to: Class, Trait, Enum.");
 
         new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
