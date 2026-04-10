@@ -30,13 +30,6 @@ class AddTraits extends InsertNodesAbstractVisitor
         );
     }
 
-    protected function modify(Node $node): Node
-    {
-        $this->insertNodes($node->stmts);
-
-        return $node;
-    }
-
     /** @param TraitUse $node */
     protected function getChildNodes(Node $node): array
     {
