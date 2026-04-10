@@ -94,3 +94,19 @@ new AppBootstrapBuilder()
     )
     ->save();
 ```
+
+#### addRoutingOption
+
+Adds or updates a named argument in the `withRouting` method call. Supports all keys of Laravel's `withRouting` method.
+If `withRouting` does not exist, it will be automatically created.
+
+**Note:** Use `PreformattedExpression` for complex values like closures or PHP expressions.
+
+Example usage:
+
+```php
+new AppBootstrapBuilder()
+    ->addRoutingOption('api', new PreformattedExpression("__DIR__.'/../routes/api.php'"))
+    ->addRoutingOption('apiPrefix', '')
+    ->save();
+```
