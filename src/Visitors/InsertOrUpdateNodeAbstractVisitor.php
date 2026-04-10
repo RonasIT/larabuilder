@@ -9,49 +9,24 @@ use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
-    public bool $hasParentNode = false;
-
     abstract protected function shouldUpdateNode(Node $node): bool;
-
-    /**
-     * Determine the criteria for selecting the node to work with.
-     * If `shouldUpdateNode` does not find a matching node, a new node will be inserted under this one.
-     */
-    abstract protected function isParentNode(Node $node): bool;
 
     abstract protected function updateNode(Node $node): void;
 
     abstract protected function getInsertableNode(): Node;
 
-    public function parentNodeNotFoundHook(): void
+    protected function modify(Node $node): Node
     {
-    }
+        /** @var Class_|Trait_ $node */
+        foreach ($node->stmts as $stmt) {
+            if ($this->shouldUpdateNode($stmt)) {
+                $this->updateNode($stmt);
 
-    public function leaveNode(Node $node): Node
-    {
-        if ($this->isParentNode($node)) {
-            $this->hasParentNode = true;
-
-            /** @var Class_|Trait_ $node */
-            foreach ($node->stmts as $stmt) {
-                if ($this->shouldUpdateNode($stmt)) {
-                    $this->updateNode($stmt);
-
-                    return $node;
-                }
+                return $node;
             }
-
-            return $this->insertNode($node);
         }
 
-        return $node;
-    }
-
-    public function afterTraverse(array $nodes): void
-    {
-        if (!$this->hasParentNode) {
-            $this->parentNodeNotFoundHook();
-        }
+        return $this->insertNode($node);
     }
 
     /** @param Class_|Trait_ $node */
