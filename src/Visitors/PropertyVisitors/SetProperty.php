@@ -11,13 +11,10 @@ use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
-use RonasIT\Larabuilder\Traits\PropertyTrait;
 use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
 class SetProperty extends BaseNodeVisitorAbstract implements InsertNodeContract, UpdateNodeContract
 {
-    use PropertyTrait;
-
     protected array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
@@ -36,6 +33,12 @@ class SetProperty extends BaseNodeVisitorAbstract implements InsertNodeContract,
         $this->propertyItem = $this->prepareNewNode(new PropertyItem($this->name, $propertyValue), $propertyValue);
 
         $this->typeIdentifier = new Identifier($propertyType);
+    }
+
+    public function shouldUpdateNode(Node $node): bool
+    {
+        return $node instanceof Property
+            && $this->name === $node->props[0]->name->name;
     }
 
     /** @param Property $node */
