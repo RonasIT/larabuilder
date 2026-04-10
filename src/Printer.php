@@ -8,6 +8,7 @@ use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class Printer extends Standard
@@ -48,14 +49,14 @@ class Printer extends Standard
 
     protected function hasParentOfType(Node $node, string $type): bool
     {
-        $parent = $node->getAttribute('parent');
+        $parent = $node->getAttribute(StatementAttributeEnum::Parent->value);
 
         while ($parent !== null) {
             if ($parent instanceof $type) {
                 return true;
             }
 
-            $parent = $parent->getAttribute('parent');
+            $parent = $parent->getAttribute(StatementAttributeEnum::Parent->value);
         }
 
         return false;
@@ -70,7 +71,7 @@ class Printer extends Standard
 
     protected function shouldAddNewlineBeforeNode(Node $node, string $type): bool
     {
-        $previousNode = $node->getAttribute('previous');
+        $previousNode = $node->getAttribute(StatementAttributeEnum::Previous->value);
 
         return $previousNode !== null && !($previousNode instanceof $type);
     }
@@ -84,7 +85,7 @@ class Printer extends Standard
 
     protected function shouldAddNewlineBeforeExpression(Node $node, string $type): bool
     {
-        $previousNode = $node->getAttribute('previous');
+        $previousNode = $node->getAttribute(StatementAttributeEnum::Previous->value);
 
         return $previousNode !== null && $previousNode instanceof $type;
     }

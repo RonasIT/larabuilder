@@ -9,12 +9,17 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
-use RonasIT\Larabuilder\Exceptions\InvalidNodeTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 {
+    protected array $allowedParentNodesTypes = [
+        Class_::class,
+        Trait_::class,
+        Enum_::class,
+    ];
+
     protected PreformattedCode $code;
     protected bool $hasTargetMethod = false;
 
@@ -24,11 +29,6 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         protected InsertPositionEnum $insertPosition,
     ) {
         $this->code = new PreformattedCode($code);
-    }
-
-    public function parentNodeNotFoundHook(): void
-    {
-        throw new InvalidNodeTypeException('Class', 'Trait', 'Enum');
     }
 
     public function insertNode(Node $node): Node
@@ -51,11 +51,6 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         return !empty($this->code->value)
             && $isTargetMethod
             && !$this->isCodeDuplicated($node->stmts ?? [], $this->code->code);
-    }
-
-    protected function isParentNode(Node $node): bool
-    {
-        return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
     }
 
     protected function updateNode(Node $node): void
