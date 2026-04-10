@@ -8,13 +8,19 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
-use RonasIT\Larabuilder\Exceptions\InvalidNodeTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
-class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
+class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeContract
 {
+    protected array $allowedParentNodesTypes = [
+        Class_::class,
+        Trait_::class,
+        Enum_::class,
+    ];
+
     protected PreformattedCode $code;
     protected bool $hasTargetMethod = false;
 
@@ -26,21 +32,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         $this->code = new PreformattedCode($code);
     }
 
-    public function parentNodeNotFoundHook(): void
-    {
-        throw new InvalidNodeTypeException('Class', 'Trait', 'Enum');
-    }
-
-    public function insertNode(Node $node): Node
-    {
-        if (!$this->hasTargetMethod) {
-            throw new NodeNotExistException('Method', $this->methodName);
-        }
-
-        return $node;
-    }
-
-    protected function shouldUpdateNode(Node $node): bool
+    public function shouldUpdateNode(Node $node): bool
     {
         $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
 
@@ -53,12 +45,7 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
             && !$this->isCodeDuplicated($node->stmts ?? [], $this->code->code);
     }
 
-    protected function isParentNode(Node $node): bool
-    {
-        return $node instanceof Class_ || $node instanceof Trait_ || $node instanceof Enum_;
-    }
-
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         $existingStmts = $node->stmts ?? [];
 
@@ -69,8 +56,12 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
             : [...$existingStmts, ...$separator, $this->code];
     }
 
-    protected function getInsertableNode(): Node
+    protected function insertNode(Node $node): Node
     {
-        return new Nop();
+        if (!$this->hasTargetMethod) {
+            throw new NodeNotExistException('Method', $this->methodName);
+        }
+
+        return $node;
     }
 }
