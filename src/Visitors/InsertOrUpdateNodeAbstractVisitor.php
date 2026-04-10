@@ -11,34 +11,22 @@ abstract class InsertOrUpdateNodeAbstractVisitor extends BaseNodeVisitorAbstract
 {
     abstract protected function shouldUpdateNode(Node $node): bool;
 
-    /**
-     * Determine the criteria for selecting the node to work with.
-     * If `shouldUpdateNode` does not find a matching node, a new node will be inserted under this one.
-     */
-    abstract protected function isParentNode(Node $node): bool;
-
     abstract protected function updateNode(Node $node): void;
 
     abstract protected function getInsertableNode(): Node;
 
-    public function leaveNode(Node $node): Node
+    protected function modify(Node $node): Node
     {
-        if ($this->isParentNode($node)) {
-            $this->hasParentNode = true;
+        /** @var Class_|Trait_ $node */
+        foreach ($node->stmts as $stmt) {
+            if ($this->shouldUpdateNode($stmt)) {
+                $this->updateNode($stmt);
 
-            /** @var Class_|Trait_ $node */
-            foreach ($node->stmts as $stmt) {
-                if ($this->shouldUpdateNode($stmt)) {
-                    $this->updateNode($stmt);
-
-                    return $node;
-                }
+                return $node;
             }
-
-            return $this->insertNode($node);
         }
 
-        return $node;
+        return $this->insertNode($node);
     }
 
     /** @param Class_|Trait_ $node */

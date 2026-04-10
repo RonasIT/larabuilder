@@ -6,34 +6,28 @@ use PhpParser\Node;
 use PhpParser\Node\Attribute;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\Exceptions\InvalidNodeTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 
 class RemoveClassAttribute extends BaseNodeVisitorAbstract
 {
+    protected array $allowedParentNodesTypes = [
+        Class_::class,
+    ];
+
     public function __construct(
         protected string $className,
         protected string $attributeName,
     ) {
     }
 
-    public function leaveNode(Node $node): Node
+    protected function modify(Node $node): Node
     {
-        if ($this->isParentNode($node)) {
-            $this->hasParentNode = true;
+        /** @var Class_ $node */
+        $this->validateClassName($node);
 
-            /** @var Class_ $node */
-            $this->validateClassName($node);
-
-            $this->removeMatchingAttributes($node);
-        }
+        $this->removeMatchingAttributes($node);
 
         return $node;
-    }
-
-    protected function isParentNode(Node $node): bool
-    {
-        return $node instanceof Class_;
     }
 
     protected function validateClassName(Class_ $node): void
@@ -62,10 +56,5 @@ class RemoveClassAttribute extends BaseNodeVisitorAbstract
     protected function shouldRemoveAttribute(Attribute $node): bool
     {
         return $this->attributeName === $node->name->name;
-    }
-
-    public function parentNodeNotFoundHook(): void
-    {
-        throw new InvalidNodeTypeException('Class');
     }
 }
