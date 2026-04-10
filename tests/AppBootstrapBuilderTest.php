@@ -2,11 +2,13 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
+use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -19,8 +21,8 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'exception_empty.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'exception_empty.php'),
         );
 
         new AppBootstrapBuilder()
@@ -42,8 +44,8 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'without_exceptions.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'without_exceptions.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'exception_missing.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'exception_create.php'),
         );
 
         new AppBootstrapBuilder()
@@ -59,8 +61,8 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'exception_custom.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'exception_custom.php'),
         );
 
         new AppBootstrapBuilder()
@@ -86,8 +88,8 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_exist.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'exception_exist.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'exception_exist.php'),
         );
 
         new AppBootstrapBuilder()
@@ -143,7 +145,7 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'exception_empty.php'),
             $this->callFilePutContent('bootstrap/app.php', 'schedule.php'),
         );
 
@@ -180,7 +182,7 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
+            $this->callFileGetContent('bootstrap/app.php', 'exception_empty.php'),
             $this->callFilePutContent('bootstrap/app.php', 'combine_render.php'),
         );
 
@@ -210,5 +212,86 @@ class AppBootstrapBuilderTest extends TestCase
         );
 
         new ScheduleOption('invalid_frequency');
+    }
+
+    public function testAddRoutingOptionNewKeys(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'routing_exists.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'routing_add.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addRoutingOption('api', new PreformattedExpression("__DIR__.'/../routes/api.php'"))
+            ->addRoutingOption('apiPrefix', '')
+            ->addRoutingOption('then', new PreformattedExpression("
+                function () {
+                    Route::middleware('api')
+                        ->prefix('webhooks')
+                        ->name('webhooks.')
+                        ->group(base_path('routes/webhooks.php'));
+                }
+            "))
+            ->addImports(['Illuminate\Support\Facades\Route'])
+            ->save();
+    }
+
+    public function testAddRoutingOptionUpdateExisting(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'routing_exists.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'routing_update.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addRoutingOption('web', new PreformattedExpression("__DIR__.'/../routes/custom-web.php'"))
+            ->addRoutingOption('health', '/status')
+            ->save();
+    }
+
+    public function testAddRoutingOptionInvalidValue(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'routing_exists.php'),
+        );
+
+        $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected \'{\' on line 2');
+
+        new AppBootstrapBuilder()
+            ->addRoutingOption('health', new PreformattedExpression('function {}'))
+            ->save();
+    }
+
+    public function testAddRoutingOptionCreateWithRouting(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'routing_missing.php'),
+            $this->callFilePutContent('bootstrap/app.php', 'routing_create.php'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addRoutingOption('health', '/up')
+            ->save();
+    }
+
+    public function testAddRoutingOptionInvalidKey(): void
+    {
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFileGetContent('bootstrap/app.php', 'routing_exists.php'),
+        );
+
+        $this->assertExceptionThrew(
+            expectedClassName: InvalidArgumentException::class,
+            expectedMessage: $this->getExceptionFixture('invalid_routing_option'),
+        );
+
+        new AppBootstrapBuilder()
+            ->addRoutingOption('invalid_key', '')
+            ->save();
     }
 }

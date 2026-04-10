@@ -86,15 +86,20 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
     {
         static::$existingParentNodes[] = $this->parentMethod;
 
+        $parentCall = new MethodCall($node->var, new Identifier($this->parentMethod), $this->makeParentArgs());
+        $parentCall->setAttribute('wasCreated', true);
+
+        return new MethodCall($parentCall, new Identifier('create'));
+    }
+
+    protected function makeParentArgs(): array
+    {
         $closure = new Closure([
             'params' => $this->closureParams,
             'returnType' => new Identifier('void'),
         ]);
 
-        $parentCall = new MethodCall($node->var, new Identifier($this->parentMethod), [new Arg($closure)]);
-        $parentCall->setAttribute('wasCreated', true);
-
-        return new MethodCall($parentCall, new Identifier('create'));
+        return [new Arg($closure)];
     }
 
     protected function handleParentNode(MethodCall $node): Node

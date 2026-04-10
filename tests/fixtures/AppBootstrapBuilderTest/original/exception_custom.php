@@ -13,8 +13,6 @@ use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\ExpectationFailedException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -50,11 +48,4 @@ return Application::configure(basePath: dirname(__DIR__))
             'password',
             'password_confirmation',
         ]);
-
-        $exceptions->render(function (HttpException $exception, Request $request) {
-            return ($request->expectsJson())
-                ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode())
-                : null;
-        });
-    })
-    ->create();
+    })->create();

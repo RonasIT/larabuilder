@@ -2,8 +2,10 @@
 
 namespace RonasIT\Larabuilder\Builders;
 
+use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
+use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddRoutingOption;
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddScheduleCommand;
 
 class AppBootstrapBuilder extends PHPFileBuilder
@@ -35,6 +37,13 @@ class AppBootstrapBuilder extends PHPFileBuilder
         $this->addImports([
             'Illuminate\Support\Facades\Schedule',
         ]);
+
+        return $this;
+    }
+
+    public function addRoutingOption(string $key, string|PreformattedExpression $value): self
+    {
+        $this->traverser->addVisitor(new AddRoutingOption($key, $value));
 
         return $this;
     }

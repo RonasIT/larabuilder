@@ -11,6 +11,7 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
+use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 
 class Printer extends Standard
 {
@@ -91,9 +92,19 @@ class Printer extends Standard
         return $previousNode !== null && $previousNode instanceof $type;
     }
 
+    protected function pExpr_PreformattedExpression(PreformattedExpression $node): string
+    {
+        return $this->formatPreformattedCode($node->value);
+    }
+
     protected function pStmt_PreformattedCode(PreformattedCode $node): string
     {
-        $value = $this->preparePreformattedCode($node->value);
+        return $this->formatPreformattedCode($node->value);
+    }
+
+    private function formatPreformattedCode(string $value): string
+    {
+        $value = $this->preparePreformattedCode($value);
 
         $indentLength = strspn($value, " \t");
         $indent = substr($value, 0, $indentLength);

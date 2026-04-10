@@ -2,13 +2,13 @@
 
 namespace RonasIT\Larabuilder\Nodes;
 
-use PhpParser\Node\Stmt;
+use PhpParser\Node\Expr;
 use RonasIT\Larabuilder\Traits\PreformattedNodesHelperTrait;
 
 /**
- * Used to insert code with saving original formatting
+ * Used to insert expression code with saving original formatting
  */
-class PreformattedCode extends Stmt
+class PreformattedExpression extends Expr
 {
     use PreformattedNodesHelperTrait;
 
@@ -28,6 +28,6 @@ class PreformattedCode extends Stmt
 
     public function getType(): string
     {
-        return 'Stmt_PreformattedCode';
+        return 'Expr_PreformattedExpression';
     }
 }
