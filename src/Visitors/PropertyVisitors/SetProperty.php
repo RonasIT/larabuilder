@@ -5,21 +5,13 @@ namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
-use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
-class SetProperty extends BaseNodeVisitorAbstract implements InsertNodeContract, UpdateNodeContract
+class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract, UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-    ];
-
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 

@@ -5,20 +5,12 @@ namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
-use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
 
-class RemoveArrayPropertyItem extends BaseNodeVisitorAbstract implements UpdateNodeContract
+class RemoveArrayPropertyItem extends AbstractPropertyVisitor implements UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-    ];
-
     public function __construct(
         protected string $name,
         protected array $valuesToRemove,
