@@ -20,6 +20,13 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
     ) {
     }
 
+    protected function modify(Node $node): Node
+    {
+        $this->insertNodes($node->stmts);
+
+        return $node;
+    }
+
     protected function insertNodes(array &$nodes): void
     {
         $newNodes = $this->getNodesToAdd($nodes);
