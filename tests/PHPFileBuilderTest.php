@@ -2,11 +2,11 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use Exception;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
@@ -452,10 +452,10 @@ class PHPFileBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
-        $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected T_PUBLIC on line 4');
+        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'$this->name\'.');
 
         new PHPFileBuilder($file)
-            ->insertCodeToMethod('someMethod', $this->getFixture('invalid_file.php'))
+            ->insertCodeToMethod('someMethod', '$this->name')
             ->save();
     }
 
