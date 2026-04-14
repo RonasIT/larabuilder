@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Http\Request;
+use PHPUnit\Framework\ExpectationFailedException;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        //
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        //
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (HttpException $exception, Request $request) {
+            return ($request->expectsJson()) ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode()) : null;
+        });
+
+        $exceptions->render(function (ExpectationFailedException $exception) {
+            throw $exception;
+        });
+    })
+    ->withSchedule(function (): void {
+        //
+    })->create();

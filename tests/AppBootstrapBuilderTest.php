@@ -16,110 +16,6 @@ class AppBootstrapBuilderTest extends TestCase
 {
     use PHPFileBuilderTestMockTrait;
 
-    public function testAddExceptionsRenderEmpty(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_empty.php'),
-        );
-
-        new AppBootstrapBuilder()
-            ->addExceptionsRender(
-                exceptionClass: HttpException::class,
-                renderBody: $this->getJsonFixture('render_body'),
-                includeRequestArg: true,
-            )
-            ->addExceptionsRender(
-                exceptionClass: ExpectationFailedException::class,
-                renderBody: '
-                    throw $exception;
-                ',
-            )
-            ->save();
-    }
-
-    public function testAddExceptionsRenderMissingWithExceptions(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'without_exceptions.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'without_exceptions.php'),
-        );
-
-        new AppBootstrapBuilder()
-            ->addExceptionsRender(
-                exceptionClass: HttpException::class,
-                renderBody: $this->getJsonFixture('render_body'),
-                includeRequestArg: true,
-            )
-            ->save();
-    }
-
-    public function testAddExceptionsRenderCustom(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_custom.php'),
-        );
-
-        new AppBootstrapBuilder()
-            ->addExceptionsRender(
-                exceptionClass: HttpException::class,
-                renderBody: '
-                    return ($request->expectsJson())
-                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
-                        : null;
-                ',
-                includeRequestArg: true,
-            )
-            ->addExceptionsRender(
-                exceptionClass: ExpectationFailedException::class,
-                renderBody: '
-                    throw $exception;
-                ',
-            )
-            ->save();
-    }
-
-    public function testAddExceptionsRenderExist(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_exist.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'expression_exist.php'),
-        );
-
-        new AppBootstrapBuilder()
-            ->addExceptionsRender(
-                exceptionClass: HttpException::class,
-                renderBody: $this->getJsonFixture('render_body'),
-                includeRequestArg: true,
-            )
-            ->save();
-    }
-
-    public function testAddExceptionsRenderInvalidBody()
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_custom.php'),
-        );
-
-        $this->assertExceptionThrew(
-            expectedClassName: InvalidPHPCodeException::class,
-            expectedMessage: 'Cannot parse provided code: \'return ($request->expectsJson()\'.',
-        );
-
-        new AppBootstrapBuilder()
-            ->addExceptionsRender(
-                exceptionClass: HttpException::class,
-                renderBody: 'return ($request->expectsJson()',
-            )
-            ->save();
-    }
-
     public static function provideForbiddenFiles(): array
     {
         return [
@@ -145,14 +41,11 @@ class AppBootstrapBuilderTest extends TestCase
     #[DataProvider('provideForbiddenFiles')]
     public function testInvalidBootstrapAppFileException(string $fixture, string $type): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', $fixture),
-        );
+        $file = $this->generateOriginalStructurePath($fixture);
 
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($file)
             ->addExceptionsRender(
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
@@ -160,15 +53,122 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddScheduleCommandEmpty(): void
+    public function testAddExceptionsRenderBootstrapEmpty(): void
     {
+        $file = $this->generateOriginalStructurePath('bootstrap_without_with_calls.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'schedule.php'),
+            $this->callFilePutContent($file, 'bootstrap_exceptions.php'),
         );
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($file)
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
+            )
+            ->save();
+    }
+
+    public function testAddExceptionsRenderWithExceptionsEmpty(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_with_calls_empty.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_empty_exceptions.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: $this->getJsonFixture('render_body'),
+                includeRequestArg: true,
+            )
+            ->addExceptionsRender(
+                exceptionClass: ExpectationFailedException::class,
+                renderBody: '
+                    throw $exception;
+                ',
+            )
+            ->save();
+    }
+
+    public function testAddExceptionsRenderCustom(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_configured_exceptions.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: '
+                    return ($request->expectsJson())
+                        ? response()->json([\'error\' => $exception->getMessage()], $exception->getStatusCode())
+                        : null;
+                ',
+                includeRequestArg: true,
+            )
+            ->addExceptionsRender(
+                exceptionClass: ExpectationFailedException::class,
+                renderBody: '
+                    throw $exception;
+                ',
+            )
+            ->save();
+    }
+
+    public function testAddExceptionsRenderExist(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_unchanged.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->addExceptionsRender(
+                exceptionClass: ExpectationFailedException::class,
+                renderBody: '
+                    throw $exception;
+                ',
+            )
+            ->save();
+    }
+
+    public function testAddExceptionsRenderInvalidBody()
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap.php');
+
+        $this->assertExceptionThrew(
+            expectedClassName: InvalidPHPCodeException::class,
+            expectedMessage: 'Cannot parse provided code: \'return ($request->expectsJson()\'.',
+        );
+
+        new AppBootstrapBuilder($file)
+            ->addExceptionsRender(
+                exceptionClass: HttpException::class,
+                renderBody: 'return ($request->expectsJson()',
+            )
+            ->save();
+    }
+
+    public function testAddScheduleCommandBootstrapEmpty(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_without_with_calls.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_schedule.php'),
+        );
+
+        new AppBootstrapBuilder($file)
             ->addScheduleCommand(
                 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 new ScheduleOption('environments', ['production']),
@@ -180,15 +180,16 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddScheduleCommandWithScheduleExists(): void
+    public function testAddScheduleCommandWithScheduleEmpty(): void
     {
+        $file = $this->generateOriginalStructurePath('bootstrap_with_calls_empty.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'schedule_exists.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'schedule_exists.php'),
+            $this->callFilePutContent($file, 'bootstrap_empty_schedule.php'),
         );
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($file)
             ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 options: new ScheduleOption('environments', ['production']),
@@ -199,13 +200,14 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testCombineScheduleAndExceptionRenders(): void
     {
+        $file = $this->generateOriginalStructurePath('bootstrap_with_calls_empty.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('bootstrap/app.php', 'expression_empty.php'),
-            $this->callFilePutContent('bootstrap/app.php', 'combine_render.php'),
+            $this->callFilePutContent($file, 'bootstrap_combine.php'),
         );
 
-        new AppBootstrapBuilder()
+        new AppBootstrapBuilder($file)
             ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 options: new ScheduleOption('environments', ['production']),
