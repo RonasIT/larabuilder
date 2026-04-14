@@ -6,12 +6,17 @@ use RonasIT\Support\Traits\FirstTrait;
 use RonasIT\Support\Traits\SecondTrait;
 use RonasIT\Support\Traits\ThirdTrait;
 
-class SomeClass
+enum SomeEnum
 {
-    use FirstTrait, SecondTrait;
+    use FirstTrait;
+    use SecondTrait;
     use ThirdTrait;
 
-    public function someMethod(): void
+    case First;
+    case Second;
+
+    public static function toArray(): array
     {
+        return self::cases();
     }
 }

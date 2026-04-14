@@ -19,13 +19,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetProperty(): void
     {
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_with_properties.php'),
+            $this->callFilePutContent($file, 'class_with_properties.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->setProperty('intProperty', 1.23)
             ->setProperty('arrayProperty', ['id' => 123])
             ->setProperty('floatProperty', 56)
@@ -43,13 +44,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyWithoutExistingProperties(): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_without_properties.php'),
+            $this->callFilePutContent($file, 'class_with_new_properties.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->setProperty('newString', 'some string')
             ->setProperty('newString', 'update string')
             ->save();
@@ -57,27 +59,25 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetPropertyNotClassTrait(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'enum.php'),
-        );
+        $file = $this->generateOriginalStructurePath('enum.php');
 
         $this->assertExceptionThrew(InvalidStructureTypeException::class, "'SetProperty' operation may only be applied to: Class, Trait.");
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->setProperty('newString', 'some string')
             ->save();
     }
 
     public function testAddArrayPropertyItem(): void
     {
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_with_array_properties.php'),
+            $this->callFilePutContent($file, 'class_with_array_properties.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->addArrayPropertyItem('fillable', 'age')
             ->addArrayPropertyItem('role', 'admin')
             ->addArrayPropertyItem('bool', true)
@@ -91,53 +91,45 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddArrayPropertyItemThrowsException(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
-        );
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
-        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'boolProperty' has unexpected type. Expected 'array', actual 'bool'.");
 
-        new PHPFileBuilder('some_file_path.php')
-            ->addArrayPropertyItem('notArray', 'value')
+        new PHPFileBuilder($file)
+            ->addArrayPropertyItem('boolProperty', 'value')
             ->save();
     }
 
     public function testAddArrayPropertyItemNotClassTrait(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'enum.php'),
-        );
+        $file = $this->generateOriginalStructurePath('enum.php');
 
         $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddArrayPropertyItem' operation may only be applied to: Class, Trait.");
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->addArrayPropertyItem('fillable', 'age')
             ->save();
     }
 
     public function testInvalidPhpFileThrowsException(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'invalid_file.php'),
-        );
+        $file = $this->generateOriginalStructurePath('invalid_file.php');
 
-        $this->assertExceptionThrew(InvalidPHPFileException::class, 'Cannot parse PHP file: some_file_path.php');
+        $this->assertExceptionThrew(InvalidPHPFileException::class, "Cannot parse PHP file: {$file}");
 
-        new PHPFileBuilder('some_file_path.php');
+        new PHPFileBuilder($file);
     }
 
     public function testSetPropertyInTrait(): void
     {
+        $file = $this->generateOriginalStructurePath('trait.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'trait.php'),
-            $this->callFilePutContent('some_file_path.php', 'trait.php'),
+            $this->callFilePutContent($file, 'trait.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->setProperty('floatProperty', 56)
             ->addArrayPropertyItem('tags', 'three')
             ->addArrayPropertyItem('tags', 4)
@@ -148,13 +140,14 @@ class PHPFileBuilderTest extends TestCase
 
     public function testRemoveArrayPropertyItem(): void
     {
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_with_array_properties_removed.php'),
+            $this->callFilePutContent($file, 'class_with_array_properties_removed.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->removeArrayPropertyItem('fillable', ['name', 'age'])
             ->removeArrayPropertyItem('tags', ['two', 3, 5.5, true])
             ->removeArrayPropertyItem('newMultiArrayProperty', ['string1'])
@@ -168,56 +161,48 @@ class PHPFileBuilderTest extends TestCase
 
     public function testRemoveArrayPropertyItemThrowsException(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_array_properties.php'),
-        );
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
-        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'notArray' has unexpected type. Expected 'array', actual 'bool'.");
+        $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'boolProperty' has unexpected type. Expected 'array', actual 'bool'.");
 
-        new PHPFileBuilder('some_file_path.php')
-            ->removeArrayPropertyItem('notArray', ['value'])
+        new PHPFileBuilder($file)
+            ->removeArrayPropertyItem('boolProperty', ['value'])
             ->save();
     }
 
     public function testRemoveArrayPropertyItemNoProperty(): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_without_properties_unchanged.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->removeArrayPropertyItem('notProperty', ['value'])
             ->save();
     }
 
     public function testRemoveArrayPropertyUnexpectedPropertyExceptionNull(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
-        );
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->assertExceptionThrew(UnexpectedPropertyTypeException::class, "Property 'nullProperty' has unexpected type. Expected 'array', actual 'null'.");
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->removeArrayPropertyItem('nullProperty', ['value'])
             ->save();
     }
 
     public function testRemoveArrayPropertyNotClassTrait(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'enum.php'),
-        );
+        $file = $this->generateOriginalStructurePath('enum.php');
 
         $this->assertExceptionThrew(InvalidStructureTypeException::class, "'RemoveArrayPropertyItem' operation may only be applied to: Class, Trait.");
 
-        new PHPFileBuilder('some_file_path.php')
-            ->removeArrayPropertyItem('fillable', ['name', 'age'])
+        new PHPFileBuilder($file)
+            ->removeArrayPropertyItem('nullProperty', ['value'])
             ->save();
     }
 
@@ -225,16 +210,16 @@ class PHPFileBuilderTest extends TestCase
     {
         return [
             [
-                'fixture' => 'add_imports_to_class.php',
+                'fixture' => 'class.php',
             ],
             [
-                'fixture' => 'add_imports_to_trait.php',
+                'fixture' => 'trait.php',
             ],
             [
-                'fixture' => 'add_imports_to_interface.php',
+                'fixture' => 'interface.php',
             ],
             [
-                'fixture' => 'add_imports_to_enum.php',
+                'fixture' => 'enum.php',
             ],
         ];
     }
@@ -242,13 +227,14 @@ class PHPFileBuilderTest extends TestCase
     #[DataProvider('provideAddImportsFiles')]
     public function testAddImports(string $fixture): void
     {
+        $file = $this->generateOriginalStructurePath($fixture);
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent($fixture, $fixture),
-            $this->callFilePutContent($fixture, $fixture),
+            $this->callFilePutContent($file, "add_imports_to_{$fixture}"),
         );
 
-        new PHPFileBuilder($fixture)
+        new PHPFileBuilder($file)
             ->addImports([
                 'RonasIT\Larabuilder\Tests\Support\FirstClass',
                 'RonasIT\Larabuilder\Tests\Support\SecondClass',
@@ -259,39 +245,42 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddImportsEmptyList(): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_imports_to_class.php', 'add_imports_to_class.php'),
-            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder('add_imports_to_class.php')
+        new PHPFileBuilder($file)
             ->addImports([])
             ->save();
     }
 
     public function testAddImportsAlreadyImported(): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_imports_to_class.php', 'add_imports_to_class.php'),
-            $this->callFilePutContent('add_imports_to_class.php', 'add_imports_to_class_empty_list.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder('add_imports_to_class.php')
+        new PHPFileBuilder($file)
             ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
             ->save();
     }
 
     public function testAddImportsToFileWithoutNamespace(): void
     {
+        $file = $this->generateOriginalStructurePath('empty_php_file.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_imports_to_file_without_namespace.php', 'add_imports_to_file_without_namespace.php'),
-            $this->callFilePutContent('add_imports_to_file_without_namespace.php', 'add_imports_to_file_without_namespace.php'),
+            $this->callFilePutContent($file, 'empty_php_file.php'),
         );
 
-        new PHPFileBuilder('add_imports_to_file_without_namespace.php')
+        new PHPFileBuilder($file)
             ->addImports(['RonasIT\Larabuilder\Tests\Support\FirstClass'])
             ->save();
     }
@@ -300,13 +289,13 @@ class PHPFileBuilderTest extends TestCase
     {
         return [
             [
-                'fixture' => 'add_traits_to_class.php',
+                'fixture' => 'class.php',
             ],
             [
-                'fixture' => 'add_traits_to_trait.php',
+                'fixture' => 'trait.php',
             ],
             [
-                'fixture' => 'add_traits_to_enum.php',
+                'fixture' => 'enum.php',
             ],
         ];
     }
@@ -314,13 +303,14 @@ class PHPFileBuilderTest extends TestCase
     #[DataProvider('provideAddTraitsFiles')]
     public function testAddTraits(string $fixture): void
     {
+        $file = $this->generateOriginalStructurePath($fixture);
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent($fixture, $fixture),
-            $this->callFilePutContent($fixture, $fixture),
+            $this->callFilePutContent($file, "add_traits_to_{$fixture}"),
         );
 
-        new PHPFileBuilder($fixture)
+        new PHPFileBuilder($file)
             ->addTraits([
                 'RonasIT\Support\Traits\FirstTrait',
                 'RonasIT\Support\Traits\SecondTrait',
@@ -329,63 +319,36 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddTraitsEmptyList(): void
+    public function testAddTraitsWithoutChanges(): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_traits_to_class.php', 'add_traits_to_class.php'),
-            $this->callFilePutContent('add_traits_to_class.php', 'add_traits_to_class_without_change.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder('add_traits_to_class.php')
+        new PHPFileBuilder($file)
             ->addTraits([])
-            ->save();
-    }
-
-    public function testAddTraitsAlreadyImported(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_traits_to_class.php', 'add_traits_to_class.php'),
-            $this->callFilePutContent('add_traits_to_class.php', 'add_traits_to_class_without_change.php'),
-        );
-
-        new PHPFileBuilder('add_traits_to_class.php')
             ->addTraits(['RonasIT\Support\Traits\FirstTrait'])
             ->save();
     }
 
     public function testAddTraitsWithDoubleCalls(): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_traits_to_class.php', 'add_traits_to_class.php'),
-            $this->callFilePutContent('add_traits_to_class.php', 'add_traits_to_class.php'),
+            $this->callFilePutContent($file, 'add_traits_to_class.php'),
         );
 
-        new PHPFileBuilder('add_traits_to_class.php')
+        new PHPFileBuilder($file)
             ->addTraits([
                 'RonasIT\Support\Traits\FirstTrait',
                 'RonasIT\Support\Traits\SecondTrait',
             ])
             ->addTraits([
-                'RonasIT\Support\Traits\ThirdTrait',
-            ])
-            ->save();
-    }
-
-    public function testAddTraitsWithMultipleTraitUse(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('add_traits_to_class_with_multiple_traits.php', 'add_traits_to_class_with_multiple_traits.php'),
-            $this->callFilePutContent('add_traits_to_class_with_multiple_traits.php', 'add_traits_to_class_with_multiple_traits.php'),
-        );
-
-        new PHPFileBuilder('add_traits_to_class_with_multiple_traits.php')
-            ->addTraits([
-                'RonasIT\Support\Traits\FirstTrait',
-                'RonasIT\Support\Traits\SecondTrait',
                 'RonasIT\Support\Traits\ThirdTrait',
             ])
             ->save();
@@ -393,14 +356,11 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddTraitsNotClassTraitEnum(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
-        );
+        $file = $this->generateOriginalStructurePath('interface.php');
 
         $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTraits' operation may only be applied to: Class, Trait, Enum.");
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->addTraits([
                 'RonasIT\Support\Traits\FirstTrait',
             ])
@@ -409,99 +369,114 @@ class PHPFileBuilderTest extends TestCase
 
     public function testInsertCodeToMethodToTheEndPosition(): void
     {
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_with_method_code_added.php'),
+            $this->callFilePutContent($file, 'class_with_method_code_added.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('__construct', $this->getFixture('sample_code.php'))
             ->save();
     }
 
     public function testInsertCodeToMethodToTheStartPosition(): void
     {
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_path.php', 'class_with_properties.php'),
-            $this->callFilePutContent('some_path.php', 'class_with_method_code.php'),
+            $this->callFilePutContent($file, 'class_with_method_code.php'),
         );
 
-        new PHPFileBuilder('some_path.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('__construct', '$this->name = $name;', InsertPositionEnum::Start)
             ->save();
     }
 
     public function testInsertCodeToTraitMethod(): void
     {
+        $file = $this->generateOriginalStructurePath('trait.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('trait.php', 'trait.php'),
-            $this->callFilePutContent('trait.php', 'trait_with_method_code_added.php'),
+            $this->callFilePutContent($file, 'trait_with_method_code_added.php'),
         );
 
-        new PHPFileBuilder('trait.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('method1', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
             ->save();
     }
 
     public function testInsertCodeToEnum(): void
     {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('enum.php', 'add_imports_to_enum.php'),
-            $this->callFilePutContent('enum.php', 'add_imports_to_enum_code_added.php'),
+            $this->callFilePutContent($file, 'add_imports_to_enum_code_added.php'),
         );
 
-        new PHPFileBuilder('enum.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('toArray', $this->getFixture('sample_code.php'), InsertPositionEnum::Start)
+            ->save();
+    }
+
+    public function testInsertCodeToMethodNotExists(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
+
+        new PHPFileBuilder($file)
+            ->insertCodeToMethod('noMethod', $this->getFixture('sample_code.php'))
             ->save();
     }
 
     public function testInsertCodeToMethodEmptyString(): void
     {
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_without_properties.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_without_properties_unchanged.php'),
-            $this->callFileGetContent('some_path.php', 'class_with_properties.php'),
-            $this->callFilePutContent('some_path.php', 'class_with_properties_unchanged.php'),
+            $this->callFilePutContent($file, 'class_with_properties_unchanged.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', '')
             ->save();
+    }
 
-        new PHPFileBuilder('some_path.php')
-            ->insertCodeToMethod('__construct', '')
+    public function testInsertCodeToMethodInvalidCode(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'$this->name\'.');
+
+        new PHPFileBuilder($file)
+            ->insertCodeToMethod('someMethod', '$this->name')
             ->save();
     }
 
     public function testInsertCodeToMethodNotClassTraitEnum(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'add_imports_to_interface.php'),
-        );
+        $file = $this->generateOriginalStructurePath('interface.php');
 
         $this->assertExceptionThrew(InvalidStructureTypeException::class, "'InsertCodeToMethod' operation may only be applied to: Class, Trait, Enum.");
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', '$this->name = $name;')
             ->save();
     }
 
     public function testInsertCodeToMethodWhenMethodNotExist(): void
     {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_with_properties.php'),
-        );
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('noMethod', '$this->name = $name;')
             ->save();
     }
@@ -543,28 +518,15 @@ class PHPFileBuilderTest extends TestCase
     #[DataProvider('provideInsertDuplicateCode')]
     public function testInsertDuplicateCodeToMethod(string $code): void
     {
+        $file = $this->generateOriginalStructurePath('class.php');
+
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_insert_duplicate_code.php'),
-            $this->callFilePutContent('some_file_path.php', 'class_insert_duplicate_code.php'),
+            $this->callFilePutContent($file, 'class_unchanged.php'),
         );
 
-        new PHPFileBuilder('some_file_path.php')
+        new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', $code)
-            ->save();
-    }
-
-    public function testInsertInvalidCodeToMethod(): void
-    {
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFileGetContent('some_file_path.php', 'class_insert_duplicate_code.php'),
-        );
-
-        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'$this->name\'.');
-
-        new PHPFileBuilder('some_file_path.php')
-            ->insertCodeToMethod('someMethod', '$this->name')
             ->save();
     }
 }
