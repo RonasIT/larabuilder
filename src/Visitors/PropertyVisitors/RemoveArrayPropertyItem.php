@@ -8,13 +8,17 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
+use RonasIT\Larabuilder\Support\NodeValueComparator;
 
 class RemoveArrayPropertyItem extends AbstractPropertyVisitor implements UpdateNodeContract
 {
+    protected NodeValueComparator $nodeValueComparator;
+
     public function __construct(
         protected string $name,
         protected array $valuesToRemove,
     ) {
+        $this->nodeValueComparator = new NodeValueComparator();
     }
 
     public function shouldUpdateNode(Node $node): bool
@@ -41,6 +45,6 @@ class RemoveArrayPropertyItem extends AbstractPropertyVisitor implements UpdateN
 
     protected function shouldRemoveItem(Node $item): bool
     {
-        return Arr::some($this->valuesToRemove, fn (mixed $removeValue) => $this->areNodesEqual($item->value, $removeValue));
+        return Arr::some($this->valuesToRemove, fn (mixed $removeValue) => $this->nodeValueComparator->areNodesEqual($item->value, $removeValue));
     }
 }
