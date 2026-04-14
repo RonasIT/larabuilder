@@ -2,7 +2,10 @@
 
 namespace RonasIT\Larabuilder\Nodes;
 
+use PhpParser\Error;
 use PhpParser\Node\Stmt;
+use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Traits\PreformattedNodesHelperTrait;
 
 /**
@@ -29,5 +32,14 @@ class PreformattedCode extends Stmt
     public function getType(): string
     {
         return 'Stmt_PreformattedCode';
+    }
+
+    protected function parsePHPCode(string $code): array
+    {
+        try {
+            return new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}");
+        } catch (Error) {
+            throw new InvalidPHPCodeException($code);
+        }
     }
 }
