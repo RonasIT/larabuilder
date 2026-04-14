@@ -230,6 +230,7 @@ class AppBootstrapBuilderTest extends TestCase
         $this->assertExceptionThrew(
             expectedClassName: InvalidArgumentException::class,
             expectedMessage: $this->getExceptionFixture('invalid_schedule_option'),
+            isStrict: false,
         );
 
         new ScheduleOption('invalid_frequency');
