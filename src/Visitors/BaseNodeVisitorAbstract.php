@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
 
@@ -83,7 +84,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
         $newNode = $this->getInsertableNode();
 
-        $this->nodeInserter->insert($node->stmts, $newNode);
+        $this->nodeInserter->insertNodes($node->stmts, get_class($newNode), [$newNode], StatementAttributeEnum::Previous->value);
 
         return $node;
     }

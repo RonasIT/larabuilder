@@ -70,17 +70,9 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
 
     protected function addNodes(array $nodes, Collection $newNodes): array
     {
-        $insertIndex = $this->nodeInserter->getInsertIndex($nodes, $this->targetNodeClass);
+        $insertableNodes = $newNodes->map(fn ($node) => $this->getInsertableNode($node))->all();
 
-        foreach ($newNodes as $node) {
-            $newNode = $this->getInsertableNode($node);
-
-            array_splice($nodes, $insertIndex, 0, [$newNode]);
-
-            $insertIndex++;
-        }
-
-        $this->nodeInserter->insertEmptyLineIfNeeded($nodes, $insertIndex, $this->targetNodeClass);
+        $this->nodeInserter->insertNodes($nodes, $this->targetNodeClass, $insertableNodes);
 
         return $nodes;
     }

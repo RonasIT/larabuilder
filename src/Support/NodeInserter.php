@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Support;
 
-use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -28,18 +27,24 @@ class NodeInserter
         ClassMethod::class,
     ];
 
-    public function insert(array &$stmts, Node $newNode): void
+    public function insertNodes(array &$stmts, string $targetNodeClass, array $newNodes, ?string $previousNodeAttribute = null): void
     {
-        $insertIndex = $this->getInsertIndex($stmts, get_class($newNode));
+        $insertIndex = $this->getInsertIndex($stmts, $targetNodeClass);
 
-        $newNode->setAttribute('previous', $stmts[$insertIndex - 1] ?? null);
+        foreach ($newNodes as $newNode) {
+            if (!empty($previousNodeAttribute)) {
+                $newNode->setAttribute($previousNodeAttribute, $stmts[$insertIndex - 1] ?? null);
+            }
 
-        array_splice($stmts, $insertIndex, 0, [$newNode]);
+            array_splice($stmts, $insertIndex, 0, [$newNode]);
 
-        $this->insertEmptyLineIfNeeded($stmts, $insertIndex + 1, get_class($newNode));
+            $insertIndex++;
+        }
+
+        $this->insertEmptyLineIfNeeded($stmts, $insertIndex, $targetNodeClass);
     }
 
-    public function getInsertIndex(array $statements, string $insertType): int
+    protected function getInsertIndex(array $statements, string $insertType): int
     {
         $insertIndex = 0;
         $insertTypeOrder = array_search($insertType, self::TYPE_ORDER);
@@ -55,7 +60,7 @@ class NodeInserter
         return $insertIndex;
     }
 
-    public function insertEmptyLineIfNeeded(array &$stmts, int $index, string $type): void
+    protected function insertEmptyLineIfNeeded(array &$stmts, int $index, string $type): void
     {
         if (isset($stmts[$index])
             && !($stmts[$index] instanceof Nop)
