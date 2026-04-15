@@ -83,13 +83,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
         $newNode = $this->getInsertableNode();
 
-        $insertIndex = $this->nodeInserter->getInsertIndex($node->stmts, get_class($newNode));
-
-        $newNode->setAttribute('previous', $node->stmts[$insertIndex - 1] ?? null);
-
-        array_splice($node->stmts, $insertIndex, 0, [$newNode]);
-
-        $this->nodeInserter->insertEmptyLineIfNeeded($node->stmts, $insertIndex + 1, get_class($newNode));
+        $this->nodeInserter->insert($node->stmts, $newNode);
 
         return $node;
     }

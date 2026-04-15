@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Support;
 
+use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -26,6 +27,17 @@ class NodeInserter
         Property::class,
         ClassMethod::class,
     ];
+
+    public function insert(array &$stmts, Node $newNode): void
+    {
+        $insertIndex = $this->getInsertIndex($stmts, get_class($newNode));
+
+        $newNode->setAttribute('previous', $stmts[$insertIndex - 1] ?? null);
+
+        array_splice($stmts, $insertIndex, 0, [$newNode]);
+
+        $this->insertEmptyLineIfNeeded($stmts, $insertIndex + 1, get_class($newNode));
+    }
 
     public function getInsertIndex(array $statements, string $insertType): int
     {
