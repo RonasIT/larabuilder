@@ -1,0 +1,60 @@
+<?php
+
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
+use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Http\Request;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->use([
+            HandleCors::class,
+            CheckForMaintenanceMode::class,
+            ValidatePostSize::class,
+            ConvertEmptyStringsToNull::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->dontReport([
+            AuthenticationException::class,
+            AuthorizationException::class,
+            ModelNotFoundException::class,
+            TokenMismatchException::class,
+            ValidationException::class,
+        ]);
+
+        $exceptions->render(function (ExpectationFailedException $exception) {
+            throw $exception;
+        });
+
+        $exceptions->dontFlash([
+            'password',
+            'password_confirmation',
+        ]);
+
+        $exceptions->render(function (HttpException $exception, Request $request) {
+            return ($request->expectsJson())
+                ? response()->json(['error' => $exception->getMessage()], $exception->getStatusCode())
+                : null;
+        });
+    })
+    ->withSchedule(function (): void {
+        Schedule::command('telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336')->environments('production');
+    })->create();
