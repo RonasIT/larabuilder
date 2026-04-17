@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
+use RonasIT\Larabuilder\Support\NodeInserter;
 
 abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
 {
@@ -16,10 +17,13 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
 
     abstract protected function getChildNodes(Node $node): array;
 
+    protected NodeInserter $nodeInserter;
+
     public function __construct(
         protected Collection $nodesToInsert,
         protected string $targetNodeClass,
     ) {
+        $this->nodeInserter = new NodeInserter();
     }
 
     /** @param Class_|Enum_|Trait_ $node */
@@ -66,19 +70,9 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
 
     protected function addNodes(array $nodes, Collection $newNodes): array
     {
-        $insertIndex = $this->getInsertIndex($nodes, $this->targetNodeClass);
+        $insertableNodes = $newNodes->map(fn ($node) => $this->getInsertableNode($node))->all();
 
-        foreach ($newNodes as $node) {
-            $newNode = $this->getInsertableNode($node);
-
-            array_splice($nodes, $insertIndex, 0, [$newNode]);
-
-            $insertIndex++;
-        }
-
-        if ($this->shouldAddEmptyLine($nodes, $insertIndex, $this->targetNodeClass)) {
-            $this->addEmptyLine($nodes, $insertIndex);
-        }
+        $this->nodeInserter->insertNodes($nodes, $this->targetNodeClass, $insertableNodes);
 
         return $nodes;
     }

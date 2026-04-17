@@ -5,24 +5,20 @@ namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
-use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
+use RonasIT\Larabuilder\Support\NodeValueComparator;
 
-class RemoveArrayPropertyItem extends BaseNodeVisitorAbstract implements UpdateNodeContract
+class RemoveArrayPropertyItem extends AbstractPropertyVisitor implements UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-    ];
+    protected NodeValueComparator $nodeValueComparator;
 
     public function __construct(
         protected string $name,
         protected array $valuesToRemove,
     ) {
+        $this->nodeValueComparator = new NodeValueComparator();
     }
 
     public function shouldUpdateNode(Node $node): bool
@@ -49,6 +45,6 @@ class RemoveArrayPropertyItem extends BaseNodeVisitorAbstract implements UpdateN
 
     protected function shouldRemoveItem(Node $item): bool
     {
-        return Arr::some($this->valuesToRemove, fn (mixed $removeValue) => $this->areNodesEqual($item->value, $removeValue));
+        return Arr::some($this->valuesToRemove, fn (mixed $removeValue) => $this->nodeValueComparator->areNodesEqual($item->value, $removeValue));
     }
 }

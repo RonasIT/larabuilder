@@ -2,6 +2,8 @@
 
 # Laravel Builder
 
+For internal architecture and contributor guidance, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Installation
 
 ```bash
@@ -110,3 +112,12 @@ new AppBootstrapBuilder()
     ->addRoutingOption('apiPrefix', '')
     ->save();
 ```
+
+## Contributing
+
+Thank you for considering contributing to Laravel Builder package! The contribution guide
+can be found in the [Contributing guide](CONTRIBUTING.md).
+
+## License
+
+Laravel Builder package is open-sourced software licensed under the [MIT license](LICENSE).

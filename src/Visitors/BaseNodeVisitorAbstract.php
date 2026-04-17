@@ -9,13 +9,12 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
-use RonasIT\Larabuilder\Traits\VisitorHelperTrait;
+use RonasIT\Larabuilder\Support\NodeInserter;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
-    use VisitorHelperTrait;
-
     protected const array ANY_TYPE = [];
 
     abstract protected array $allowedParentNodesTypes {
@@ -23,6 +22,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     }
 
     protected bool $hasParentNode = false;
+    protected NodeInserter $nodeInserter;
 
     public function leaveNode(Node $node): Node
     {
@@ -80,17 +80,11 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
             return $node;
         }
 
+        $this->nodeInserter ??= new NodeInserter();
+
         $newNode = $this->getInsertableNode();
 
-        $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
-
-        $newNode->setAttribute('previous', $node->stmts[$insertIndex - 1] ?? null);
-
-        array_splice($node->stmts, $insertIndex, 0, [$newNode]);
-
-        if ($this->shouldAddEmptyLine($node->stmts, $insertIndex + 1, get_class($newNode))) {
-            $this->addEmptyLine($node->stmts, $insertIndex + 1);
-        }
+        $this->nodeInserter->insertNodes($node->stmts, get_class($newNode), [$newNode], StatementAttributeEnum::Previous->value);
 
         return $node;
     }

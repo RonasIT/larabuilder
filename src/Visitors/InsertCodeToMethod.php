@@ -12,6 +12,7 @@ use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
+use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
 class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeContract
 {
@@ -21,8 +22,10 @@ class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeCo
         Enum_::class,
     ];
 
-    protected PreformattedCode $code;
     protected bool $hasTargetMethod = false;
+
+    protected PreformattedCode $code;
+    protected StatementDuplicateChecker $statementDuplicateChecker;
 
     public function __construct(
         protected string $methodName,
@@ -30,6 +33,7 @@ class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeCo
         protected InsertPositionEnum $insertPosition,
     ) {
         $this->code = new PreformattedCode($code);
+        $this->statementDuplicateChecker = new StatementDuplicateChecker();
     }
 
     public function shouldUpdateNode(Node $node): bool
@@ -42,7 +46,7 @@ class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeCo
 
         return !empty($this->code->value)
             && $isTargetMethod
-            && !$this->isCodeDuplicated($node->stmts ?? [], $this->code->code);
+            && !$this->statementDuplicateChecker->isDuplicated($node->stmts ?? [], $this->code->code);
     }
 
     public function updateNode(Node $node): void
