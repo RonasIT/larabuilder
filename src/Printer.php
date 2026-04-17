@@ -132,7 +132,11 @@ class Printer extends Standard
         if ($node->getAttribute('wasCreated')) {
             $this->indent();
 
-            $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';
+            $args = $this->isMultilineMethodCall($node)
+                ? $this->pCommaSeparatedMultiline($node->args, true) . $this->nl
+                : $this->pMaybeMultiline($node->args);
+
+            $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $args . ')';
 
             $this->outdent();
 
@@ -140,5 +144,10 @@ class Printer extends Standard
         }
 
         return parent::pExpr_MethodCall($node);
+    }
+
+    protected function isMultilineMethodCall(MethodCall $node): bool
+    {
+        return $node->name->toString() === 'withRouting';
     }
 }
