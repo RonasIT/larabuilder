@@ -3,8 +3,6 @@
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
@@ -16,9 +14,10 @@ use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
-abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
+abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implements InsertNodeContract
 {
     protected const array FORBIDDEN_NODES = [
         Class_::class,
@@ -29,14 +28,11 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected static array $existingParentNodes = [];
 
-    abstract protected function getInsertableNode(): Expression;
+    abstract protected function getParentMethod(): string;
 
-    public function __construct(
-        protected string $parentMethod,
-        protected string $targetMethod,
-        protected array $closureParams = [],
-    ) {
-    }
+    abstract protected function getTargetMethod(): string;
+
+    abstract protected function makeParentArgs(): array;
 
     public function afterTraverse(array $nodes): ?array
     {
@@ -53,9 +49,9 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
             throw new InvalidBootstrapAppFileException(class_basename($node));
         }
 
-        if ($node instanceof MethodCall && $node->name->toString() === $this->parentMethod) {
+        if ($node instanceof MethodCall && $node->name->toString() === $this->getParentMethod()) {
             if ($this->isApplicationBootstrapChain($node)) {
-                static::$existingParentNodes[] = $this->parentMethod;
+                static::$existingParentNodes[] = $this->getParentMethod();
             }
         }
     }
@@ -67,7 +63,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
                 return $node;
             }
 
-            if (!in_array($this->parentMethod, static::$existingParentNodes)) {
+            if (!in_array($this->getParentMethod(), static::$existingParentNodes)) {
                 $node = $this->insertParentNode($node);
             }
 
@@ -89,22 +85,12 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected function insertParentNode(Node $node): Node
     {
-        static::$existingParentNodes[] = $this->parentMethod;
+        static::$existingParentNodes[] = $this->getParentMethod();
 
-        $parentCall = new MethodCall($node->var, new Identifier($this->parentMethod), $this->makeParentArgs());
+        $parentCall = new MethodCall($node->var, new Identifier($this->getParentMethod()), $this->makeParentArgs());
         $parentCall->setAttribute('wasCreated', true);
 
         return new MethodCall($parentCall, new Identifier('create'));
-    }
-
-    protected function makeParentArgs(): array
-    {
-        $closure = new Closure([
-            'params' => $this->closureParams,
-            'returnType' => new Identifier('void'),
-        ]);
-
-        return [new Arg($closure)];
     }
 
     protected function handleParentNode(MethodCall $node): Node
@@ -118,7 +104,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected function isParentNode(Node $node): bool
     {
-        return $node instanceof MethodCall && $node->name->toString() === $this->parentMethod;
+        return $node instanceof MethodCall && $node->name->toString() === $this->getParentMethod();
     }
 
     protected function shouldInsertNode(MethodCall $node): bool
@@ -182,6 +168,6 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected function isCallbackCall(Expression $stmt): bool
     {
-        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
+        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->getTargetMethod();
     }
 }

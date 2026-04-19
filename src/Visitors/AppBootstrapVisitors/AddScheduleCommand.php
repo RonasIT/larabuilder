@@ -2,7 +2,9 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
+use PhpParser\Node;
 use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
@@ -13,7 +15,6 @@ use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
-    protected Expression $scheduleStatement;
     protected ValueNodeFactory $valueNodeFactory;
 
     protected array $options = [];
@@ -25,13 +26,28 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         $this->valueNodeFactory = new ValueNodeFactory();
 
         $this->options = $options;
+    }
 
-        $this->scheduleStatement = $this->buildScheduleCall();
+    public function getInsertableNode(): Node
+    {
+        return $this->buildScheduleCall();
+    }
 
-        parent::__construct(
-            parentMethod: 'withSchedule',
-            targetMethod: 'command',
-        );
+    protected function getParentMethod(): string
+    {
+        return 'withSchedule';
+    }
+
+    protected function getTargetMethod(): string
+    {
+        return 'command';
+    }
+
+    protected function makeParentArgs(): array
+    {
+        $closure = new Closure(['returnType' => new Identifier('void')]);
+
+        return [new Arg($closure)];
     }
 
     protected function buildScheduleCall(): Expression
@@ -62,10 +78,5 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         list($value) = $this->valueNodeFactory->makeNode($value);
 
         return new Arg($value);
-    }
-
-    protected function getInsertableNode(): Expression
-    {
-        return $this->scheduleStatement;
     }
 }
