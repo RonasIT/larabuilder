@@ -4,12 +4,14 @@ namespace RonasIT\Larabuilder;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
+use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 
 class Printer extends Standard
 {
@@ -90,9 +92,19 @@ class Printer extends Standard
         return $previousNode !== null && $previousNode instanceof $type;
     }
 
+    protected function pExpr_PreformattedExpression(PreformattedExpression $node): string
+    {
+        return $this->formatPreformattedCode($node->value);
+    }
+
     protected function pStmt_PreformattedCode(PreformattedCode $node): string
     {
-        $value = $this->preparePreformattedCode($node->value);
+        return $this->formatPreformattedCode($node->value);
+    }
+
+    private function formatPreformattedCode(string $value): string
+    {
+        $value = $this->preparePreformattedCode($value);
 
         $indentLength = strspn($value, " \t");
         $indent = substr($value, 0, $indentLength);
@@ -113,5 +125,29 @@ class Printer extends Standard
         $value = ltrim($value, "\n");
 
         return rtrim($value);
+    }
+
+    protected function pExpr_MethodCall(MethodCall $node): string
+    {
+        if ($node->getAttribute('wasCreated')) {
+            $this->indent();
+
+            $args = $this->isMultilineMethodCall($node)
+                ? $this->pCommaSeparatedMultiline($node->args, true) . $this->nl
+                : $this->pMaybeMultiline($node->args);
+
+            $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $args . ')';
+
+            $this->outdent();
+
+            return $this->pDereferenceLhs($node->var) . $newCall;
+        }
+
+        return parent::pExpr_MethodCall($node);
+    }
+
+    protected function isMultilineMethodCall(MethodCall $node): bool
+    {
+        return $node->name->toString() === 'withRouting';
     }
 }

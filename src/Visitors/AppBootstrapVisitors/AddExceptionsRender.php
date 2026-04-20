@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
+use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
@@ -10,8 +11,6 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Expression;
-use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
@@ -24,43 +23,36 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         protected bool $includeRequestArg,
     ) {
         $this->renderStatement = $this->buildRenderCall();
-
-        parent::__construct(
-            parentMethod: 'withExceptions',
-            targetMethod: 'render',
-        );
     }
 
-    protected function matchesCustomCriteria(Expression $stmt): bool
+    public function getInsertableNode(): Node
     {
-        $paramType = $stmt->expr->args[0]?->value?->params[0]?->type ?? null;
-
-        if (!($paramType instanceof Name)) {
-            return false;
-        }
-
-        $typeName = $paramType->toString();
-
-        return $typeName === $this->exceptionClass || $typeName === class_basename($this->exceptionClass);
+        return $this->renderStatement;
     }
 
-    protected function insertNode(MethodCall $node): MethodCall
+    protected function getParentMethod(): string
     {
-        $currentStatements = $node->args[0]->value->stmts;
+        return 'withExceptions';
+    }
 
-        if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
-            $node->args[0]->value->stmts = [$this->renderStatement];
+    protected function getTargetMethod(): string
+    {
+        return 'render';
+    }
 
-            return $node;
-        }
+    protected function makeParentArgs(): array
+    {
+        $closure = new Closure([
+            'params' => [
+                new Param(
+                    var: new Variable('exceptions'),
+                    type: new Name('Exceptions'),
+                ),
+            ],
+            'returnType' => new Identifier('void'),
+        ]);
 
-        $lastExistingStatement = end($currentStatements);
-
-        $this->renderStatement->setAttribute(StatementAttributeEnum::Previous->value, $lastExistingStatement);
-
-        $node->args[0]->value->stmts[] = $this->renderStatement;
-
-        return $node;
+        return [new Arg($closure)];
     }
 
     protected function buildRenderCall(): Expression
@@ -96,5 +88,18 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
             'params' => $params,
             'stmts' => [new PreformattedCode($this->renderBody)],
         ]);
+    }
+
+    protected function matchesCustomCriteria(Expression $stmt): bool
+    {
+        $paramType = $stmt->expr->args[0]?->value?->params[0]?->type ?? null;
+
+        if (!($paramType instanceof Name)) {
+            return false;
+        }
+
+        $typeName = $paramType->toString();
+
+        return $typeName === $this->exceptionClass || $typeName === class_basename($this->exceptionClass);
     }
 }
