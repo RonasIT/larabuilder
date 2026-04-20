@@ -177,6 +177,11 @@ class AppBootstrapBuilderTest extends TestCase
                 new ScheduleOption('timezone', ['America/New_York']),
             )
             ->addScheduleCommand('telescope:prune --set-hours=resolved_exception:12222')
+            ->addScheduleCommand(
+                'emails:send',
+                new ScheduleOption('daily'),
+                new ScheduleOption('when', ['fn () => User::count() > 0']),
+            )
             ->save();
     }
 
