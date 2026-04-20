@@ -25,12 +25,6 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
     protected const array ANY_TYPE = [];
 
-    abstract protected array $allowedParentNodesTypes {
-        get;
-    }
-
-    protected bool $hasParentNode = false;
-
     protected const TYPE_ORDER = [
         Namespace_::class,
         Use_::class,
@@ -42,6 +36,12 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         Property::class,
         ClassMethod::class,
     ];
+
+    protected bool $hasParentNode = false;
+
+    abstract protected array $allowedParentNodesTypes {
+        get;
+    }
 
     abstract protected function modify(Node $node): Node;
 
