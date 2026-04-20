@@ -31,7 +31,7 @@ class AddArrayPropertyItem extends SetProperty
     }
 
     /** @param Property $node */
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         if (!$node->props[0]->default instanceof Array_) {
             throw new UnexpectedPropertyTypeException(

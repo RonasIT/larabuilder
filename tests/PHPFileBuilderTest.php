@@ -134,6 +134,7 @@ class PHPFileBuilderTest extends TestCase
             ->addArrayPropertyItem('tags', 'three')
             ->addArrayPropertyItem('tags', 4)
             ->setProperty('newString', 'some string')
+            ->setProperty('default', null)
             ->removeArrayPropertyItem('fillable', ['name'])
             ->save();
     }
@@ -510,7 +511,7 @@ class PHPFileBuilderTest extends TestCase
                 'code' => '$db->table(\'users\')->where(\'id\', 1)->first();',
             ],
             [
-                'code' => 'Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
+                'code' => 'Helpers\Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
             ],
         ];
     }
@@ -527,6 +528,104 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', $code)
+            ->save();
+    }
+
+    public function testRemoveImportsUnused(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'remove_unused_import.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeImports([
+                'App\Service\UserService',
+                'Some\SomeTrait',
+                'Some\AnotherTrait',
+                'App\Service\UserService',
+                'App\Support\Traits\SecondTrait',
+            ])
+            ->save();
+    }
+
+    public function testRemoveImportsUsedSkipped(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_unchanged.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeImports([
+                'RonasIT\Support\Traits\FirstTrait',
+                'RonasIT\Support\Traits\SecondTrait',
+            ])
+            ->save();
+    }
+
+    public function testRemoveImportsForce(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'remove_imports_force.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeImports([
+                'RonasIT\Larabuilder\Tests\Support\FirstClass',
+                'Some\SomeTrait',
+                'RonasIT\Support\Traits\FirstTrait',
+                'App\Service\UserService',
+                'App\Support\Traits\SecondTrait',
+                'App\Support\Classname',
+                'Illuminate\Support',
+            ], force: true)
+            ->save();
+    }
+
+    public function testRemoveImportsAfterChanges(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'remove_imports_after_changes.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->insertCodeToMethod('someMethod', 'app(UserService::class)->doSomething();')
+            ->removeImports([
+                'App\Service\UserService',
+                'App\Support\Classname',
+            ])
+            ->save();
+    }
+
+    public function testRemoveImportsThenAddImports(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'remove_then_add_imports.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeImports([
+                'RonasIT\Support\SecondTrait',
+                'RonasIT\Support\Traits\NewTrait',
+                'App\Support\Traits\SecondTrait',
+                'App\Support\Classname',
+                'Illuminate\Support',
+            ], force: true)
+            ->addImports(['App\New\Service'])
             ->save();
     }
 }

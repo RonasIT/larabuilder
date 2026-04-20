@@ -4,12 +4,14 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use Illuminate\Support\Collection;
 use PhpParser\Node;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Enum_;
+use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 
 abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
 {
-    // TODO: remove duplicated abstract method from here and/or from InsertOrUpdateNodeAbstractVisitor as part of architecture refactoring
     abstract protected function getInsertableNode(string $name): Node;
 
     abstract protected function getChildNodes(Node $node): array;
@@ -20,6 +22,7 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
     ) {
     }
 
+    /** @param Class_|Enum_|Trait_ $node */
     protected function modify(Node $node): Node
     {
         $this->insertNodes($node->stmts);

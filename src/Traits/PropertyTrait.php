@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
+namespace RonasIT\Larabuilder\Traits;
 
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
@@ -10,24 +10,11 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\Trait_;
-use RonasIT\Larabuilder\Visitors\InsertOrUpdateNodeAbstractVisitor;
 
-abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
+trait PropertyTrait
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-    ];
-
-    public function __construct(
-        protected string $name,
-    ) {
-    }
-
-    protected function shouldUpdateNode(Node $node): bool
+    public function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof Property
             && $this->name === $node->props[0]->name->name;

@@ -8,10 +8,8 @@ use RonasIT\Support\Traits\FirstTrait;
 use App\Service\UserService;
 use RonasIT\Support\SecondTrait;
 use RonasIT\Support\Traits\NewTrait as SomeTrait;
-use App\Support\Traits\SecondTrait as UnusedTrait, App\Support\Classname;
+use App\Support\Traits\SecondTrait as UnusedTrait;
 use Illuminate\Support as Helpers;
-use RonasIT\Support\Traits\SecondTrait;
-use RonasIT\Support\Traits\ThirdTrait;
 
 /**
  * Test
@@ -19,7 +17,6 @@ use RonasIT\Support\Traits\ThirdTrait;
 class SomeClass implements Test, Some
 {
     use FirstTrait, SecondTrait;
-    use ThirdTrait;
 
     public function __construct()
     {
@@ -42,5 +39,7 @@ class SomeClass implements Test, Some
         Helpers\Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
 
         $x = \App\Service\UserService::CONST;
+
+        app(UserService::class)->doSomething();
     }
 }

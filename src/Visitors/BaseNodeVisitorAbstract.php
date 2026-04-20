@@ -18,6 +18,8 @@ use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\PrettyPrinter\Standard;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 
@@ -42,8 +44,6 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         Property::class,
         ClassMethod::class,
     ];
-
-    abstract protected function modify(Node $node): Node;
 
     public function leaveNode(Node $node): Node
     {
@@ -76,6 +76,44 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     protected function isParentNode(Node $node): bool
     {
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
+    }
+
+    protected function modify(Node $node): Node
+    {
+        if ($this instanceof UpdateNodeContract) {
+            /** @var Class_|Trait_|Enum_ $node */
+            foreach ($node->stmts as $stmt) {
+                if ($this->shouldUpdateNode($stmt)) {
+                    $this->updateNode($stmt);
+
+                    return $node;
+                }
+            }
+        }
+
+        return $this->insertNode($node);
+    }
+
+    /** @param Class_|Trait_|Enum_ $node */
+    protected function insertNode(Node $node): Node
+    {
+        if (!($this instanceof InsertNodeContract)) {
+            return $node;
+        }
+
+        $newNode = $this->getInsertableNode();
+
+        $insertIndex = $this->getInsertIndex($node->stmts, get_class($newNode));
+
+        $newNode->setAttribute('previous', $node->stmts[$insertIndex - 1] ?? null);
+
+        array_splice($node->stmts, $insertIndex, 0, [$newNode]);
+
+        if ($this->shouldAddEmptyLine($node->stmts, $insertIndex + 1, get_class($newNode))) {
+            $this->addEmptyLine($node->stmts, $insertIndex + 1);
+        }
+
+        return $node;
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int
@@ -153,7 +191,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         });
     }
 
-    private function isSubsequence(array $haystackStatements, array $needleStatements): bool
+    protected function isSubsequence(array $haystackStatements, array $needleStatements): bool
     {
         $needleCount = count($needleStatements);
         $haystackCount = count($haystackStatements);
@@ -165,5 +203,16 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         }
 
         return false;
+    }
+
+    protected function &getNamespaceStatements(array &$nodes): array
+    {
+        $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
+
+        if (!is_null($targetNamespace)) {
+            return $targetNamespace->stmts;
+        }
+
+        return $nodes;
     }
 }

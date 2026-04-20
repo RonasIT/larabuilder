@@ -1,0 +1,25 @@
+<?php
+
+namespace RonasIT\Larabuilder\Tests\Support;
+
+use App\SomeClass;
+use App\Models\User;
+use App\Service\UserService;
+use RonasIT\Support\SecondTrait;
+use RonasIT\Support\Traits\NewTrait as SomeTrait;
+use App\Support\Traits\SecondTrait as UnusedTrait, App\Support\Classname;
+
+class SomeClass extends SomeClass
+{
+    use SomeTrait;
+
+    protected string $property;
+
+    public function __construct(): void
+    {
+    }
+
+    public function someMethod(User $user): void
+    {
+    }
+}
