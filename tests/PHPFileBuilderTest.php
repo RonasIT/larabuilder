@@ -542,7 +542,7 @@ class PHPFileBuilderTest extends TestCase
     }
 
     public function testRemoveClassAttributeWhenClassNotExist(): void
-    {        
+    {
         $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->assertExceptionThrew(NodeNotExistException::class, "Class 'AnotherClass' does not exist.");
@@ -553,7 +553,7 @@ class PHPFileBuilderTest extends TestCase
     }
 
     public function testRemoveClassAttribute(): void
-    {        
+    {
         $file = $this->generateOriginalStructurePath('class_with_attributes.php');
 
         $this->mockNativeFunction(
