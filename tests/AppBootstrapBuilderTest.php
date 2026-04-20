@@ -182,6 +182,12 @@ class AppBootstrapBuilderTest extends TestCase
                 new ScheduleOption('daily'),
                 new ScheduleOption('when', ['fn () => User::count() > 0']),
             )
+            ->addScheduleCommand(
+                'reports:generate',
+                new ScheduleOption('daily'),
+                new ScheduleOption('sendOutputTo', ['/var/log/reports.log']),
+                new ScheduleOption('pingOnFailure', ['https://example.com/ping']),
+            )
             ->save();
     }
 

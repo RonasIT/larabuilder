@@ -10,4 +10,6 @@ return Application::configure(basePath: dirname(__DIR__))
         Schedule::command('telescope:prune --set-hours=resolved_exception:12222');
 
         Schedule::command('emails:send')->daily()->when('fn () => User::count() > 0');
+
+        Schedule::command('reports:generate')->daily()->sendOutputTo('/var/log/reports.log')->pingOnFailure('https://example.com/ping');
     })->create();
