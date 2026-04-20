@@ -607,4 +607,25 @@ class PHPFileBuilderTest extends TestCase
             ])
             ->save();
     }
+
+    public function testRemoveImportsThenAddImports(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'remove_then_add_imports.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeImports([
+                'RonasIT\Support\SecondTrait',
+                'RonasIT\Support\Traits\NewTrait',
+                'App\Support\Traits\SecondTrait',
+                'App\Support\Classname',
+                'Illuminate\Support',
+            ], force: true)
+            ->addImports(['App\New\Service'])
+            ->save();
+    }
 }
