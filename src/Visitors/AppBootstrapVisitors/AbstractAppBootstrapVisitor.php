@@ -34,7 +34,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
 
     abstract protected function makeParentArgs(): array;
 
-    public function afterTraverse(array $nodes): ?array
+    public function beforeTraverse(array $nodes): ?array
     {
         static::$existingParentNodes = [];
 

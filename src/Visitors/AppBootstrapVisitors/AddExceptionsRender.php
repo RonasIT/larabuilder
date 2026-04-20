@@ -15,16 +15,19 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
+    protected Expression $renderStatement;
+
     public function __construct(
         protected string $exceptionClass,
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
+        $this->renderStatement = $this->buildRenderCall();
     }
 
     public function getInsertableNode(): Node
     {
-        return $this->buildRenderCall();
+        return $this->renderStatement;
     }
 
     protected function getParentMethod(): string

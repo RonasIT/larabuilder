@@ -16,7 +16,7 @@ use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
     protected ValueNodeFactory $valueNodeFactory;
-
+    protected Expression $scheduleStatement;
     protected array $options = [];
 
     public function __construct(
@@ -26,11 +26,13 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         $this->valueNodeFactory = new ValueNodeFactory();
 
         $this->options = $options;
+
+        $this->scheduleStatement = $this->buildScheduleCall();
     }
 
     public function getInsertableNode(): Node
     {
-        return $this->buildScheduleCall();
+        return $this->scheduleStatement;
     }
 
     protected function getParentMethod(): string
