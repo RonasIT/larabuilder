@@ -543,6 +543,9 @@ class PHPFileBuilderTest extends TestCase
         new PHPFileBuilder($file)
             ->removeImports([
                 'App\Service\UserService',
+                'Some\SomeTrait',
+                'Some\AnotherTrait',
+                'App\Service\UserService',
                 'App\Support\Traits\SecondTrait',
             ])
             ->save();

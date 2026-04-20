@@ -3,7 +3,6 @@
 namespace RonasIT\Larabuilder\Tests\Support;
 
 use RonasIT\Larabuilder\Tests\Support\FirstClass;
-use Some\SomeTrait;
 use RonasIT\Support\Traits\FirstTrait;
 use RonasIT\Support\SecondTrait;
 use RonasIT\Support\Traits\NewTrait as SomeTrait;

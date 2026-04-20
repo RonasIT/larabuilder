@@ -4,6 +4,7 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use PhpParser\NodeFinder;
@@ -27,19 +28,26 @@ class RemoveImports extends BaseNodeVisitorAbstract
         $targetNodes = &$this->getNamespaceStatements($nodes);
 
         foreach ($targetNodes as $node) {
-            if ($node instanceof Use_) {
-                $node->uses = array_filter($node->uses, fn (UseItem $useItem) => !$this->shouldRemove($useItem, $targetNodes));
+            if ($node instanceof Use_ || $node instanceof GroupUse) {
+                $this->removeTargetImports($node, $targetNodes);
             }
         }
 
-        $targetNodes = array_filter($targetNodes, fn ($node) => !($node instanceof Use_) || !empty($node->uses));
+        $targetNodes = array_filter($targetNodes, fn ($node) => !$this->isEmptyImportNode($node));
 
         return $nodes;
     }
 
-    protected function shouldRemove(UseItem $useItem, array $targetNodes): bool
+    protected function removeTargetImports(Use_|GroupUse $node, array $targetNodes): void
     {
-        if (!in_array($useItem->name->toString(), $this->imports)) {
+        $prefix = $node instanceof GroupUse ? $node->prefix : null;
+
+        $node->uses = array_filter($node->uses, fn (UseItem $useItem) => !$this->shouldRemove($useItem, $targetNodes, $prefix));
+    }
+
+    protected function shouldRemove(UseItem $useItem, array $targetNodes, ?Name $prefix = null): bool
+    {
+        if (!in_array($this->resolveFqcn($useItem, $prefix), $this->imports)) {
             return false;
         }
 
@@ -52,9 +60,21 @@ class RemoveImports extends BaseNodeVisitorAbstract
         return !$this->isImportUsed($resolvedName, $targetNodes);
     }
 
+    protected function resolveFqcn(UseItem $useItem, ?Name $prefix): string
+    {
+        return $prefix !== null
+            ? $prefix->toString() . '\\' . $useItem->name->toString()
+            : $useItem->name->toString();
+    }
+
+    protected function isEmptyImportNode(Node $node): bool
+    {
+        return ($node instanceof Use_ || $node instanceof GroupUse) && empty($node->uses);
+    }
+
     protected function isImportUsed(string $importName, array $targetNodes): bool
     {
-        $nodesWithoutImports = array_filter($targetNodes, fn ($node) => !($node instanceof Use_));
+        $nodesWithoutImports = array_filter($targetNodes, fn ($node) => !($node instanceof Use_) && !($node instanceof GroupUse));
 
         if ($this->hasUsageOf($importName, $nodesWithoutImports)) {
             return true;

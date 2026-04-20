@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Tests\Support;
 
+use Some\{AnotherTrait};
 use RonasIT\Support\SecondTrait;
 use RonasIT\Support\Traits\NewTrait as SomeTrait;
 
