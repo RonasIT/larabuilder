@@ -38,6 +38,8 @@ class SomeClass implements Test, Some
 
         Helpers\Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
 
+        $x = \App\Service\UserService::CONST;
+
         app(UserService::class)->doSomething();
     }
 }

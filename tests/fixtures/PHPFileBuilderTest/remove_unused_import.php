@@ -35,5 +35,7 @@ class SomeClass implements Test, Some
         $db->table('users')->where('id', 1)->first();
 
         Helpers\Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
+
+        $x = \App\Service\UserService::CONST;
     }
 }
