@@ -76,8 +76,9 @@ render for the passed exception class.
 
 #### addScheduleCommand
 
-Adds a scheduled command into the `withSchedule` method closure. 
+Adds a scheduled command into the `withSchedule` method closure.
 If `withSchedule` does not exist, it will be automatically created. The new scheduled command will then be inserted into its closure.
+Automatically adds `use Illuminate\Support\Facades\Schedule;` to the file imports.
 
 Example usage:
 
