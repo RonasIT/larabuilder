@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -25,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/status',
         apiPrefix: '',
     )
-    ->withMiddleware(function (Middleware $middleware) {
+    ->withMiddleware(function (Middleware $middleware): void {
         $middleware->use([
             HandleCors::class,
             CheckForMaintenanceMode::class,
@@ -33,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ConvertEmptyStringsToNull::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
+    ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontReport([
             AuthenticationException::class,
             AuthorizationException::class,
@@ -57,4 +58,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 : null;
         });
     })
-    ->create();
+    ->withSchedule(function (): void {
+        Schedule::command('telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336')->environments('production');
+    })->create();

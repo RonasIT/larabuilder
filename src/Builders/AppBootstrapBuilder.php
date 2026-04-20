@@ -2,7 +2,9 @@
 
 namespace RonasIT\Larabuilder\Builders;
 
+use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
+use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddScheduleCommand;
 
 class AppBootstrapBuilder extends PHPFileBuilder
 {
@@ -15,13 +17,24 @@ class AppBootstrapBuilder extends PHPFileBuilder
     {
         $this->traverser->addVisitor(new AddExceptionsRender($exceptionClass, $renderBody, $includeRequestArg));
 
-        $imports = [$exceptionClass];
+        $imports = ['Illuminate\Foundation\Configuration\Exceptions', $exceptionClass];
 
         if ($includeRequestArg) {
             $imports[] = 'Illuminate\Http\Request';
         }
 
         $this->addImports($imports);
+
+        return $this;
+    }
+
+    public function addScheduleCommand(string $command, ScheduleOption ...$options): self
+    {
+        $this->traverser->addVisitor(new AddScheduleCommand($command, ...$options));
+
+        $this->addImports([
+            'Illuminate\Support\Facades\Schedule',
+        ]);
 
         return $this;
     }

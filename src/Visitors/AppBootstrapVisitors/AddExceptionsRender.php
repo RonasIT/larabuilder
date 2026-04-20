@@ -28,20 +28,13 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         parent::__construct(
             parentMethod: 'withExceptions',
             targetMethod: 'render',
+            closureParams: [
+                new Param(
+                    var: new Variable('exceptions'),
+                    type: new Name('Exceptions'),
+                ),
+            ],
         );
-    }
-
-    protected function matchesCustomCriteria(Expression $stmt): bool
-    {
-        $paramType = $stmt->expr->args[0]?->value?->params[0]?->type ?? null;
-
-        if (!($paramType instanceof Name)) {
-            return false;
-        }
-
-        $typeName = $paramType->toString();
-
-        return $typeName === $this->exceptionClass || $typeName === class_basename($this->exceptionClass);
     }
 
     protected function insertNode(MethodCall $node): MethodCall
@@ -96,5 +89,23 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
             'params' => $params,
             'stmts' => [new PreformattedCode($this->renderBody)],
         ]);
+    }
+
+    protected function matchesCustomCriteria(Expression $stmt): bool
+    {
+        $paramType = $stmt->expr->args[0]?->value?->params[0]?->type ?? null;
+
+        if (!($paramType instanceof Name)) {
+            return false;
+        }
+
+        $typeName = $paramType->toString();
+
+        return $typeName === $this->exceptionClass || $typeName === class_basename($this->exceptionClass);
+    }
+
+    protected function getInsertableNode(): Expression
+    {
+        return $this->renderStatement;
     }
 }
