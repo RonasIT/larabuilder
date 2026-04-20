@@ -74,6 +74,6 @@ class RemoveImports extends BaseNodeVisitorAbstract
 
     protected function hasUsageOf(string $name, array $nodes): bool
     {
-        return !empty($this->nodeFinder->find($nodes, fn (Node $node) => $node instanceof Name && $node->toString() === $name));
+        return !empty($this->nodeFinder->find($nodes, fn (Node $node) => $node instanceof Name && $node->getFirst() === $name));
     }
 }

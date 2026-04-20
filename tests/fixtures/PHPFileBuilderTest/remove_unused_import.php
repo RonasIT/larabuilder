@@ -8,6 +8,7 @@ use RonasIT\Support\Traits\FirstTrait;
 use RonasIT\Support\SecondTrait;
 use RonasIT\Support\Traits\NewTrait as SomeTrait;
 use App\Support\Classname;
+use Illuminate\Support as Helpers;
 
 /**
  * Test
@@ -34,6 +35,6 @@ class SomeClass implements Test, Some
 
         $db->table('users')->where('id', 1)->first();
 
-        Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
+        Helpers\Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
     }
 }

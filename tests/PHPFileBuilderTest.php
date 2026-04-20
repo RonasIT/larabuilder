@@ -511,7 +511,7 @@ class PHPFileBuilderTest extends TestCase
                 'code' => '$db->table(\'users\')->where(\'id\', 1)->first();',
             ],
             [
-                'code' => 'Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
+                'code' => 'Helpers\Arr::map($arr, fn ($value) => str_replace(\'0\', \'1\', $value));',
             ],
         ];
     }
@@ -582,6 +582,7 @@ class PHPFileBuilderTest extends TestCase
                 'App\Service\UserService',
                 'App\Support\Traits\SecondTrait',
                 'App\Support\Classname',
+                'Illuminate\Support',
             ], force: true)
             ->save();
     }
