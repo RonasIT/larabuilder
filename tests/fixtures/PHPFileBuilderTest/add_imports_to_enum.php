@@ -6,7 +6,13 @@ use RonasIT\Larabuilder\Tests\Support\FirstClass;
 use RonasIT\Larabuilder\Tests\Support\SecondClass;
 use RonasIT\Larabuilder\Tests\Support\ThirdClass;
 
-interface SomeInterface
+enum SomeEnum
 {
+    case First;
+    case Second;
 
+    public static function toArray(): array
+    {
+        return self::cases();
+    }
 }

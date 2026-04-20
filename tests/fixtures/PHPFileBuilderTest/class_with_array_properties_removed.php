@@ -17,6 +17,14 @@ class SomeClass extends Some
     public int $intProperty;
     public float $floatProperty;
     public $nullProperty = null;
+    protected array $tags = ['one', 78.4];
+    protected array $fillable = [
+        'email',
+    ];
+    public array $newMultiArrayProperty = [
+        'arrayProperty2' => [1, 2, 3],
+    ];
+    public array $notArray = [];
 
     public function __construct()
     {

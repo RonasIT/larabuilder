@@ -2,7 +2,8 @@
   "preset": "laravel",
   "exclude": [
       "vendor",
-      "tests/fixtures"
+      "tests/fixtures",
+      "tests/Support/OriginStructures"
   ],
   "rules": {
     "not_operator_with_successor_space": false,
