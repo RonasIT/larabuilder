@@ -26,6 +26,10 @@ new PHPFileBuilder(app_path('Models/User.php'))
 
 ### Features
 
+#### setNamespace
+
+Set or replace the namespace declaration in a PHP file. If the file has no namespace, it will be added. If the namespace is already the same, no changes are made.
+
 #### setProperty
 
 Add new class property with the passed value and passed access level in case property does not exist in the class. Otherwise

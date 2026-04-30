@@ -16,29 +16,29 @@ class SetNamespace extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        foreach ($nodes as $node) {
-            if ($node instanceof Namespace_) {
-                if ($node->name->toString() === $this->namespace) {
-                    return null;
-                }
-
-                $node->name = new Name($this->namespace);
-
-                return null;
-            }
-        }
-
         $declares = [];
-        $stmts = [];
 
-        foreach ($nodes as $node) {
+        foreach ($nodes as $key => $node) {
+            if ($node instanceof Namespace_) {
+                return $this->updateNamespace($node);
+            }
+
             if ($node instanceof Declare_) {
                 $declares[] = $node;
-            } else {
-                $stmts[] = $node;
+
+                unset($nodes[$key]);
             }
         }
 
-        return [...$declares, new Namespace_(new Name($this->namespace), $stmts)];
+        return [...$declares, new Namespace_(new Name($this->namespace), array_values($nodes))];
+    }
+
+    protected function updateNamespace(Namespace_ $node): ?array
+    {
+        if ($node->name->toString() !== $this->namespace) {
+            $node->name = new Name($this->namespace);
+        }
+
+        return null;
     }
 }
