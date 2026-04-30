@@ -20,18 +20,18 @@ class AddArrayPropertyItem extends SetProperty
     ) {
         parent::__construct($name, $value);
 
-        list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+        list($propertyValue, $propertyType) = $this->valueNodeFactory->makeNode($value);
 
         $this->arrayItem = new ArrayItem($propertyValue);
         $arrayNode = new Array_([$this->arrayItem]);
 
-        $this->propertyItem = $this->prepareNewNode(new PropertyProperty($this->name, $arrayNode), $arrayNode);
+        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyProperty($this->name, $arrayNode), $arrayNode);
 
         $this->typeIdentifier = new Identifier('array');
     }
 
     /** @param Property $node */
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         if (!$node->props[0]->default instanceof Array_) {
             throw new UnexpectedPropertyTypeException(

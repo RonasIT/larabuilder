@@ -5,17 +5,12 @@ namespace RonasIT\Larabuilder\Tests\Support;
 use Some\AnotherTrait;
 
 trait SomeTrait {
-    public int $floatProperty = 56;
+    public float $floatProperty;
 
     protected array $fillable = [
+        'name',
         'email',
     ];
-    public array $tags = [
-        'three',
-        4,
-    ];
-    public string $newString = 'some string';
-    public null $default = null;
 
     public function method1()
     {
@@ -38,5 +33,10 @@ trait SomeTrait {
             'name' => $key,
             'value' => $value,
         ]);
+    }
+
+    public function handle(): bool
+    {
+        return $this->process();
     }
 }

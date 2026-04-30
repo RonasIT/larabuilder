@@ -2,6 +2,8 @@
 
 # Laravel Builder
 
+For internal architecture and contributor guidance, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Installation
 
 ```bash
@@ -53,6 +55,32 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 **Note:** Need to provide the full trait class name (FQCN); the method will import it automatically.
 
+#### addMethod
+
+Add a new method to a class, trait, or enum. Throws `NodeAlreadyExistsException` if a method with the given name already exists.
+
+```php
+new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
+    ->addMethod(
+        name: 'delete',
+        code: '
+            $service->delete($id);
+            return response()->noContent();
+        ',
+        params: new MethodParams(
+            new MethodParam(name: 'request', type: 'DeleteRequest'),
+            new MethodParam(name: 'service', type: 'Service'),
+            new MethodParam(name: 'id', type: 'int'),
+        ),
+        returnType: 'Response',
+    )
+    ->save();
+```
+
+Each `MethodParam` accepts: `name`, `type` (e.g. `'int'`, `'?string'`, `'MyClass'`), `default` (`DefaultValue::None` to omit), `variadic`, `byRef`.
+
+`addMethod` also supports `static: true` and `returnsByRef: true` (for methods that return by reference, e.g. `public function &items(): array`).
+
 ## Special Laravel structure builders
 
 ### Bootstrap app
@@ -73,3 +101,12 @@ Adds a new exception render to the `withExceptions` called method in case it doe
 render for the passed exception class.
 
 **Note** Need to provide the full exception class name (FQCN) to the method, it automatically imports it.
+
+## Contributing
+
+Thank you for considering contributing to Laravel Builder package! The contribution guide
+can be found in the [Contributing guide](CONTRIBUTING.md).
+
+## License
+
+Laravel Builder package is open-sourced software licensed under the [MIT license](LICENSE).

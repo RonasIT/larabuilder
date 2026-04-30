@@ -1,27 +1,22 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\Node\Stmt\Trait_;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
+use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
-class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
+class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-    ];
+    protected bool $hasTargetMethod = false;
 
     protected PreformattedCode $code;
-    protected bool $hasTargetMethod = false;
+    protected StatementDuplicateChecker $statementDuplicateChecker;
 
     public function __construct(
         protected string $methodName,
@@ -29,18 +24,10 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
         protected InsertPositionEnum $insertPosition,
     ) {
         $this->code = new PreformattedCode($code);
+        $this->statementDuplicateChecker = new StatementDuplicateChecker();
     }
 
-    public function insertNode(Node $node): Node
-    {
-        if (!$this->hasTargetMethod) {
-            throw new NodeNotExistException('Method', $this->methodName);
-        }
-
-        return $node;
-    }
-
-    protected function shouldUpdateNode(Node $node): bool
+    public function shouldUpdateNode(Node $node): bool
     {
         $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
 
@@ -50,10 +37,10 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
 
         return !empty($this->code->value)
             && $isTargetMethod
-            && !$this->isCodeDuplicated($node->stmts ?? [], $this->code->code);
+            && !$this->statementDuplicateChecker->isDuplicated($node->stmts ?? [], $this->code->code);
     }
 
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         $existingStmts = $node->stmts ?? [];
 
@@ -64,8 +51,12 @@ class InsertCodeToMethod extends InsertOrUpdateNodeAbstractVisitor
             : [...$existingStmts, ...$separator, $this->code];
     }
 
-    protected function getInsertableNode(): Node
+    protected function insertNode(Node $node): Node
     {
-        return new Nop();
+        if (!$this->hasTargetMethod) {
+            throw new NodeNotExistException('Method', $this->methodName);
+        }
+
+        return $node;
     }
 }

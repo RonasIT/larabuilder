@@ -10,9 +10,11 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
+use RonasIT\Larabuilder\ValueOptions\MethodParams;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
-use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
+use RonasIT\Larabuilder\Visitors\MethodVisitors\AddMethod;
+use RonasIT\Larabuilder\Visitors\MethodVisitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
@@ -74,6 +76,20 @@ class PHPFileBuilder
         $this->traverser->addVisitor(new AddTraits($traits));
 
         $this->addImports($traits);
+
+        return $this;
+    }
+
+    public function addMethod(
+        string $name,
+        string $code,
+        MethodParams $params = new MethodParams(),
+        ?string $returnType = null,
+        AccessModifierEnum $accessModifier = AccessModifierEnum::Public,
+        bool $static = false,
+        bool $returnsByRef = false,
+    ): self {
+        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $static, $returnsByRef));
 
         return $this;
     }
