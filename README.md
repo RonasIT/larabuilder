@@ -79,6 +79,8 @@ new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
 
 Each `MethodParam` accepts: `name`, `type` (e.g. `'int'`, `'?string'`, `'MyClass'`), `default` (`DefaultValue::None` to omit), `variadic`, `byRef`.
 
+`addMethod` also supports `static: true` and `returnsByRef: true` (for methods that return by reference, e.g. `public function &items(): array`).
+
 ## Special Laravel structure builders
 
 ### Bootstrap app

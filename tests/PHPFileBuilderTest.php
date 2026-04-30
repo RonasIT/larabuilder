@@ -645,6 +645,7 @@ class PHPFileBuilderTest extends TestCase
                 name: 'label',
                 code: 'return $this->name;',
                 returnType: 'string',
+                returnsByRef: true,
             )
             ->save();
     }

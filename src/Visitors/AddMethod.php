@@ -36,6 +36,7 @@ class AddMethod extends BaseNodeVisitorAbstract implements InsertNodeContract
         protected ?string $returnType = null,
         protected ?AccessModifierEnum $accessModifier = null,
         protected bool $static = false,
+        protected bool $returnsByRef = false,
     ) {
         $this->code = new PreformattedCode($code);
     }
@@ -61,6 +62,7 @@ class AddMethod extends BaseNodeVisitorAbstract implements InsertNodeContract
 
         return new ClassMethod($this->name, [
             'flags' => $flags,
+            'byRef' => $this->returnsByRef,
             'params' => $this->buildParams(),
             'returnType' => $this->returnType !== null ? BuilderHelpers::normalizeType($this->returnType) : null,
             'stmts' => [$this->code],

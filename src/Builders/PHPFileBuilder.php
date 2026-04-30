@@ -87,8 +87,9 @@ class PHPFileBuilder
         ?string $returnType = null,
         AccessModifierEnum $accessModifier = AccessModifierEnum::Public,
         bool $static = false,
+        bool $returnsByRef = false,
     ): self {
-        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $static));
+        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $static, $returnsByRef));
 
         return $this;
     }

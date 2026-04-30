@@ -12,7 +12,7 @@ enum SomeEnum
         return self::cases();
     }
 
-    public function label(): string
+    public function &label(): string
     {
         return $this->name;
     }
