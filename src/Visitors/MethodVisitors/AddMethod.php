@@ -1,16 +1,13 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 
 use PhpParser\BuilderHelpers;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Param;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\Enum_;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\DefaultValue;
@@ -19,14 +16,8 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\ValueOptions\MethodParam;
 use RonasIT\Larabuilder\ValueOptions\MethodParams;
 
-class AddMethod extends BaseNodeVisitorAbstract implements InsertNodeContract
+class AddMethod extends AbstractMethodVisitor implements InsertNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-    ];
-
     protected PreformattedCode $code;
 
     public function __construct(

@@ -1,27 +1,18 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
-class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeContract
+class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-    ];
-
     protected bool $hasTargetMethod = false;
 
     protected PreformattedCode $code;
