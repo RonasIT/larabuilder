@@ -55,6 +55,30 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 **Note:** Need to provide the full trait class name (FQCN); the method will import it automatically.
 
+#### addMethod
+
+Add a new method to a class, trait, or enum. Throws `NodeAlreadyExistsException` if a method with the given name already exists.
+
+```php
+new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
+    ->addMethod(
+        name: 'delete',
+        code: '
+            $service->delete($id);
+            return response()->noContent();
+        ',
+        params: new MethodParams(
+            new MethodParam(name: 'request', type: 'DeleteRequest'),
+            new MethodParam(name: 'service', type: 'Service'),
+            new MethodParam(name: 'id', type: 'int'),
+        ),
+        returnType: 'Response',
+    )
+    ->save();
+```
+
+Each `MethodParam` accepts: `name`, `type` (e.g. `'int'`, `'?string'`, `'MyClass'`), `default` (`DefaultValue::None` to omit), `variadic`, `byRef`.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app

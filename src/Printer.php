@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\PrettyPrinter\Standard;
@@ -64,12 +65,12 @@ class Printer extends Standard
 
     protected function pStmt_Property(Property $node): string
     {
-        $newLine = ($this->shouldAddNewlineBeforeNode($node, Property::class)) ? $this->nl : '';
+        $newLine = ($this->shouldAddNewlineBeforeIfTypeDiffers($node, Property::class)) ? $this->nl : '';
 
         return $newLine . parent::pStmt_Property($node);
     }
 
-    protected function shouldAddNewlineBeforeNode(Node $node, string $type): bool
+    protected function shouldAddNewlineBeforeIfTypeDiffers(Node $node, string $type): bool
     {
         $previousNode = $node->getAttribute(StatementAttributeEnum::Previous->value);
 
@@ -78,12 +79,19 @@ class Printer extends Standard
 
     protected function pStmt_Expression(Expression $node): string
     {
-        $newLine = ($this->shouldAddNewlineBeforeExpression($node, Expression::class)) ? $this->nl : '';
+        $newLine = ($this->shouldAddNewlineBeforeIfTypeSame($node, Expression::class)) ? $this->nl : '';
 
         return $newLine . parent::pStmt_Expression($node);
     }
 
-    protected function shouldAddNewlineBeforeExpression(Node $node, string $type): bool
+    protected function pStmt_ClassMethod(ClassMethod $node): string
+    {
+        $newLine = ($this->shouldAddNewlineBeforeIfTypeSame($node, ClassMethod::class)) ? $this->nl : '';
+
+        return $newLine . parent::pStmt_ClassMethod($node);
+    }
+
+    protected function shouldAddNewlineBeforeIfTypeSame(Node $node, string $type): bool
     {
         $previousNode = $node->getAttribute(StatementAttributeEnum::Previous->value);
 
