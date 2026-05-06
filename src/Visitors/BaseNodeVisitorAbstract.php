@@ -7,7 +7,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
-use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
@@ -71,24 +71,23 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
         $this->updatableNotFoundHook();
 
-        return ($this instanceof InsertNodeContract)
-            ? $this->insertNode($node)
-            : $node;
+        if ($this instanceof InsertNodesContract) {
+            $this->insertNodes($node->stmts);
+        }
+
+        return $node;
     }
 
     protected function updatableNotFoundHook(): void
     {
     }
 
-    /** @param Class_|Trait_|Enum_ $node */
-    private function insertNode(Node $node): Node
+    protected function insertNodes(array &$nodes): void
     {
         $this->nodeInserter ??= new NodeInserter();
 
-        $newNode = $this->getInsertableNode();
+        $newNodes = $this->getInsertableNodes($nodes);
 
-        $this->nodeInserter->insertNodes($node->stmts, [$newNode], true);
-
-        return $node;
+        $this->nodeInserter->insertNodes($nodes, $newNodes, true);
     }
 }

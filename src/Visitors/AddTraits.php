@@ -22,7 +22,7 @@ class AddTraits extends InsertNodesAbstractVisitor
         $nodesToInsert = collect($traits)
             ->filter()
             ->unique()
-            ->map(fn ($trait) => class_basename($trait));
+            ->map(fn ($trait) => new TraitUse([new Name(class_basename($trait))]));
 
         parent::__construct(
             nodesToInsert: $nodesToInsert,
@@ -34,10 +34,5 @@ class AddTraits extends InsertNodesAbstractVisitor
     protected function getChildNodes(Node $node): array
     {
         return $node->traits;
-    }
-
-    protected function getInsertableNode(string $name): Node
-    {
-        return new TraitUse([new Name($name)]);
     }
 }

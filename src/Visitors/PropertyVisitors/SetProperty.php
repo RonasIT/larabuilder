@@ -6,13 +6,13 @@ use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
-use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Support\ParentNodeLinker;
 use RonasIT\Larabuilder\Support\ValueNodeFactory;
 
-class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract, UpdateNodeContract
+class SetProperty extends AbstractPropertyVisitor implements InsertNodesContract, UpdateNodeContract
 {
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
@@ -51,12 +51,14 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract,
         }
     }
 
-    public function getInsertableNode(): Node
+    public function getInsertableNodes(array $nodes): array
     {
-        return new Property(
-            flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
-            props: [$this->propertyItem],
-            type: $this->typeIdentifier,
-        );
+        return [
+            new Property(
+                flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
+                props: [$this->propertyItem],
+                type: $this->typeIdentifier,
+            ),
+        ];
     }
 }

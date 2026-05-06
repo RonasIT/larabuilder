@@ -16,17 +16,13 @@ class AddImports extends InsertNodesAbstractVisitor
     {
         $nodesToInsert = collect($imports)
             ->filter()
-            ->unique();
+            ->unique()
+            ->map(fn ($import) => new Use_([new UseItem(new Name($import))]));
 
         parent::__construct(
             nodesToInsert: $nodesToInsert,
             targetNodeClass: Use_::class,
         );
-    }
-
-    public function leaveNode(Node $node): Node
-    {
-        return $node;
     }
 
     public function afterTraverse(array $nodes): ?array
@@ -49,10 +45,5 @@ class AddImports extends InsertNodesAbstractVisitor
     protected function getChildNodes(Node $node): array
     {
         return $node->uses;
-    }
-
-    protected function getInsertableNode(string $name): Node
-    {
-        return new Use_([new UseItem(new Name($name))]);
     }
 }
