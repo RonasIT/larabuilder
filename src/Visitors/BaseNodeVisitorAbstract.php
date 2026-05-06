@@ -70,16 +70,20 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
             }
         }
 
-        return $this->insertNode($node);
+        $this->updatableNotFoundHook();
+
+        return ($this instanceof InsertNodeContract)
+            ? $this->insertNode($node)
+            : $node;
+    }
+
+    protected function updatableNotFoundHook(): void
+    {
     }
 
     /** @param Class_|Trait_|Enum_ $node */
-    protected function insertNode(Node $node): Node
+    private function insertNode(Node $node): Node
     {
-        if (!($this instanceof InsertNodeContract)) {
-            return $node;
-        }
-
         $this->nodeInserter ??= new NodeInserter();
 
         $newNode = $this->getInsertableNode();

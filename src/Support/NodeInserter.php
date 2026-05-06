@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Support;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -33,7 +34,7 @@ class NodeInserter
 
         foreach ($newNodes as $newNode) {
             if (!empty($previousNodeAttribute)) {
-                $newNode->setAttribute($previousNodeAttribute, $stmts[$insertIndex - 1] ?? null);
+                $newNode->setAttribute($previousNodeAttribute, Arr::get($stmts, $insertIndex - 1));
             }
 
             array_splice($stmts, $insertIndex, 0, [$newNode]);
