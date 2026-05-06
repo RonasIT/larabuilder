@@ -69,4 +69,5 @@ class NodeInserter
         if ($needToInsert) {
             array_splice($stmts, $index, 0, [new Nop()]);
         }
+    }
 }
