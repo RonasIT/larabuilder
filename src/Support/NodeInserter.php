@@ -31,20 +31,18 @@ class NodeInserter
 
     public function insertNodes(array &$stmts, array $newNodes, bool $setPreviousAttribute = false): void
     {
-        $insertIndex = 0;
-
         foreach ($newNodes as $newNode) {
-            $insertIndex = $this->getInsertIndex($stmts, get_class($newNode));
+            $newNodeClass = get_class($newNode);
+
+            $insertIndex = $this->getInsertIndex($stmts, $newNodeClass);
 
             if ($setPreviousAttribute) {
                 $newNode->setAttribute(StatementAttributeEnum::Previous->value, Arr::get($stmts, $insertIndex - 1));
             }
 
             array_splice($stmts, $insertIndex, 0, [$newNode]);
-        }
 
-        if (!empty($newNodes)) {
-            $this->insertEmptyLineIfNeeded($stmts, $insertIndex + 1, get_class($newNodes[0]));
+            $this->insertEmptyLineIfNeeded($stmts, $insertIndex + 1, $newNodeClass);
         }
     }
 
