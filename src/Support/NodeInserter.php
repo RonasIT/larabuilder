@@ -62,11 +62,6 @@ class NodeInserter
 
     protected function insertEmptyLineIfNeeded(array &$stmts, int $index, string $type): void
     {
-        if (isset($stmts[$index])
-            && !($stmts[$index] instanceof Nop)
-            && !($stmts[$index] instanceof $type)) {
-            array_splice($stmts, $index, 0, [new Nop()]);
-        }
         $needToInsert = isset($stmts[$index])
             && !($stmts[$index] instanceof Nop)
             && !($stmts[$index] instanceof $type);
