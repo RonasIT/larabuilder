@@ -35,7 +35,7 @@ class NodeInserterTest extends TestCase
 
     public function testInsertMixedNodes(): void
     {
-        $this->parseAndClone('class.php');
+        $this->prepareFixture('class.php');
 
         $classNode = (new NodeFinder())->findFirstInstanceOf($this->newSyntaxTree, Class_::class);
 
@@ -56,13 +56,18 @@ class NodeInserterTest extends TestCase
         );
     }
 
-    protected function parseAndClone(string $fixture): void
+    protected function prepareFixture(string $fixture): void
     {
         $parser = (new ParserFactory())->createForHostVersion();
-        $syntaxTree = $parser->parse(file_get_contents($this->generateOriginalStructurePath($fixture)));
+
+        $code = file_get_contents($this->generateOriginalStructurePath($fixture));
+
+        $syntaxTree = $parser->parse($code);
+
         $this->oldTokens = $parser->getTokens();
 
         $traverser = new NodeTraverser();
+
         $traverser->addVisitor(new CloningVisitor());
 
         $this->oldSyntaxTree = $syntaxTree;
