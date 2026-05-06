@@ -29,21 +29,23 @@ class NodeInserter
         ClassMethod::class,
     ];
 
-    public function insertNodes(array &$stmts, array $newNodes, string $newNodesClass, bool $setPreviousAttribute = false): void
+    public function insertNodes(array &$stmts, array $newNodes, bool $setPreviousAttribute = false): void
     {
-        $insertIndex = $this->getInsertIndex($stmts, $newNodesClass);
+        $insertIndex = 0;
 
         foreach ($newNodes as $newNode) {
+            $insertIndex = $this->getInsertIndex($stmts, get_class($newNode));
+
             if ($setPreviousAttribute) {
                 $newNode->setAttribute(StatementAttributeEnum::Previous->value, Arr::get($stmts, $insertIndex - 1));
             }
 
             array_splice($stmts, $insertIndex, 0, [$newNode]);
-
-            $insertIndex++;
         }
 
-        $this->insertEmptyLineIfNeeded($stmts, $insertIndex, $newNodesClass);
+        if (!empty($newNodes)) {
+            $this->insertEmptyLineIfNeeded($stmts, $insertIndex + 1, get_class($newNodes[0]));
+        }
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int
