@@ -67,5 +67,11 @@ class NodeInserter
             && !($stmts[$index] instanceof $type)) {
             array_splice($stmts, $index, 0, [new Nop()]);
         }
-    }
+        $needToInsert = isset($stmts[$index])
+            && !($stmts[$index] instanceof Nop)
+            && !($stmts[$index] instanceof $type);
+
+        if ($needToInsert) {
+            array_splice($stmts, $index, 0, [new Nop()]);
+        }
 }
