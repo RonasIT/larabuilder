@@ -22,7 +22,7 @@ class AddImports extends BaseNodeVisitorAbstract implements InsertNodesContract
     {
         $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
 
-        if ($targetNamespace !== null) {
+        if (!is_null($targetNamespace)) {
             /** @var Namespace_ $targetNamespace */
             $targetNodes = &$targetNamespace->stmts;
         } else {
