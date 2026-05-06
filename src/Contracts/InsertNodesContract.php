@@ -6,6 +6,7 @@ use PhpParser\Node;
 
 interface InsertNodesContract
 {
-    /** @return Node[] */
-    public function getInsertableNodes(array $nodes): array;
+    public function getInsertableNodes(): array;
+
+    public function getSubNodes(Node $node): array;
 }
