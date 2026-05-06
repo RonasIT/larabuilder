@@ -13,6 +13,7 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 class NodeInserter
 {
@@ -28,13 +29,13 @@ class NodeInserter
         ClassMethod::class,
     ];
 
-    public function insertNodes(array &$stmts, string $targetNodeClass, array $newNodes, ?string $previousNodeAttribute = null): void
+    public function insertNodes(array &$stmts, array $newNodes, string $newNodesClass, bool $setPreviousAttribute = false): void
     {
-        $insertIndex = $this->getInsertIndex($stmts, $targetNodeClass);
+        $insertIndex = $this->getInsertIndex($stmts, $newNodesClass);
 
         foreach ($newNodes as $newNode) {
-            if (!empty($previousNodeAttribute)) {
-                $newNode->setAttribute($previousNodeAttribute, Arr::get($stmts, $insertIndex - 1));
+            if ($setPreviousAttribute) {
+                $newNode->setAttribute(StatementAttributeEnum::Previous->value, Arr::get($stmts, $insertIndex - 1));
             }
 
             array_splice($stmts, $insertIndex, 0, [$newNode]);
@@ -42,7 +43,7 @@ class NodeInserter
             $insertIndex++;
         }
 
-        $this->insertEmptyLineIfNeeded($stmts, $insertIndex, $targetNodeClass);
+        $this->insertEmptyLineIfNeeded($stmts, $insertIndex, $newNodesClass);
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int

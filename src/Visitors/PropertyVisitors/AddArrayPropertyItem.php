@@ -6,8 +6,8 @@ use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\PropertyProperty;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 
 class AddArrayPropertyItem extends SetProperty
@@ -25,7 +25,7 @@ class AddArrayPropertyItem extends SetProperty
         $this->arrayItem = new ArrayItem($propertyValue);
         $arrayNode = new Array_([$this->arrayItem]);
 
-        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyProperty($this->name, $arrayNode), $arrayNode);
+        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $arrayNode), $arrayNode);
 
         $this->typeIdentifier = new Identifier('array');
     }

@@ -72,7 +72,7 @@ abstract class InsertNodesAbstractVisitor extends BaseNodeVisitorAbstract
     {
         $insertableNodes = $newNodes->map(fn ($node) => $this->getInsertableNode($node))->all();
 
-        $this->nodeInserter->insertNodes($nodes, $this->targetNodeClass, $insertableNodes);
+        $this->nodeInserter->insertNodes($nodes, $insertableNodes, $this->targetNodeClass);
 
         return $nodes;
     }
