@@ -2,24 +2,16 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use Illuminate\Support\Arr;
 use PhpParser\Node;
-use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\ClassConst;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
-use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\Node\Stmt\Nop;
-use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
-use PhpParser\Node\Stmt\TraitUse;
-use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\PrettyPrinter\Standard;
-use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\InsertNodesContract;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
+use RonasIT\Larabuilder\Support\NodeInserter;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
@@ -30,20 +22,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     }
 
     protected bool $hasParentNode = false;
-
-    protected const TYPE_ORDER = [
-        Namespace_::class,
-        Use_::class,
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-        TraitUse::class,
-        ClassConst::class,
-        Property::class,
-        ClassMethod::class,
-    ];
-
-    abstract protected function modify(Node $node): Node;
+    protected NodeInserter $nodeInserter;
 
     public function leaveNode(Node $node): Node
     {
@@ -78,92 +57,70 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 
-    protected function getInsertIndex(array $statements, string $insertType): int
+    protected function modify(Node $node): Node
     {
-        $insertIndex = 0;
-        $insertTypeOrder = array_search($insertType, self::TYPE_ORDER);
+        if ($this instanceof UpdateNodeContract) {
+            /** @var Class_|Trait_|Enum_ $node */
+            foreach ($node->stmts as $stmt) {
+                if ($this->shouldUpdateNode($stmt)) {
+                    $this->updateNode($stmt);
 
-        foreach ($statements as $index => $statement) {
-            foreach (self::TYPE_ORDER as $currentTypeIndex => $type) {
-                if ($statement instanceof $type && $currentTypeIndex <= $insertTypeOrder) {
-                    $insertIndex = $index + 1;
+                    return $node;
                 }
             }
         }
 
-        return $insertIndex;
+        $this->updatableNotFoundHook();
+
+        $this->insertNodes($node->stmts);
+
+        return $node;
     }
 
-    protected function shouldAddEmptyLine(array $stmts, int $index, string $type): bool
+    protected function updatableNotFoundHook(): void
     {
-        return (isset($stmts[$index]))
-            && !($stmts[$index] instanceof Nop)
-            && !($stmts[$index] instanceof $type);
     }
 
-    protected function addEmptyLine(array &$nodes, int $index): void
+    protected function insertNodes(array &$nodes): void
     {
-        array_splice($nodes, $index, 0, [new Nop()]);
+        $newNodes = match (true) {
+            $this instanceof InsertNodesContract => $this->filterExistingNodes($nodes),
+            $this instanceof InsertNodeContract => [$this->getInsertableNode()],
+            default => null,
+        };
+
+        if (!empty($newNodes)) {
+            $this->nodeInserter ??= new NodeInserter();
+
+            $this->nodeInserter->insertNodes($nodes, $newNodes, true);
+        }
     }
 
-    protected function prepareNewNode(mixed $parent, mixed $child): mixed
+    private function filterExistingNodes(array $nodes): array
     {
-        $this->setParentForNode($child, $parent);
+        $insertableNodes = $this->getInsertableNodes();
 
-        return $parent;
-    }
+        if (empty($insertableNodes)) {
+            return [];
+        }
 
-    protected function setParentForNode(Node $child, Node $parent): void
-    {
-        $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
+        $targetNodeClass = get_class($insertableNodes[0]);
 
-        if ($child instanceof Array_) {
-            foreach ($child->items as $item) {
-                $item->setAttribute(StatementAttributeEnum::Parent->value, $child);
+        $existingNames = [];
 
-                if ($item->value instanceof Array_) {
-                    $this->setParentForNode($item->value, $item);
-                }
+        foreach ($nodes as $node) {
+            if (!($node instanceof $targetNodeClass)) {
+                continue;
             }
-        }
-    }
 
-    protected function isCodeDuplicated(array $existingStatements, array $statementsToCheck): bool
-    {
-        if (empty($existingStatements) || empty($statementsToCheck)) {
-            return false;
-        }
-
-        $haystack = $this->normalizeStatements($existingStatements);
-        $needle = $this->normalizeStatements($statementsToCheck);
-
-        return $this->isSubsequence($haystack, $needle);
-    }
-
-    protected function normalizeStatements(array $statements): array
-    {
-        $printer = new Standard();
-
-        return Arr::map($statements, function (Stmt $statement) use ($printer) {
-            $stmtCopy = clone $statement;
-
-            $stmtCopy->setAttribute(StatementAttributeEnum::Comments->value, []);
-
-            return $printer->prettyPrint([$stmtCopy]);
-        });
-    }
-
-    private function isSubsequence(array $haystackStatements, array $needleStatements): bool
-    {
-        $needleCount = count($needleStatements);
-        $haystackCount = count($haystackStatements);
-
-        for ($i = 0; $i <= $haystackCount - $needleCount; $i++) {
-            if (array_slice($haystackStatements, $i, $needleCount) === $needleStatements) {
-                return true;
+            foreach ($this->getSubNodes($node) as $childNode) {
+                $existingNames[] = (string) $childNode->name;
             }
         }
 
-        return false;
+        return array_values(array_filter(
+            $insertableNodes,
+            fn (Node $newNode) => !in_array((string) $this->getSubNodes($newNode)[0]->name, $existingNames),
+        ));
     }
 }

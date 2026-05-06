@@ -8,8 +8,9 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
+use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 
-class AddTraits extends InsertNodesAbstractVisitor
+class AddTraits extends BaseNodeVisitorAbstract implements InsertNodesContract
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,
@@ -17,27 +18,22 @@ class AddTraits extends InsertNodesAbstractVisitor
         Enum_::class,
     ];
 
-    public function __construct(array $traits)
-    {
-        $nodesToInsert = collect($traits)
-            ->filter()
-            ->unique()
-            ->map(fn ($trait) => class_basename($trait));
+    public function __construct(
+        protected array $traits,
+    ) {
+    }
 
-        parent::__construct(
-            nodesToInsert: $nodesToInsert,
-            targetNodeClass: TraitUse::class,
+    public function getInsertableNodes(): array
+    {
+        return array_map(
+            fn ($trait) => new TraitUse([new Name(class_basename($trait))]),
+            array_unique(array_filter($this->traits)),
         );
     }
 
     /** @param TraitUse $node */
-    protected function getChildNodes(Node $node): array
+    public function getSubNodes(Node $node): array
     {
         return $node->traits;
-    }
-
-    protected function getInsertableNode(string $name): Node
-    {
-        return new TraitUse([new Name($name)]);
     }
 }
