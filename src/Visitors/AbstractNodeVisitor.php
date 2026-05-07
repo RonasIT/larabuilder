@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
@@ -13,7 +14,7 @@ use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
 
-abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
+abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 {
     protected const array ANY_TYPE = [];
 
@@ -65,26 +66,46 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
                 if ($this->shouldUpdateNode($stmt)) {
                     $this->updateNode($stmt);
 
+                    $this->linkParents($stmt);
+
                     return $node;
                 }
             }
+
+            $this->updatableNodeNotFoundHook();
         }
 
-        return $this->insertNode($node);
+        return ($this instanceof InsertNodeContract)
+            ? $this->insertNode($node)
+            : $node;
+    }
+
+    protected function updatableNodeNotFoundHook(): void
+    {
+    }
+
+    protected function linkParents(Node $parent): void
+    {
+        foreach ($parent->getSubNodeNames() as $name) {
+            foreach (Arr::wrap($parent->$name) as $child) {
+                if ($child instanceof Node) {
+                    $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
+                    $this->linkParents($child);
+                }
+            }
+        }
     }
 
     /** @param Class_|Trait_|Enum_ $node */
-    protected function insertNode(Node $node): Node
+    private function insertNode(Node $node): Node
     {
-        if (!($this instanceof InsertNodeContract)) {
-            return $node;
-        }
-
         $this->nodeInserter ??= new NodeInserter();
 
         $newNode = $this->getInsertableNode();
 
-        $this->nodeInserter->insertNodes($node->stmts, get_class($newNode), [$newNode], StatementAttributeEnum::Previous->value);
+        $this->linkParents($newNode);
+
+        $this->nodeInserter->insertNodes($node->stmts, [$newNode]);
 
         return $node;
     }

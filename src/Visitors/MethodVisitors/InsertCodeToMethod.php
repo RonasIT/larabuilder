@@ -51,12 +51,10 @@ class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeCont
             : [...$existingStmts, ...$separator, $this->code];
     }
 
-    protected function insertNode(Node $node): Node
+    protected function updatableNodeNotFoundHook(): void
     {
         if (!$this->hasTargetMethod) {
             throw new NodeNotExistException('Method', $this->methodName);
         }
-
-        return $node;
     }
 }

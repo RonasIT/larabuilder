@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Support;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -12,6 +13,7 @@ use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 class NodeInserter
 {
@@ -27,21 +29,19 @@ class NodeInserter
         ClassMethod::class,
     ];
 
-    public function insertNodes(array &$stmts, string $targetNodeClass, array $newNodes, ?string $previousNodeAttribute = null): void
+    public function insertNodes(array &$stmts, array $newNodes): void
     {
-        $insertIndex = $this->getInsertIndex($stmts, $targetNodeClass);
-
         foreach ($newNodes as $newNode) {
-            if (!empty($previousNodeAttribute)) {
-                $newNode->setAttribute($previousNodeAttribute, $stmts[$insertIndex - 1] ?? null);
-            }
+            $newNodeClass = get_class($newNode);
+
+            $insertIndex = $this->getInsertIndex($stmts, $newNodeClass);
+
+            $newNode->setAttribute(StatementAttributeEnum::Previous->value, Arr::get($stmts, $insertIndex - 1));
 
             array_splice($stmts, $insertIndex, 0, [$newNode]);
 
-            $insertIndex++;
+            $this->insertEmptyLineIfNeeded($stmts, $insertIndex + 1, $newNodeClass);
         }
-
-        $this->insertEmptyLineIfNeeded($stmts, $insertIndex, $targetNodeClass);
     }
 
     protected function getInsertIndex(array $statements, string $insertType): int
@@ -62,9 +62,11 @@ class NodeInserter
 
     protected function insertEmptyLineIfNeeded(array &$stmts, int $index, string $type): void
     {
-        if (isset($stmts[$index])
+        $needToInsert = isset($stmts[$index])
             && !($stmts[$index] instanceof Nop)
-            && !($stmts[$index] instanceof $type)) {
+            && !($stmts[$index] instanceof $type);
+
+        if ($needToInsert) {
             array_splice($stmts, $index, 0, [new Nop()]);
         }
     }

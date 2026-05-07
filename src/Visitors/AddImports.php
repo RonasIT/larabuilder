@@ -6,9 +6,9 @@ use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
-use PhpParser\Node\Stmt\UseUse;
+use PhpParser\Node\UseItem;
 
-class AddImports extends InsertNodesAbstractVisitor
+class AddImports extends AbstractInsertNodesVisitor
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
@@ -53,6 +53,6 @@ class AddImports extends InsertNodesAbstractVisitor
 
     protected function getInsertableNode(string $name): Node
     {
-        return new Use_([new UseUse(new Name($name))]);
+        return new Use_([new UseItem(new Name($name))]);
     }
 }
