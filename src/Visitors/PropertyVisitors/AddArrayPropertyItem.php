@@ -20,13 +20,10 @@ class AddArrayPropertyItem extends SetProperty
     ) {
         parent::__construct($name, $value);
 
-        list($propertyValue, $propertyType) = $this->valueNodeFactory->makeNode($value);
-
-        $this->arrayItem = new ArrayItem($propertyValue);
+        $this->arrayItem = new ArrayItem($this->property->node);
         $arrayNode = new Array_([$this->arrayItem]);
 
-        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $arrayNode), $arrayNode);
-
+        $this->propertyItem = new PropertyItem($this->name, $arrayNode);
         $this->typeIdentifier = new Identifier('array');
     }
 

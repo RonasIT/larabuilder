@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
@@ -10,10 +11,11 @@ use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
 
-abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
+abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 {
     protected const array ANY_TYPE = [];
 
@@ -65,23 +67,42 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
                 if ($this->shouldUpdateNode($stmt)) {
                     $this->updateNode($stmt);
 
+                    $this->linkParents($stmt);
+
                     return $node;
                 }
             }
-        }
 
-        $this->updatableNotFoundHook();
+            $this->updatableNodeNotFoundHook();
+        }
 
         $this->insertNodes($node->stmts);
 
         return $node;
     }
 
-    protected function updatableNotFoundHook(): void
+    protected function updatableNodeNotFoundHook(): void
     {
     }
 
+<<<<<<< HEAD:src/Visitors/BaseNodeVisitorAbstract.php
     protected function insertNodes(array &$nodes): void
+=======
+    protected function linkParents(Node $parent): void
+    {
+        foreach ($parent->getSubNodeNames() as $name) {
+            foreach (Arr::wrap($parent->$name) as $child) {
+                if ($child instanceof Node) {
+                    $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
+                    $this->linkParents($child);
+                }
+            }
+        }
+    }
+
+    /** @param Class_|Trait_|Enum_ $node */
+    private function insertNode(Node $node): Node
+>>>>>>> origin/master:src/Visitors/AbstractNodeVisitor.php
     {
         $newNodes = match (true) {
             $this instanceof InsertNodesContract => $this->filterExistingNodes($nodes),
@@ -92,9 +113,15 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         if (!empty($newNodes)) {
             $this->nodeInserter ??= new NodeInserter();
 
+<<<<<<< HEAD:src/Visitors/BaseNodeVisitorAbstract.php
             $this->nodeInserter->insertNodes($nodes, $newNodes, true);
         }
     }
+=======
+        $this->linkParents($newNode);
+
+        $this->nodeInserter->insertNodes($node->stmts, [$newNode]);
+>>>>>>> origin/master:src/Visitors/AbstractNodeVisitor.php
 
     private function filterExistingNodes(array $nodes): array
     {

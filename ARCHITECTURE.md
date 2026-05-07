@@ -33,7 +33,7 @@ Each fluent method (e.g. `setProperty()`, `addImports()`) creates a visitor and 
 
 All code modifications happen through visitors that traverse the AST. The library uses two independent visitor hierarchies.
 
-### Class-based visitors (`BaseNodeVisitorAbstract`)
+### Class-based visitors (`AbstractNodeVisitor`)
 
 For modifying classes, traits, enums, etc. The base class handles:
 
@@ -59,8 +59,7 @@ Located in `src/Support/`:
 | Class | Purpose |
 |-------|---------|
 | `NodeInserter` | Determines insertion position based on node type ordering and handles empty line separators |
-| `ValueNodeFactory` | Converts PHP values (int, string, array, etc.) into AST node representations |
-| `ParentNodeLinker` | Sets parent attributes on AST nodes |
+| `NodeValueFactory` | Converts PHP values (int, string, array, etc.) into AST node representations; returns `NodeValueDTO` |
 | `NodeValueComparator` | Compares AST nodes against PHP values for equality checks |
 | `StatementDuplicateChecker` | Detects whether statements are already present |
 
@@ -71,6 +70,7 @@ Located in `src/Support/`:
 
 ## Creating a New Visitor
 
+1. Extend `AbstractNodeVisitor` (or `AbstractInsertNodesVisitor` for bulk insertions).
 1. Extend `BaseNodeVisitorAbstract`.
 2. Set `$allowedParentNodesTypes` to the node types your visitor targets.
 3. Implement the appropriate contract(s):

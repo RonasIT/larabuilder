@@ -29,16 +29,14 @@ class NodeInserter
         ClassMethod::class,
     ];
 
-    public function insertNodes(array &$stmts, array $newNodes, bool $setPreviousAttribute = false): void
+    public function insertNodes(array &$stmts, array $newNodes): void
     {
         foreach ($newNodes as $newNode) {
             $newNodeClass = get_class($newNode);
 
             $insertIndex = $this->getInsertIndex($stmts, $newNodeClass);
 
-            if ($setPreviousAttribute) {
-                $newNode->setAttribute(StatementAttributeEnum::Previous->value, Arr::get($stmts, $insertIndex - 1));
-            }
+            $newNode->setAttribute(StatementAttributeEnum::Previous->value, Arr::get($stmts, $insertIndex - 1));
 
             array_splice($stmts, $insertIndex, 0, [$newNode]);
 
