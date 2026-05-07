@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder\Support;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Scalar\Int_;
@@ -26,7 +27,7 @@ class NodeValueFactory
             'null' => new ConstFetch(new Name('null')),
         };
 
-        return new NodeValueDTO($node, $type);
+        return new NodeValueDTO($node, new Identifier($type));
     }
 
     protected static function makeBoolValue(bool $value): ConstFetch
