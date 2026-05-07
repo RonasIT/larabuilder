@@ -2,11 +2,13 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Expression;
+use RonasIT\Larabuilder\Support\NodeValueFactory;
 use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
@@ -34,12 +36,12 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
             class: new Name('Schedule'),
             name: new Identifier('command'),
             args: [
-                $this->makeArgument($this->command),
+                new Arg(NodeValueFactory::make($this->command)->node),
             ],
         );
 
         foreach ($this->options as $option) {
-            $arguments = array_map(fn ($argument) => $this->makeArgument($argument), $option->arguments);
+            $arguments = array_map(fn ($argument) => new Arg(NodeValueFactory::make($argument)->node), $option->arguments);
 
             $call = new MethodCall(
                 var: $call,
