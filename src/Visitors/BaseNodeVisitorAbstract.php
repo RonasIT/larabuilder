@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
@@ -9,9 +10,9 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
-use RonasIT\Larabuilder\Support\ParentNodeLinker;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
@@ -65,7 +66,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
                 if ($this->shouldUpdateNode($stmt)) {
                     $this->updateNode($stmt);
 
-                    ParentNodeLinker::linkParents($stmt);
+                    $this->linkParents($stmt);
 
                     return $node;
                 }
@@ -83,6 +84,18 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
     {
     }
 
+    protected function linkParents(Node $parent): void
+    {
+        foreach ($parent->getSubNodeNames() as $name) {
+            foreach (Arr::wrap($parent->$name) as $child) {
+                if ($child instanceof Node) {
+                    $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
+                    static::linkParents($child);
+                }
+            }
+        }
+    }
+
     /** @param Class_|Trait_|Enum_ $node */
     private function insertNode(Node $node): Node
     {
@@ -90,7 +103,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 
         $newNode = $this->getInsertableNode();
 
-        ParentNodeLinker::linkParents($newNode);
+        $this->linkParents($newNode);
 
         $this->nodeInserter->insertNodes($node->stmts, [$newNode]);
 
