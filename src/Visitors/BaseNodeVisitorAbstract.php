@@ -90,7 +90,7 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
             foreach (Arr::wrap($parent->$name) as $child) {
                 if ($child instanceof Node) {
                     $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
-                    static::linkParents($child);
+                    $this->linkParents($child);
                 }
             }
         }
