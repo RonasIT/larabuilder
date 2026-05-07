@@ -70,8 +70,7 @@ Located in `src/Support/`:
 
 ## Creating a New Visitor
 
-1. Extend `AbstractNodeVisitor` (or `AbstractInsertNodesVisitor` for bulk insertions).
-1. Extend `BaseNodeVisitorAbstract`.
+1. Extend `AbstractNodeVisitor`.
 2. Set `$allowedParentNodesTypes` to the node types your visitor targets.
 3. Implement the appropriate contract(s):
    - `InsertNodeContract` — for inserting a single node, implement `getInsertableNode(): Node`
