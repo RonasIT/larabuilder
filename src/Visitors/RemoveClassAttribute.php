@@ -8,7 +8,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Nop;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 
-class RemoveClassAttribute extends BaseNodeVisitorAbstract
+class RemoveClassAttribute extends AbstractNodeVisitor
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,

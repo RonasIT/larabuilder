@@ -3,19 +3,13 @@
 namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 
 use PhpParser\Node;
-use PhpParser\Node\ArrayItem;
-use PhpParser\Node\Expr\Array_;
-use PhpParser\Node\Expr\ConstFetch;
-use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\Float_;
-use PhpParser\Node\Scalar\Int_;
-use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
-use RonasIT\Larabuilder\Visitors\InsertOrUpdateNodeAbstractVisitor;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Visitors\AbstractNodeVisitor;
 
-abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
+abstract class AbstractPropertyVisitor extends AbstractNodeVisitor implements UpdateNodeContract
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,
@@ -27,46 +21,9 @@ abstract class AbstractPropertyVisitor extends InsertOrUpdateNodeAbstractVisitor
     ) {
     }
 
-    protected function shouldUpdateNode(Node $node): bool
+    public function shouldUpdateNode(Node $node): bool
     {
         return $node instanceof Property
-            && $this->name === $node->props[0]->name->name;
-    }
-
-    protected function getPropertyValue(mixed $value): array
-    {
-        $type = get_debug_type($value);
-
-        $value = match ($type) {
-            'int' => new Int_($value),
-            'array' => $this->makeArrayValue($value),
-            'string' => new String_($value),
-            'float' => new Float_($value),
-            'bool' => $this->makeBoolValue($value),
-            'null' => new ConstFetch(new Name('null')),
-        };
-
-        return [$value, $type];
-    }
-
-    protected function makeBoolValue(bool $value): ConstFetch
-    {
-        $name = new Name(($value) ? 'true' : 'false');
-
-        return new ConstFetch($name);
-    }
-
-    protected function makeArrayValue(array $values): Array_
-    {
-        $items = [];
-
-        foreach ($values as $key => $val) {
-            list($val) = $this->getPropertyValue($val);
-            list($key) = $this->getPropertyValue($key);
-
-            $items[] = new ArrayItem($val, $key);
-        }
-
-        return new Array_($items);
+            && $node->props[0]->name->name === $this->name;
     }
 }
