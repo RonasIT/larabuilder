@@ -3,28 +3,24 @@
 namespace RonasIT\Larabuilder\Support;
 
 use PhpParser\Node;
-use PhpParser\Node\Expr\Array_;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 class ParentNodeLinker
 {
-    public function setParent(Node $parent, Node $child): mixed
+    public static function linkParents(Node $parent): void
     {
-        $this->setParentForNode($child, $parent);
+        foreach ($parent->getSubNodeNames() as $name) {
+            $child = $parent->$name;
 
-        return $parent;
-    }
-
-    protected function setParentForNode(Node $child, Node $parent): void
-    {
-        $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
-
-        if ($child instanceof Array_) {
-            foreach ($child->items as $item) {
-                $item->setAttribute(StatementAttributeEnum::Parent->value, $child);
-
-                if ($item->value instanceof Array_) {
-                    $this->setParentForNode($item->value, $item);
+            if ($child instanceof Node) {
+                $child->setAttribute(StatementAttributeEnum::Parent->value, $parent);
+                static::linkParents($child);
+            } elseif (is_array($child)) {
+                foreach ($child as $item) {
+                    if ($item instanceof Node) {
+                        $item->setAttribute(StatementAttributeEnum::Parent->value, $parent);
+                        static::linkParents($item);
+                    }
                 }
             }
         }

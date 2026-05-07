@@ -11,6 +11,7 @@ use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
+use RonasIT\Larabuilder\Support\ParentNodeLinker;
 
 abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
 {
@@ -64,6 +65,8 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
                 if ($this->shouldUpdateNode($stmt)) {
                     $this->updateNode($stmt);
 
+                    ParentNodeLinker::linkParents($stmt);
+
                     return $node;
                 }
             }
@@ -86,6 +89,8 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
         $this->nodeInserter ??= new NodeInserter();
 
         $newNode = $this->getInsertableNode();
+
+        ParentNodeLinker::linkParents($newNode);
 
         $this->nodeInserter->insertNodes($node->stmts, [$newNode]);
 

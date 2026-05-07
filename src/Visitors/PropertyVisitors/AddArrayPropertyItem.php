@@ -26,8 +26,7 @@ class AddArrayPropertyItem extends SetProperty
         $this->arrayItem = new ArrayItem($property->node);
         $arrayNode = new Array_([$this->arrayItem]);
 
-        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $arrayNode), $arrayNode);
-
+        $this->propertyItem = new PropertyItem($this->name, $arrayNode);
         $this->typeIdentifier = new Identifier('array');
     }
 
