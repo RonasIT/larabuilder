@@ -60,8 +60,7 @@ Located in `src/Support/`:
 | Class | Purpose |
 |-------|---------|
 | `NodeInserter` | Determines insertion position based on node type ordering and handles empty line separators |
-| `ValueNodeFactory` | Converts PHP values (int, string, array, etc.) into AST node representations |
-| `ParentNodeLinker` | Sets parent attributes on AST nodes |
+| `NodeValueFactory` | Converts PHP values (int, string, array, etc.) into AST node representations; returns `NodeValueDTO` |
 | `NodeValueComparator` | Compares AST nodes against PHP values for equality checks |
 | `StatementDuplicateChecker` | Detects whether statements are already present |
 
