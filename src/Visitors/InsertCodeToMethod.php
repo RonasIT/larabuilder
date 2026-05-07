@@ -60,7 +60,7 @@ class InsertCodeToMethod extends BaseNodeVisitorAbstract implements UpdateNodeCo
             : [...$existingStmts, ...$separator, $this->code];
     }
 
-    protected function updatableNotFoundHook(): void
+    protected function updatableNodeNotFoundHook(): void
     {
         if (!$this->hasTargetMethod) {
             throw new NodeNotExistException('Method', $this->methodName);

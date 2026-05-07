@@ -69,14 +69,14 @@ abstract class BaseNodeVisitorAbstract extends NodeVisitorAbstract
             }
         }
 
-        $this->updatableNotFoundHook();
+        $this->updatableNodeNotFoundHook();
 
         return ($this instanceof InsertNodeContract)
             ? $this->insertNode($node)
             : $node;
     }
 
-    protected function updatableNotFoundHook(): void
+    protected function updatableNodeNotFoundHook(): void
     {
     }
 
