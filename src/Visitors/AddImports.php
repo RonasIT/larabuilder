@@ -8,7 +8,7 @@ use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 
-class AddImports extends InsertNodesAbstractVisitor
+class AddImports extends AbstractInsertNodesVisitor
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
