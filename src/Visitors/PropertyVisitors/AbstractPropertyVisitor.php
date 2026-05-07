@@ -7,9 +7,9 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
-use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
+use RonasIT\Larabuilder\Visitors\AbstractBaseNodeVisitor;
 
-abstract class AbstractPropertyVisitor extends BaseNodeVisitorAbstract implements UpdateNodeContract
+abstract class AbstractPropertyVisitor extends AbstractBaseNodeVisitor implements UpdateNodeContract
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,

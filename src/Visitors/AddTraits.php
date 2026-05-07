@@ -9,7 +9,7 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 
-class AddTraits extends InsertNodesAbstractVisitor
+class AddTraits extends AbstractInsertNodesVisitor
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,
