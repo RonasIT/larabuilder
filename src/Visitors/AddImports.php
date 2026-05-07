@@ -7,26 +7,15 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
+use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 
-class AddImports extends AbstractInsertNodesVisitor
+class AddImports extends AbstractNodeVisitor implements InsertNodesContract
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
-    public function __construct(array $imports)
-    {
-        $nodesToInsert = collect($imports)
-            ->filter()
-            ->unique();
-
-        parent::__construct(
-            nodesToInsert: $nodesToInsert,
-            targetNodeClass: Use_::class,
-        );
-    }
-
-    public function leaveNode(Node $node): Node
-    {
-        return $node;
+    public function __construct(
+        protected array $imports,
+    ) {
     }
 
     public function afterTraverse(array $nodes): ?array
@@ -45,14 +34,17 @@ class AddImports extends AbstractInsertNodesVisitor
         return $nodes;
     }
 
-    /** @param Use_ $node */
-    protected function getChildNodes(Node $node): array
+    public function getInsertableNodes(): array
     {
-        return $node->uses;
+        return array_map(
+            fn ($import) => new Use_([new UseItem(new Name($import))]),
+            array_unique(array_filter($this->imports)),
+        );
     }
 
-    protected function getInsertableNode(string $name): Node
+    /** @param Use_ $node */
+    public function getSubNodes(Node $node): array
     {
-        return new Use_([new UseItem(new Name($name))]);
+        return $node->uses;
     }
 }
