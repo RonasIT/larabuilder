@@ -33,7 +33,7 @@ Each fluent method (e.g. `setProperty()`, `addImports()`) creates a visitor and 
 
 All code modifications happen through visitors that traverse the AST. The library uses two independent visitor hierarchies.
 
-### Class-based visitors (`AbstractBaseNodeVisitor`)
+### Class-based visitors (`AbstractNodeVisitor`)
 
 For modifying classes, traits, enums, etc. The base class handles:
 
@@ -47,7 +47,7 @@ For modifying classes, traits, enums, etc. The base class handles:
 
 A visitor may implement both contracts. In that case, update is attempted first — insertion happens only if no existing node matched.
 
-**Bulk insertion visitors** extend `InsertNodesAbstractVisitor` (which extends `AbstractBaseNodeVisitor`) and handle inserting multiple nodes with built-in duplicate filtering.
+**Bulk insertion visitors** extend `InsertNodesAbstractVisitor` (which extends `AbstractNodeVisitor`) and handle inserting multiple nodes with built-in duplicate filtering.
 
 ### App bootstrap visitors (`AbstractAppBootstrapVisitor`)
 
@@ -71,7 +71,7 @@ Located in `src/Support/`:
 
 ## Creating a New Visitor
 
-1. Extend `AbstractBaseNodeVisitor` (or `AbstractInsertNodesVisitor` for bulk insertions).
+1. Extend `AbstractNodeVisitor` (or `AbstractInsertNodesVisitor` for bulk insertions).
 2. Set `$allowedParentNodesTypes` to the node types your visitor targets.
 3. Implement `InsertNodeContract`, `UpdateNodeContract`, or both.
 4. Add a corresponding fluent method in `PHPFileBuilder` that creates and registers the visitor.

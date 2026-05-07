@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
 
-abstract class AbstractBaseNodeVisitor extends NodeVisitorAbstract
+abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 {
     protected const array ANY_TYPE = [];
 

@@ -11,7 +11,7 @@ use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\Node\Stmt\Use_;
 use RonasIT\Larabuilder\Support\NodeInserter;
 
-abstract class AbstractInsertNodesVisitor extends AbstractBaseNodeVisitor
+abstract class AbstractInsertNodesVisitor extends AbstractNodeVisitor
 {
     abstract protected function getInsertableNode(string $name): Node;
 

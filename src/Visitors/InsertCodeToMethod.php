@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
-class InsertCodeToMethod extends AbstractBaseNodeVisitor implements UpdateNodeContract
+class InsertCodeToMethod extends AbstractNodeVisitor implements UpdateNodeContract
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,
