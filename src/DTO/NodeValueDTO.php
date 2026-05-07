@@ -9,7 +9,7 @@ class NodeValueDTO
 {
     public function __construct(
         public readonly Expr $node,
-        public readonly Identifier $type,
+        public readonly Identifier $typeNode,
     ) {
     }
 }
