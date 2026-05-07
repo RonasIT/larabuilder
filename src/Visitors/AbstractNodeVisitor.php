@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
+use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
@@ -94,6 +95,17 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
                 }
             }
         }
+    }
+
+    protected function &getNamespaceStatements(array &$nodes): array
+    {
+        $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
+
+        if (!is_null($targetNamespace)) {
+            return $targetNamespace->stmts;
+        }
+
+        return $nodes;
     }
 
     /** @param Class_|Trait_|Enum_ $node */
