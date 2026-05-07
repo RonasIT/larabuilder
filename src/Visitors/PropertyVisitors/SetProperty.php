@@ -6,10 +6,14 @@ use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\DTO\NodeValueDTO;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Support\NodeValueFactory;
 
-class SetProperty extends AbstractPropertyVisitor
+class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
 {
+    protected NodeValueDTO $property;
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 
@@ -20,15 +24,14 @@ class SetProperty extends AbstractPropertyVisitor
     ) {
         parent::__construct($name);
 
-        list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+        $this->property = NodeValueFactory::make($value);
 
-        $this->propertyItem = $this->prepareNewNode(new PropertyItem($this->name, $propertyValue), $propertyValue);
-
-        $this->typeIdentifier = new Identifier($propertyType);
+        $this->propertyItem = new PropertyItem($this->name, $this->property->node);
+        $this->typeIdentifier = $this->property->typeNode;
     }
 
     /** @param Property $node */
-    protected function updateNode(Node $node): void
+    public function updateNode(Node $node): void
     {
         $node->props[0] = $this->propertyItem;
         $node->type = $this->typeIdentifier;
@@ -38,7 +41,7 @@ class SetProperty extends AbstractPropertyVisitor
         }
     }
 
-    protected function getInsertableNode(): Node
+    public function getInsertableNode(): Node
     {
         return new Property(
             flags: ($this->accessModifier ?? AccessModifierEnum::Public)->value,
