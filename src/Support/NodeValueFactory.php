@@ -9,41 +9,39 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\Float_;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
+use RonasIT\Larabuilder\DTO\NodeValueDTO;
 
-class ValueNodeFactory
+class NodeValueFactory
 {
-    public function makeNode(mixed $value): array
+    public static function make(mixed $value): NodeValueDTO
     {
         $type = get_debug_type($value);
 
-        $value = match ($type) {
+        $node = match ($type) {
             'int' => new Int_($value),
-            'array' => $this->makeArrayValue($value),
+            'array' => static::makeArrayValue($value),
             'string' => new String_($value),
             'float' => new Float_($value),
-            'bool' => $this->makeBoolValue($value),
+            'bool' => static::makeBoolValue($value),
             'null' => new ConstFetch(new Name('null')),
         };
 
-        return [$value, $type];
+        return new NodeValueDTO($node, $type);
     }
 
-    protected function makeBoolValue(bool $value): ConstFetch
+    protected static function makeBoolValue(bool $value): ConstFetch
     {
-        $name = new Name(($value) ? 'true' : 'false');
+        $name = new Name($value ? 'true' : 'false');
 
         return new ConstFetch($name);
     }
 
-    protected function makeArrayValue(array $values): Array_
+    protected static function makeArrayValue(array $values): Array_
     {
         $items = [];
 
         foreach ($values as $key => $val) {
-            list($val) = $this->makeNode($val);
-            list($key) = $this->makeNode($key);
-
-            $items[] = new ArrayItem($val, $key);
+            $items[] = new ArrayItem(static::make($val)->node, static::make($key)->node);
         }
 
         return new Array_($items);

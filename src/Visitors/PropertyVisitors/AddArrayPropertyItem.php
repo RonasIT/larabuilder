@@ -9,6 +9,7 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
+use RonasIT\Larabuilder\Support\NodeValueFactory;
 
 class AddArrayPropertyItem extends SetProperty
 {
@@ -20,9 +21,9 @@ class AddArrayPropertyItem extends SetProperty
     ) {
         parent::__construct($name, $value);
 
-        list($propertyValue, $propertyType) = $this->valueNodeFactory->makeNode($value);
+        $property = NodeValueFactory::make($value);
 
-        $this->arrayItem = new ArrayItem($propertyValue);
+        $this->arrayItem = new ArrayItem($property->node);
         $arrayNode = new Array_([$this->arrayItem]);
 
         $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $arrayNode), $arrayNode);

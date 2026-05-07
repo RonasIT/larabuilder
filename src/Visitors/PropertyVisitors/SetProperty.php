@@ -8,14 +8,13 @@ use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Support\NodeValueFactory;
 use RonasIT\Larabuilder\Support\ParentNodeLinker;
-use RonasIT\Larabuilder\Support\ValueNodeFactory;
 
 class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
 {
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
-    protected ValueNodeFactory $valueNodeFactory;
     protected ParentNodeLinker $parentNodeLinker;
 
     public function __construct(
@@ -25,14 +24,13 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
     ) {
         parent::__construct($name);
 
-        $this->valueNodeFactory = new ValueNodeFactory();
         $this->parentNodeLinker = new ParentNodeLinker();
 
-        list($propertyValue, $propertyType) = $this->valueNodeFactory->makeNode($value);
+        $property = NodeValueFactory::make($value);
 
-        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $propertyValue), $propertyValue);
+        $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $property->node), $property->node);
 
-        $this->typeIdentifier = new Identifier($propertyType);
+        $this->typeIdentifier = new Identifier($property->type);
     }
 
     /** @param Property $node */
