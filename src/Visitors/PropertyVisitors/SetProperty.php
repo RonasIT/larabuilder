@@ -5,37 +5,29 @@ namespace RonasIT\Larabuilder\Visitors\PropertyVisitors;
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
-use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\DTO\NodeValueDTO;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
-use RonasIT\Larabuilder\Traits\PropertyTrait;
-use RonasIT\Larabuilder\Visitors\BaseNodeVisitorAbstract;
+use RonasIT\Larabuilder\Support\NodeValueFactory;
 
-class SetProperty extends BaseNodeVisitorAbstract implements InsertNodeContract, UpdateNodeContract
+class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
 {
-    use PropertyTrait;
-
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-    ];
-
+    protected NodeValueDTO $property;
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
 
     public function __construct(
-        protected string $name,
+        string $name,
         mixed $value,
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
-        list($propertyValue, $propertyType) = $this->getPropertyValue($value);
+        parent::__construct($name);
 
-        $this->propertyItem = $this->prepareNewNode(new PropertyItem($this->name, $propertyValue), $propertyValue);
+        $this->property = NodeValueFactory::make($value);
 
-        $this->typeIdentifier = new Identifier($propertyType);
+        $this->propertyItem = new PropertyItem($this->name, $this->property->node);
+        $this->typeIdentifier = $this->property->typeNode;
     }
 
     /** @param Property $node */

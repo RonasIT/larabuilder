@@ -10,7 +10,7 @@ use PhpParser\Node\UseItem;
 use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
-class RemoveImports extends BaseNodeVisitorAbstract
+class RemoveImports extends AbstractNodeVisitor
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
