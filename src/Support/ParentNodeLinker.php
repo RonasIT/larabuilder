@@ -8,7 +8,7 @@ use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 class ParentNodeLinker
 {
-    public function setParent(mixed $parent, mixed $child): mixed
+    public function setParent(Node $parent, Node $child): mixed
     {
         $this->setParentForNode($child, $parent);
 

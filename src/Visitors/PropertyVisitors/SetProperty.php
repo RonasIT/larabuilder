@@ -7,12 +7,11 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
-use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Support\ParentNodeLinker;
 use RonasIT\Larabuilder\Support\ValueNodeFactory;
 
-class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract, UpdateNodeContract
+class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
 {
     protected PropertyItem $propertyItem;
     protected Identifier $typeIdentifier;
@@ -20,10 +19,12 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract,
     protected ParentNodeLinker $parentNodeLinker;
 
     public function __construct(
-        protected string $name,
+        string $name,
         mixed $value,
         protected ?AccessModifierEnum $accessModifier = null,
     ) {
+        parent::__construct($name);
+
         $this->valueNodeFactory = new ValueNodeFactory();
         $this->parentNodeLinker = new ParentNodeLinker();
 
@@ -32,12 +33,6 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract,
         $this->propertyItem = $this->parentNodeLinker->setParent(new PropertyItem($this->name, $propertyValue), $propertyValue);
 
         $this->typeIdentifier = new Identifier($propertyType);
-    }
-
-    public function shouldUpdateNode(Node $node): bool
-    {
-        return $node instanceof Property
-            && $this->name === $node->props[0]->name->name;
     }
 
     /** @param Property $node */
