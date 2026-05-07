@@ -25,7 +25,7 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
         $property = NodeValueFactory::make($value);
 
         $this->propertyItem = new PropertyItem($this->name, $property->node);
-        $this->typeIdentifier = new Identifier($property->type);
+        $this->typeIdentifier = $property->type;
     }
 
     /** @param Property $node */
