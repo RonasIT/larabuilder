@@ -10,7 +10,7 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 
-class AddTraits extends AbstractInsertNodesVisitor implements InsertNodesContract
+class AddTraits extends AbstractNodeVisitor implements InsertNodesContract
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,

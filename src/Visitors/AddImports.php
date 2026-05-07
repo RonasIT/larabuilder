@@ -9,7 +9,7 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 
-class AddImports extends AbstractInsertNodesVisitor implements InsertNodesContract
+class AddImports extends AbstractNodeVisitor implements InsertNodesContract
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 

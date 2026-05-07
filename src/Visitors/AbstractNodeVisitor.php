@@ -85,9 +85,6 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
     {
     }
 
-<<<<<<< HEAD:src/Visitors/BaseNodeVisitorAbstract.php
-    protected function insertNodes(array &$nodes): void
-=======
     protected function linkParents(Node $parent): void
     {
         foreach ($parent->getSubNodeNames() as $name) {
@@ -100,9 +97,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
         }
     }
 
-    /** @param Class_|Trait_|Enum_ $node */
-    private function insertNode(Node $node): Node
->>>>>>> origin/master:src/Visitors/AbstractNodeVisitor.php
+    protected function insertNodes(array &$nodes): void
     {
         $newNodes = match (true) {
             $this instanceof InsertNodesContract => $this->filterExistingNodes($nodes),
@@ -113,15 +108,13 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
         if (!empty($newNodes)) {
             $this->nodeInserter ??= new NodeInserter();
 
-<<<<<<< HEAD:src/Visitors/BaseNodeVisitorAbstract.php
-            $this->nodeInserter->insertNodes($nodes, $newNodes, true);
+            foreach ($newNodes as $newNode) {
+                $this->linkParents($newNode);
+            }
+
+            $this->nodeInserter->insertNodes($nodes, $newNodes);
         }
     }
-=======
-        $this->linkParents($newNode);
-
-        $this->nodeInserter->insertNodes($node->stmts, [$newNode]);
->>>>>>> origin/master:src/Visitors/AbstractNodeVisitor.php
 
     private function filterExistingNodes(array $nodes): array
     {
