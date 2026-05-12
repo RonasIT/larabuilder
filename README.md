@@ -55,6 +55,43 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 **Note:** Need to provide the full trait class name (FQCN); the method will import it automatically.
 
+#### addItemToReturnArray
+
+Add or update an item in the array returned by a method. Targets the top-level `return` statement of the method body. If a key is given and already exists, its value is updated; otherwise the item is appended. Works with classes, traits, and enums.
+
+```php
+new PHPFileBuilder(app_path('Models/User.php'))
+    ->addItemToReturnArray('casts', 'RoleEnum::class', 'role')
+    ->addItemToReturnArray('getAvailableRelations', 'logo')
+    ->save();
+```
+
+#### addMethod
+
+Add a new method to a class, trait, or enum. Throws `NodeAlreadyExistsException` if a method with the given name already exists.
+
+```php
+new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
+    ->addMethod(
+        name: 'delete',
+        code: '
+            $service->delete($id);
+            return response()->noContent();
+        ',
+        params: new MethodParams(
+            new MethodParam(name: 'request', type: 'DeleteRequest'),
+            new MethodParam(name: 'service', type: 'Service'),
+            new MethodParam(name: 'id', type: 'int'),
+        ),
+        returnType: 'Response',
+    )
+    ->save();
+```
+
+Each `MethodParam` accepts: `name`, `type` (e.g. `'int'`, `'?string'`, `'MyClass'`), `default` (`DefaultValue::None` to omit), `variadic`, `byRef`.
+
+`addMethod` also supports `static: true` and `returnsByRef: true` (for methods that return by reference, e.g. `public function &items(): array`).
+
 ## Special Laravel structure builders
 
 ### Bootstrap app
