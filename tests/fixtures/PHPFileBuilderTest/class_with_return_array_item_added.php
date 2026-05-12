@@ -5,8 +5,6 @@ namespace RonasIT\Larabuilder\Tests\Support;
 use RonasIT\Larabuilder\Tests\Support\FirstClass;
 use Some\SomeTrait;
 use RonasIT\Support\Traits\FirstTrait;
-use RonasIT\Support\Traits\SecondTrait;
-use RonasIT\Support\Traits\ThirdTrait;
 
 /**
  * Test
@@ -14,7 +12,6 @@ use RonasIT\Support\Traits\ThirdTrait;
 class SomeClass implements Test, Some
 {
     use FirstTrait, SecondTrait;
-    use ThirdTrait;
 
     public function __construct()
     {
@@ -42,6 +39,8 @@ class SomeClass implements Test, Some
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'created_at' => 'datetime',
+            'role' => RoleEnum::class,
         ];
     }
 
@@ -50,6 +49,7 @@ class SomeClass implements Test, Some
         return [
             'comments',
             'tags',
+            'logo',
         ];
     }
 }

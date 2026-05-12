@@ -7,14 +7,11 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
-use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
 class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeContract
 {
-    protected bool $hasTargetMethod = false;
-
     protected PreformattedCode $code;
     protected StatementDuplicateChecker $statementDuplicateChecker;
 
@@ -23,6 +20,8 @@ class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeCont
         string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
+        parent::__construct($methodName);
+
         $this->code = new PreformattedCode($code);
         $this->statementDuplicateChecker = new StatementDuplicateChecker();
     }
@@ -49,12 +48,5 @@ class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeCont
         $node->stmts = ($this->insertPosition === InsertPositionEnum::Start)
             ? [$this->code, ...$separator, ...$existingStmts]
             : [...$existingStmts, ...$separator, $this->code];
-    }
-
-    protected function updatableNodeNotFoundHook(): void
-    {
-        if (!$this->hasTargetMethod) {
-            throw new NodeNotExistException('Method', $this->methodName);
-        }
     }
 }
