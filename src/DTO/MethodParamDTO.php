@@ -1,10 +1,10 @@
 <?php
 
-namespace RonasIT\Larabuilder\ValueOptions;
+namespace RonasIT\Larabuilder\DTO;
 
 use RonasIT\Larabuilder\Enums\DefaultValue;
 
-class MethodParam
+class MethodParamDTO
 {
     public function __construct(
         public readonly string $name,

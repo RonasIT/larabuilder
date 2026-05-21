@@ -10,7 +10,7 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
-use RonasIT\Larabuilder\ValueOptions\MethodParams;
+use RonasIT\Larabuilder\ValueOptions\MethodParamsList;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\AddMethod;
@@ -83,7 +83,7 @@ class PHPFileBuilder
     public function addMethod(
         string $name,
         string $code,
-        MethodParams $params = new MethodParams(),
+        MethodParamsList $params = new MethodParamsList(),
         ?string $returnType = null,
         AccessModifierEnum $accessModifier = AccessModifierEnum::Public,
         bool $static = false,

@@ -4,6 +4,7 @@ namespace RonasIT\Larabuilder\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\Larabuilder\DTO\MethodParamDTO;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
@@ -13,8 +14,7 @@ use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
-use RonasIT\Larabuilder\ValueOptions\MethodParam;
-use RonasIT\Larabuilder\ValueOptions\MethodParams;
+use RonasIT\Larabuilder\ValueOptions\MethodParamsList;
 
 class PHPFileBuilderTest extends TestCase
 {
@@ -551,12 +551,12 @@ class PHPFileBuilderTest extends TestCase
 
                     return response()->json($user);
                 ',
-                params: new MethodParams(
-                    new MethodParam(name: 'request', type: 'StoreUserRequest'),
-                    new MethodParam(name: 'count', type: 'int', byRef: true),
-                    new MethodParam(name: 'search', type: '?string', default: null),
-                    new MethodParam(name: 'limit', type: 'int', default: 10),
-                    new MethodParam(name: 'ids', type: 'int', variadic: true),
+                params: new MethodParamsList(
+                    new MethodParamDTO(name: 'request', type: 'StoreUserRequest'),
+                    new MethodParamDTO(name: 'count', type: 'int', byRef: true),
+                    new MethodParamDTO(name: 'search', type: '?string', default: null),
+                    new MethodParamDTO(name: 'limit', type: 'int', default: 10),
+                    new MethodParamDTO(name: 'ids', type: 'int', variadic: true),
                 ),
                 returnType: 'JsonResponse',
             )
@@ -567,10 +567,10 @@ class PHPFileBuilderTest extends TestCase
 
                     return response()->noContent();
                 ',
-                params: new MethodParams(
-                    new MethodParam(name: 'request', type: 'DeleteUserRequest'),
-                    new MethodParam(name: 'service', type: 'UserService'),
-                    new MethodParam(name: 'id', type: 'int'),
+                params: new MethodParamsList(
+                    new MethodParamDTO(name: 'request', type: 'DeleteUserRequest'),
+                    new MethodParamDTO(name: 'service', type: 'UserService'),
+                    new MethodParamDTO(name: 'id', type: 'int'),
                 ),
                 returnType: 'Response',
             )
