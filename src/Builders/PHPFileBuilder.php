@@ -86,9 +86,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function removeClassAttribute(string $className, string $attributeName): self
+    public function removeClassAttribute(string $attributeName): self
     {
-        $this->traverser->addVisitor(new RemoveClassAttribute($className, $attributeName));
+        $this->traverser->addVisitor(new RemoveClassAttribute($attributeName));
 
         return $this;
     }

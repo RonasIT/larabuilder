@@ -6,7 +6,6 @@ use PhpParser\Node;
 use PhpParser\Node\Attribute;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 
 class RemoveClassAttribute extends AbstractNodeVisitor
 {
@@ -15,7 +14,6 @@ class RemoveClassAttribute extends AbstractNodeVisitor
     ];
 
     public function __construct(
-        protected string $className,
         protected string $attributeName,
     ) {
     }
@@ -23,18 +21,9 @@ class RemoveClassAttribute extends AbstractNodeVisitor
     protected function modify(Node $node): Node
     {
         /** @var Class_ $node */
-        $this->validateClassName($node);
-
         $this->removeMatchingAttributes($node);
 
         return $node;
-    }
-
-    protected function validateClassName(Class_ $node): void
-    {
-        if ($this->className !== $node->name->name) {
-            throw new NodeNotExistException('Class', $this->className);
-        }
     }
 
     protected function removeMatchingAttributes(Class_ $node): void

@@ -538,18 +538,7 @@ class PHPFileBuilderTest extends TestCase
         $this->assertExceptionThrew(InvalidStructureTypeException::class, "'RemoveClassAttribute' operation may only be applied to: Class.");
 
         new PHPFileBuilder($file)
-            ->removeClassAttribute('SomeClass', 'someAttribute')
-            ->save();
-    }
-
-    public function testRemoveClassAttributeWhenClassNotExist(): void
-    {
-        $file = $this->generateOriginalStructurePath('class_with_properties.php');
-
-        $this->assertExceptionThrew(NodeNotExistException::class, "Class 'AnotherClass' does not exist.");
-
-        new PHPFileBuilder($file)
-            ->removeClassAttribute('AnotherClass', 'someAttribute')
+            ->removeClassAttribute('someAttribute')
             ->save();
     }
 
@@ -563,8 +552,8 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->removeClassAttribute('SomeClass', 'MyAttribute')
-            ->removeClassAttribute('SomeClass', 'AnotherAttribute')
+            ->removeClassAttribute('MyAttribute')
+            ->removeClassAttribute('AnotherAttribute')
             ->save();
     }
 
@@ -578,7 +567,7 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->removeClassAttribute('SomeClass', 'MyAttribute')
+            ->removeClassAttribute('MyAttribute')
             ->save();
     }
 
@@ -591,7 +580,7 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->removeClassAttribute('SomeClass', 'MyAttribute')
+            ->removeClassAttribute('MyAttribute')
             ->save();
     }
 
@@ -605,7 +594,7 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->removeClassAttribute('SomeClass', 'NonExistentAttribute')
+            ->removeClassAttribute('NonExistentAttribute')
             ->save();
     }
 }
