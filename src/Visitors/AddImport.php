@@ -7,14 +7,14 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
-use RonasIT\Larabuilder\Contracts\InsertNodesContract;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 
-class AddImports extends AbstractNodeVisitor implements InsertNodesContract
+class AddImport extends AbstractNodeVisitor implements InsertNodeContract
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
     public function __construct(
-        protected array $imports,
+        protected string $import,
     ) {
     }
 
@@ -29,22 +29,30 @@ class AddImports extends AbstractNodeVisitor implements InsertNodesContract
             $targetNodes = &$nodes;
         }
 
-        $this->insertNodes($targetNodes);
+        $this->insertNode($targetNodes);
 
         return $nodes;
     }
 
-    public function getInsertableNodes(): array
+    public function getInsertableNode(): Node
     {
-        return array_map(
-            fn ($import) => new Use_([new UseItem(new Name($import))]),
-            array_unique(array_filter($this->imports)),
-        );
+        return new Use_([new UseItem(new Name($this->import))]);
     }
 
-    /** @param Use_ $node */
-    public function getSubNodes(Node $node): array
+    protected function isDuplicate(array $stmts): bool
     {
-        return $node->uses;
+        foreach ($stmts as $stmt) {
+            if (!($stmt instanceof Use_)) {
+                continue;
+            }
+
+            foreach ($stmt->uses as $useItem) {
+                if ($useItem->name->toString() === $this->import) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

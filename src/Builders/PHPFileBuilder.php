@@ -10,8 +10,8 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
-use RonasIT\Larabuilder\Visitors\AddImports;
-use RonasIT\Larabuilder\Visitors\AddTraits;
+use RonasIT\Larabuilder\Visitors\AddImport;
+use RonasIT\Larabuilder\Visitors\AddTrait;
 use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
@@ -64,14 +64,18 @@ class PHPFileBuilder
 
     public function addImports(array $imports): self
     {
-        $this->traverser->addVisitor(new AddImports($imports));
+        foreach ($imports as $import) {
+            $this->traverser->addVisitor(new AddImport($import));
+        }
 
         return $this;
     }
 
     public function addTraits(array $traits): self
     {
-        $this->traverser->addVisitor(new AddTraits($traits));
+        foreach ($traits as $trait) {
+            $this->traverser->addVisitor(new AddTrait($trait));
+        }
 
         $this->addImports($traits);
 

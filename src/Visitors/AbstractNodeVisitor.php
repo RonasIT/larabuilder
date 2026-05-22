@@ -9,7 +9,6 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
-use RonasIT\Larabuilder\Contracts\InsertNodesContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
@@ -76,13 +75,31 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
             $this->updatableNodeNotFoundHook();
         }
 
-        $this->insertNodes($node->stmts);
+        $this->insertNode($node->stmts);
 
         return $node;
     }
 
     protected function updatableNodeNotFoundHook(): void
     {
+    }
+
+    protected function insertNode(array &$stmts): void
+    {
+        if ($this instanceof InsertNodeContract && !$this->isDuplicate($stmts)) {
+            $this->nodeInserter ??= new NodeInserter();
+
+            $newNode = $this->getInsertableNode();
+
+            $this->linkParents($newNode);
+
+            $this->nodeInserter->insertNode($stmts, $newNode);
+        }
+    }
+
+    protected function isDuplicate(array $stmts): bool
+    {
+        return false;
     }
 
     protected function linkParents(Node $parent): void
@@ -95,52 +112,5 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
                 }
             }
         }
-    }
-
-    protected function insertNodes(array &$nodes): void
-    {
-        $newNodes = match (true) {
-            $this instanceof InsertNodesContract => $this->filterExistingNodes($nodes),
-            $this instanceof InsertNodeContract => [$this->getInsertableNode()],
-            default => null,
-        };
-
-        if (!empty($newNodes)) {
-            $this->nodeInserter ??= new NodeInserter();
-
-            foreach ($newNodes as $newNode) {
-                $this->linkParents($newNode);
-            }
-
-            $this->nodeInserter->insertNodes($nodes, $newNodes);
-        }
-    }
-
-    private function filterExistingNodes(array $nodes): array
-    {
-        $insertableNodes = $this->getInsertableNodes();
-
-        if (empty($insertableNodes)) {
-            return [];
-        }
-
-        $targetNodeClass = get_class($insertableNodes[0]);
-
-        $existingNames = [];
-
-        foreach ($nodes as $node) {
-            if (!($node instanceof $targetNodeClass)) {
-                continue;
-            }
-
-            foreach ($this->getSubNodes($node) as $childNode) {
-                $existingNames[] = (string) $childNode->name;
-            }
-        }
-
-        return array_values(array_filter(
-            $insertableNodes,
-            fn (Node $newNode) => !in_array((string) $this->getSubNodes($newNode)[0]->name, $existingNames),
-        ));
     }
 }

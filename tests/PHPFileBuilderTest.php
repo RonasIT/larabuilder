@@ -359,7 +359,7 @@ class PHPFileBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('interface.php');
 
-        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTraits' operation may only be applied to: Class, Trait, Enum.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTrait' operation may only be applied to: Class, Trait, Enum.");
 
         new PHPFileBuilder($file)
             ->addTraits([
