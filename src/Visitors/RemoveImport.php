@@ -10,14 +10,14 @@ use PhpParser\Node\UseItem;
 use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
-class RemoveImports extends AbstractNodeVisitor
+class RemoveImport extends AbstractNodeVisitor
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
     protected NodeFinder $nodeFinder;
 
     public function __construct(
-        protected array $imports,
+        protected string $import,
         protected bool $force = false,
     ) {
         $this->nodeFinder = new NodeFinder();
@@ -29,7 +29,7 @@ class RemoveImports extends AbstractNodeVisitor
 
         foreach ($targetNodes as $node) {
             if ($node instanceof Use_ || $node instanceof GroupUse) {
-                $this->removeTargetImports($node, $targetNodes);
+                $this->removeTargetImport($node, $targetNodes);
             }
         }
 
@@ -38,7 +38,7 @@ class RemoveImports extends AbstractNodeVisitor
         return $nodes;
     }
 
-    protected function removeTargetImports(Use_|GroupUse $node, array $targetNodes): void
+    protected function removeTargetImport(Use_|GroupUse $node, array $targetNodes): void
     {
         $prefix = $node instanceof GroupUse ? $node->prefix : null;
 
@@ -47,7 +47,7 @@ class RemoveImports extends AbstractNodeVisitor
 
     protected function shouldRemove(UseItem $useItem, array $targetNodes, ?Name $prefix = null): bool
     {
-        if (!in_array($this->resolveFqcn($useItem, $prefix), $this->imports)) {
+        if ($this->resolveFqcn($useItem, $prefix) !== $this->import) {
             return false;
         }
 
@@ -94,7 +94,7 @@ class RemoveImports extends AbstractNodeVisitor
 
     protected function hasUsageOf(string $name, array $nodes): bool
     {
-        return !empty($this->nodeFinder->find(
+        return !empty($this->nodeFinder->findFirst(
             $nodes,
             fn (Node $node) => $node instanceof Name && get_class($node) === Name::class && $node->getFirst() === $name,
         ));
