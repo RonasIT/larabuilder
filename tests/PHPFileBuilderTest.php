@@ -530,4 +530,18 @@ class PHPFileBuilderTest extends TestCase
             ->insertCodeToMethod('someMethod', $code)
             ->save();
     }
+
+    public function testRemoveMethod(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_method_removed.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeMethod('someMethod')
+            ->save();
+    }
 }

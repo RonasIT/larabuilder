@@ -55,6 +55,10 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 **Note:** Need to provide the full trait class name (FQCN); the method will import it automatically.
 
+#### removeMethod
+
+Remove method from a class, trait, enum.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app

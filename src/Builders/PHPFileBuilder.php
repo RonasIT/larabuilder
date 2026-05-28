@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Builders;
 
 use PhpParser\Error;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
@@ -16,6 +17,7 @@ use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
+use RonasIT\Larabuilder\Visitors\RemoveNode;
 
 class PHPFileBuilder
 {
@@ -81,6 +83,13 @@ class PHPFileBuilder
     public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
     {
         $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
+
+        return $this;
+    }
+
+    public function removeMethod(string $methodName): self
+    {
+        $this->traverser->addVisitor(new RemoveNode($methodName, ClassMethod::class));
 
         return $this;
     }
