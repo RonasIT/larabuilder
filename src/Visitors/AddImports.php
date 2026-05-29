@@ -24,7 +24,7 @@ class AddImports extends AbstractInsertNodesVisitor
         );
     }
 
-    public function leaveNode(Node $node): Node|int
+    public function leaveNode(Node $node): Node
     {
         return $node;
     }

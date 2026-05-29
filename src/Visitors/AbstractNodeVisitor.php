@@ -64,7 +64,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 
-    protected function modify(Node $node): Node|int
+    protected function modify(Node $node): Node
     {
         if ($this instanceof UpdateNodeContract) {
             /** @var Class_|Trait_|Enum_ $node */

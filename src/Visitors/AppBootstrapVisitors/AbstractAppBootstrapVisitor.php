@@ -38,7 +38,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         }
     }
 
-    public function leaveNode(Node $node): Node|int
+    public function leaveNode(Node $node): Node
     {
         if (!$node instanceof MethodCall) {
             return $node;

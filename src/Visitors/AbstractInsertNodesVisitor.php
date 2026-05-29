@@ -27,7 +27,7 @@ abstract class AbstractInsertNodesVisitor extends AbstractNodeVisitor
     }
 
     /** @param Class_|Enum_|Trait_ $node */
-    protected function modify(Node $node): Node|int
+    protected function modify(Node $node): Node
     {
         $this->insertNodes($node->stmts);
 

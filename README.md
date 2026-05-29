@@ -57,7 +57,7 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 #### removeMethod
 
-Remove method by name.
+Remove a method by name from a class, trait, enum, or interface.
 
 ## Special Laravel structure builders
 
