@@ -3,10 +3,10 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node\Stmt\ClassMethod;
-use RonasIT\Larabuilder\Contracts\DeleteNodeContract;
+use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
 use PhpParser\Node;
 
-class DeleteMethod extends AbstractNodeVisitor implements DeleteNodeContract
+class RemoveMethod extends AbstractNodeVisitor implements RemoveNodeContract
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
@@ -15,7 +15,7 @@ class DeleteMethod extends AbstractNodeVisitor implements DeleteNodeContract
     ) {
     }
 
-    public function shouldDeleteNode(Node $node): bool
+    public function shouldRemoveNode(Node $node): bool
     {
         return $node instanceof ClassMethod
             && $node->name->toString() === $this->name;

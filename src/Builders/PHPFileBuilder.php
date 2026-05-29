@@ -17,7 +17,7 @@ use RonasIT\Larabuilder\Visitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
-use RonasIT\Larabuilder\Visitors\DeleteMethod;
+use RonasIT\Larabuilder\Visitors\RemoveMethod;
 
 class PHPFileBuilder
 {
@@ -87,9 +87,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function deleteMethod(string $methodName): self
+    public function removeMethod(string $methodName): self
     {
-        $this->traverser->addVisitor(new DeleteMethod($methodName));
+        $this->traverser->addVisitor(new RemoveMethod($methodName));
 
         return $this;
     }
