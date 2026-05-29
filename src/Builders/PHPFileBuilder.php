@@ -3,7 +3,6 @@
 namespace RonasIT\Larabuilder\Builders;
 
 use PhpParser\Error;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;

@@ -11,13 +11,13 @@ class RemoveMethod extends AbstractNodeVisitor implements RemoveNodeContract
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
     public function __construct(
-        protected string $name,
+        protected string $methodName,
     ) {
     }
 
     public function shouldRemoveNode(Node $node): bool
     {
         return $node instanceof ClassMethod
-            && $node->name->toString() === $this->name;
+            && $node->name->toString() === $this->methodName;
     }
 }
