@@ -541,7 +541,7 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->removeMethod('someMethod')
+            ->deleteMethod('someMethod')
             ->save();
     }
 }

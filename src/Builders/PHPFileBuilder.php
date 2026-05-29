@@ -87,7 +87,7 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function removeMethod(string $methodName): self
+    public function deleteMethod(string $methodName): self
     {
         $this->traverser->addVisitor(new DeleteMethod($methodName));
 
