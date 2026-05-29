@@ -29,6 +29,10 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): Node|int
     {
+        if ($this instanceof DeleteNodeContract && $this->shouldDeleteNode($node)) {
+            return NodeVisitor::REMOVE_NODE;
+        }
+
         if ($this->isParentNode($node)) {
             $this->hasParentNode = true;
 

@@ -2,20 +2,13 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\Enum_;
-use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Contracts\DeleteNodeContract;
 use PhpParser\Node;
 
 class DeleteMethod extends AbstractNodeVisitor implements DeleteNodeContract
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-    ];
+    protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
     public function __construct(
         protected string $name,
