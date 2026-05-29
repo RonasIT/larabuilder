@@ -7,7 +7,9 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use RonasIT\Larabuilder\Contracts\DeleteNodeContract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
@@ -25,12 +27,16 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
     protected bool $hasParentNode = false;
     protected NodeInserter $nodeInserter;
 
-    public function leaveNode(Node $node): Node
+    public function leaveNode(Node $node): Node|int
     {
         if ($this->isParentNode($node)) {
             $this->hasParentNode = true;
 
             return $this->modify($node);
+        }
+
+        if ($this instanceof DeleteNodeContract && $this->shouldDeleteNode($node)) {
+            return NodeVisitor::REMOVE_NODE;
         }
 
         return $node;
@@ -58,7 +64,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 
-    protected function modify(Node $node): Node
+    protected function modify(Node $node): Node|int
     {
         if ($this instanceof UpdateNodeContract) {
             /** @var Class_|Trait_|Enum_ $node */
