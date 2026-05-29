@@ -39,10 +39,6 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
             return $this->modify($node);
         }
 
-        if ($this instanceof DeleteNodeContract && $this->shouldDeleteNode($node)) {
-            return NodeVisitor::REMOVE_NODE;
-        }
-
         return $node;
     }
 
