@@ -16,7 +16,7 @@ use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
 class InsertCodeToMethod extends AbstractNodeVisitor implements UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
+    public array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
         Enum_::class,

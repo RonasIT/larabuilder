@@ -20,9 +20,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 {
     protected const array ANY_TYPE = [];
 
-    abstract protected array $allowedParentNodesTypes {
-        get;
-    }
+    public array $allowedParentNodesTypes = self::ANY_TYPE;
 
     protected bool $hasParentNode = false;
     protected NodeInserter $nodeInserter;

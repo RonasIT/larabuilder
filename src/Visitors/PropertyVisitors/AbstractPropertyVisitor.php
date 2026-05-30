@@ -11,7 +11,7 @@ use RonasIT\Larabuilder\Visitors\AbstractNodeVisitor;
 
 abstract class AbstractPropertyVisitor extends AbstractNodeVisitor implements UpdateNodeContract
 {
-    protected array $allowedParentNodesTypes = [
+    public array $allowedParentNodesTypes = [
         Class_::class,
         Trait_::class,
     ];
