@@ -43,7 +43,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if ($this instanceof ShouldRestrictParentNodeTypes && !$this->hasParentNode) {
+        if (!empty($this->allowedParentNodesTypes) && !$this->hasParentNode) {
             throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
         }
 
@@ -60,10 +60,6 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function isParentNode(Node $node): bool
     {
-        if (!$this instanceof ShouldRestrictParentNodeTypes) {
-            return false;
-        }
-
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 
