@@ -4,11 +4,7 @@ namespace RonasIT\Larabuilder\Contracts;
 
 use PhpParser\Node;
 
-interface InsertNodeContract
+interface InsertNodeContract extends HasParentNodeTypesContract
 {
-    public array $allowedParentNodesTypes {
-        get;
-    }
-
     public function getInsertableNode(): Node;
 }

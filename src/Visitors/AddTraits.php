@@ -8,8 +8,9 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
+use RonasIT\Larabuilder\Contracts\HasParentNodeTypesContract;
 
-class AddTraits extends AbstractInsertNodesVisitor
+class AddTraits extends AbstractInsertNodesVisitor implements HasParentNodeTypesContract
 {
     public array $allowedParentNodesTypes = [
         Class_::class,

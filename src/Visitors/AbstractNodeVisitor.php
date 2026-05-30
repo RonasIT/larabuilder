@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use RonasIT\Larabuilder\Contracts\HasParentNodeTypesContract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
@@ -42,7 +43,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if (!empty($this->allowedParentNodesTypes) && !$this->hasParentNode) {
+        if ($this instanceof HasParentNodeTypesContract && !$this->hasParentNode) {
             throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
         }
 
@@ -59,6 +60,10 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function isParentNode(Node $node): bool
     {
+        if (!$this instanceof HasParentNodeTypesContract) {
+            return false;
+        }
+
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 

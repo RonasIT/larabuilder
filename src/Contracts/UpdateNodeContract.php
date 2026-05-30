@@ -4,12 +4,8 @@ namespace RonasIT\Larabuilder\Contracts;
 
 use PhpParser\Node;
 
-interface UpdateNodeContract
+interface UpdateNodeContract extends HasParentNodeTypesContract
 {
-    public array $allowedParentNodesTypes {
-        get;
-    }
-
     public function shouldUpdateNode(Node $node): bool;
 
     public function updateNode(Node $node): void;
