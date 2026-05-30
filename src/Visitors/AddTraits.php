@@ -12,11 +12,15 @@ use RonasIT\Larabuilder\Contracts\ShouldRestrictParentNodeTypes;
 
 class AddTraits extends AbstractInsertNodesVisitor implements ShouldRestrictParentNodeTypes
 {
-    public array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-    ];
+    public array $allowedParentNodesTypes {
+        get {
+            return [
+                Class_::class,
+                Trait_::class,
+                Enum_::class,
+            ];
+        }
+    }
 
     public function __construct(array $traits)
     {
@@ -41,4 +45,6 @@ class AddTraits extends AbstractInsertNodesVisitor implements ShouldRestrictPare
     {
         return new TraitUse([new Name($name)]);
     }
+
+
 }

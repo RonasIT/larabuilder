@@ -11,10 +11,14 @@ use RonasIT\Larabuilder\Visitors\AbstractNodeVisitor;
 
 abstract class AbstractPropertyVisitor extends AbstractNodeVisitor implements UpdateNodeContract
 {
-    public array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-    ];
+    public array $allowedParentNodesTypes {
+        get {
+            return [
+                Class_::class,
+                Trait_::class,
+            ];
+        }
+    }
 
     public function __construct(
         protected string $name,
