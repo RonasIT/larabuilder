@@ -10,9 +10,9 @@ use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\ShouldRestrictParentNodeTypes;
-use RonasIT\Larabuilder\Contracts\InsertNode;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
-use RonasIT\Larabuilder\Contracts\UpdateNode;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
@@ -69,7 +69,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function modify(Node $node): Node
     {
-        if ($this instanceof UpdateNode) {
+        if ($this instanceof UpdateNodeContract) {
             /** @var Class_|Trait_|Enum_ $node */
             foreach ($node->stmts as $stmt) {
                 if ($this->shouldUpdateNode($stmt)) {
@@ -84,7 +84,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
             $this->updatableNodeNotFoundHook();
         }
 
-        return ($this instanceof InsertNode)
+        return ($this instanceof InsertNodeContract)
             ? $this->insertNode($node)
             : $node;
     }

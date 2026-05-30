@@ -6,12 +6,12 @@ use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\Property;
-use RonasIT\Larabuilder\Contracts\InsertNode;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\DTO\NodeValueDTO;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Support\NodeValueFactory;
 
-class SetProperty extends AbstractPropertyVisitor implements InsertNode
+class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
 {
     protected NodeValueDTO $property;
     protected PropertyItem $propertyItem;

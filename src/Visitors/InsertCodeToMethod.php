@@ -8,13 +8,13 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
-use RonasIT\Larabuilder\Contracts\UpdateNode;
+use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
-class InsertCodeToMethod extends AbstractNodeVisitor implements UpdateNode
+class InsertCodeToMethod extends AbstractNodeVisitor implements UpdateNodeContract
 {
     public array $allowedParentNodesTypes = [
         Class_::class,
