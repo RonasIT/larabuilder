@@ -9,10 +9,10 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
-use RonasIT\Larabuilder\Contracts\HasParentNodeTypesContract;
-use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\ShouldRestrictParentNodeTypes;
+use RonasIT\Larabuilder\Contracts\InsertNode;
 use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
-use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
+use RonasIT\Larabuilder\Contracts\UpdateNode;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Support\NodeInserter;
@@ -43,7 +43,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if ($this instanceof HasParentNodeTypesContract && !$this->hasParentNode) {
+        if ($this instanceof ShouldRestrictParentNodeTypes && !$this->hasParentNode) {
             throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
         }
 
@@ -60,7 +60,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function isParentNode(Node $node): bool
     {
-        if (!$this instanceof HasParentNodeTypesContract) {
+        if (!$this instanceof ShouldRestrictParentNodeTypes) {
             return false;
         }
 
@@ -69,7 +69,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function modify(Node $node): Node
     {
-        if ($this instanceof UpdateNodeContract) {
+        if ($this instanceof UpdateNode) {
             /** @var Class_|Trait_|Enum_ $node */
             foreach ($node->stmts as $stmt) {
                 if ($this->shouldUpdateNode($stmt)) {
@@ -84,7 +84,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
             $this->updatableNodeNotFoundHook();
         }
 
-        return ($this instanceof InsertNodeContract)
+        return ($this instanceof InsertNode)
             ? $this->insertNode($node)
             : $node;
     }

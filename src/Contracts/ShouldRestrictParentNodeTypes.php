@@ -2,7 +2,7 @@
 
 namespace RonasIT\Larabuilder\Contracts;
 
-interface HasParentNodeTypesContract
+interface ShouldRestrictParentNodeTypes
 {
     public array $allowedParentNodesTypes {
         get;
