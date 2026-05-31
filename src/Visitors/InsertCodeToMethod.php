@@ -16,20 +16,16 @@ use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
 class InsertCodeToMethod extends AbstractNodeVisitor implements UpdateNodeContract
 {
+    protected array $allowedParentNodesTypes = [
+        Class_::class,
+        Trait_::class,
+        Enum_::class,
+    ];
+
     protected bool $hasTargetMethod = false;
 
     protected PreformattedCode $code;
     protected StatementDuplicateChecker $statementDuplicateChecker;
-
-    public array $allowedParentNodesTypes {
-        get {
-            return [
-                Class_::class,
-                Trait_::class,
-                Enum_::class,
-            ];
-        }
-    }
 
     public function __construct(
         protected string $methodName,
