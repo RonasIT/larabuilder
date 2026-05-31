@@ -4,7 +4,7 @@ namespace RonasIT\Larabuilder\Contracts;
 
 use PhpParser\Node;
 
-interface UpdateNodeContract
+interface UpdateNodeContract extends ShouldRestrictParentNodeTypes
 {
     public function shouldUpdateNode(Node $node): bool;
 
