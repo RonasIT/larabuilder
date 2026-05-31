@@ -44,7 +44,6 @@ For modifying classes, traits, enums, etc. The base class handles:
 
 - **`UpdateNodeContract`** — The visitor can update an existing node. Requires `shouldUpdateNode(Node): bool` and `updateNode(Node): void`. The base class iterates over child statements and calls `updateNode()` on the first match.
 - **`InsertNodeContract`** — The visitor can insert a new node. Requires `getInsertableNode(): Node`. The base class handles positioning (via `NodeInserter`) and empty line insertion.
-- **`RemoveNodeContract`** — The visitor can remove an existing node. Requires `shouldRemoveNode(Node): bool`. The base class iterates over child statements and removes the first matching node.
 
 A visitor may implement both contracts. In that case, update is attempted first — insertion happens only if no existing node matched.
 
