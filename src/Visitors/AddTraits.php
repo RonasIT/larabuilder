@@ -40,6 +40,4 @@ class AddTraits extends AbstractInsertNodesVisitor
     {
         return new TraitUse([new Name($name)]);
     }
-
-
 }
