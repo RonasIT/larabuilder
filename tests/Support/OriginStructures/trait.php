@@ -4,7 +4,8 @@ namespace RonasIT\Larabuilder\Tests\Support;
 
 use Some\AnotherTrait;
 
-trait SomeTrait {
+trait SomeTrait
+{
     public float $floatProperty;
 
     protected array $fillable = [
