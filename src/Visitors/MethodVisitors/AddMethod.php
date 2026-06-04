@@ -25,7 +25,7 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
         string $code,
         protected MethodParamsList $paramsList,
         protected ?string $returnType = null,
-        protected ?AccessModifierEnum $accessModifier = null,
+        protected AccessModifierEnum $accessModifier = AccessModifierEnum::Public,
         protected bool $isStatic = false,
         protected bool $isReturnsByRef = false,
     ) {
@@ -45,7 +45,7 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
 
     public function getInsertableNode(): Node
     {
-        $flags = ($this->accessModifier ?? AccessModifierEnum::Public)->value;
+        $flags = $this->accessModifier->value;
 
         if ($this->isStatic) {
             $flags |= Modifiers::STATIC;
@@ -64,8 +64,8 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
     {
         return array_map(fn (MethodParamDTO $param) => new Param(
             var: new Variable($param->name),
-            default: $param->default !== DefaultValue::None ? BuilderHelpers::normalizeValue($param->default) : null,
-            type: $param->type !== null ? BuilderHelpers::normalizeType($param->type) : null,
+            default: ($param->default !== DefaultValue::None) ? BuilderHelpers::normalizeValue($param->default) : null,
+            type: (!is_null($param->type)) ? BuilderHelpers::normalizeType($param->type) : null,
             byRef: $param->isReference,
             variadic: $param->isVariadic,
         ), $this->paramsList->toArray());
