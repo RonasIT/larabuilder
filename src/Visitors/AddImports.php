@@ -10,8 +10,6 @@ use PhpParser\Node\UseItem;
 
 class AddImports extends AbstractInsertNodesVisitor
 {
-    protected array $allowedParentNodesTypes = self::ANY_TYPE;
-
     public function __construct(array $imports)
     {
         $nodesToInsert = collect($imports)

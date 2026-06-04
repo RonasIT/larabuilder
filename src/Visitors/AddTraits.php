@@ -8,14 +8,19 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
+use RonasIT\Larabuilder\Contracts\ShouldRestrictParentNodeTypes;
 
-class AddTraits extends AbstractInsertNodesVisitor
+class AddTraits extends AbstractInsertNodesVisitor implements ShouldRestrictParentNodeTypes
 {
-    protected array $allowedParentNodesTypes = [
-        Class_::class,
-        Trait_::class,
-        Enum_::class,
-    ];
+    public array $allowedParentNodesTypes {
+        get {
+            return [
+                Class_::class,
+                Trait_::class,
+                Enum_::class,
+            ];
+        }
+    }
 
     public function __construct(array $traits)
     {
