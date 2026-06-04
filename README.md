@@ -55,6 +55,28 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 **Note:** Need to provide the full trait class name (FQCN); the method will import it automatically.
 
+#### addMethod
+
+Add a new method to a class, trait, or enum. Throws `NodeAlreadyExistsException` if a method with the given name already exists.
+
+```php
+new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
+    ->addMethod(
+        name: 'delete',
+        code: '
+            $service->delete($id);
+            return response()->noContent();
+        ',
+        params: new MethodParamsList(
+            new MethodParamDTO(name: 'request', type: 'DeleteRequest'),
+            new MethodParamDTO(name: 'service', type: 'UserService'),
+            new MethodParamDTO(name: 'id', type: 'int'),
+        ),
+        returnType: 'Response',
+    )
+    ->save();
+```
+
 #### removeMethod
 
 Remove a method by name from a class, trait, enum, or interface.
