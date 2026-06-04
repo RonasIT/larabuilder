@@ -44,7 +44,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if (!empty($allowedParentNodesTypes) && !$this->hasParentNode) {
+        if (!empty($this->allowedParentNodesTypes) && !$this->hasParentNode) {
             throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
         }
 
