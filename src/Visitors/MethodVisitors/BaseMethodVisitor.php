@@ -7,7 +7,7 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Visitors\AbstractNodeVisitor;
 
-abstract class AbstractMethodVisitor extends AbstractNodeVisitor
+abstract class BaseMethodVisitor extends AbstractNodeVisitor
 {
     protected array $allowedParentNodesTypes = [
         Class_::class,

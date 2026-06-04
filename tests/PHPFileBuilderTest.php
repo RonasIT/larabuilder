@@ -14,7 +14,7 @@ use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
-use RonasIT\Larabuilder\ValueOptions\MethodParamsList;
+use RonasIT\Larabuilder\DTO\MethodParamsList;
 
 class PHPFileBuilderTest extends TestCase
 {

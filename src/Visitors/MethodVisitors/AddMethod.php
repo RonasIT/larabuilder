@@ -14,9 +14,9 @@ use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
-use RonasIT\Larabuilder\ValueOptions\MethodParamsList;
+use RonasIT\Larabuilder\DTO\MethodParamsList;
 
-class AddMethod extends AbstractMethodVisitor implements InsertNodeContract
+class AddMethod extends BaseMethodVisitor implements InsertNodeContract
 {
     protected PreformattedCode $code;
 

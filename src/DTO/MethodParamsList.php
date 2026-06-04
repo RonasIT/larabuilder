@@ -1,12 +1,10 @@
 <?php
 
-namespace RonasIT\Larabuilder\ValueOptions;
-
-use RonasIT\Larabuilder\DTO\MethodParamDTO;
+namespace RonasIT\Larabuilder\DTO;
 
 class MethodParamsList
 {
-    public readonly array $params;
+    protected array $params;
 
     public function __construct(MethodParamDTO ...$params)
     {

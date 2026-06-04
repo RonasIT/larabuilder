@@ -11,7 +11,7 @@ use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
-class InsertCodeToMethod extends AbstractMethodVisitor implements UpdateNodeContract
+class InsertCodeToMethod extends BaseMethodVisitor implements UpdateNodeContract
 {
     protected bool $hasTargetMethod = false;
 
