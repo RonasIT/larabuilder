@@ -26,8 +26,8 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
         protected MethodParamsList $paramsList,
         protected ?string $returnType = null,
         protected ?AccessModifierEnum $accessModifier = null,
-        protected bool $static = false,
-        protected bool $returnsByRef = false,
+        protected bool $isStatic = false,
+        protected bool $isReturnsByRef = false,
     ) {
         $this->code = new PreformattedCode($code);
     }
@@ -47,13 +47,13 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
     {
         $flags = ($this->accessModifier ?? AccessModifierEnum::Public)->value;
 
-        if ($this->static) {
+        if ($this->isStatic) {
             $flags |= Modifiers::STATIC;
         }
 
         return new ClassMethod($this->name, [
             'flags' => $flags,
-            'byRef' => $this->returnsByRef,
+            'byRef' => $this->isReturnsByRef,
             'params' => $this->buildParams(),
             'returnType' => (!is_null($this->returnType)) ? BuilderHelpers::normalizeType($this->returnType) : null,
             'stmts' => [$this->code],

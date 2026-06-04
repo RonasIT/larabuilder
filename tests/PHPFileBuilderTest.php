@@ -608,7 +608,7 @@ class PHPFileBuilderTest extends TestCase
                 name: 'create',
                 code: 'return new static();',
                 returnType: 'static',
-                static: true,
+                isStatic: true,
             )
             ->save();
     }
@@ -645,7 +645,7 @@ class PHPFileBuilderTest extends TestCase
                 name: 'label',
                 code: 'return $this->name;',
                 returnType: 'string',
-                returnsByRef: true,
+                isReturnsByRef: true,
             )
             ->save();
     }
