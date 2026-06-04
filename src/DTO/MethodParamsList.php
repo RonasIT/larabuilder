@@ -2,7 +2,10 @@
 
 namespace RonasIT\Larabuilder\DTO;
 
-class MethodParamsList
+use Illuminate\Contracts\Support\Arrayable;
+
+/** @implements Arrayable<int, MethodParamDTO> */
+class MethodParamsList implements Arrayable
 {
     protected array $params;
 
