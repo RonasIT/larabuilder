@@ -86,10 +86,10 @@ class PHPFileBuilder
         MethodParamsList $params = new MethodParamsList(),
         ?string $returnType = null,
         AccessModifierEnum $accessModifier = AccessModifierEnum::Public,
-        bool $static = false,
-        bool $returnsByRef = false,
+        bool $isStatic = false,
+        bool $isReturnsByRef = false,
     ): self {
-        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $static, $returnsByRef));
+        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $isStatic, $isReturnsByRef));
 
         return $this;
     }
