@@ -4,14 +4,14 @@ namespace RonasIT\Larabuilder\DTO;
 
 use RonasIT\Larabuilder\Enums\DefaultValue;
 
-class MethodParamDTO
+readonly class MethodParamDTO
 {
     public function __construct(
-        public readonly string $name,
-        public readonly ?string $type = null,
-        public readonly mixed $default = DefaultValue::None,
-        public readonly bool $variadic = false,
-        public readonly bool $byRef = false,
+        public string $name,
+        public ?string $type = null,
+        public mixed $default = DefaultValue::None,
+        public bool $variadic = false,
+        public bool $byRef = false,
     ) {
     }
 }
