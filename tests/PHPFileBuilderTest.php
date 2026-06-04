@@ -690,7 +690,7 @@ class PHPFileBuilderTest extends TestCase
             [
                 'structure' => 'class.php',
                 'method' => 'save',
-                'result' => 'class_method_dont_removed.php',
+                'result' => 'class_method_wasnt_removed.php',
             ],
             [
                 'structure' => 'trait.php',
