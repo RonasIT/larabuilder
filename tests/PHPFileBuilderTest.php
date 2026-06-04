@@ -5,6 +5,7 @@ namespace RonasIT\Larabuilder\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
 use RonasIT\Larabuilder\DTO\MethodParamDTO;
+use RonasIT\Larabuilder\DTO\MethodParamsList;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
@@ -14,7 +15,6 @@ use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
-use RonasIT\Larabuilder\DTO\MethodParamsList;
 
 class PHPFileBuilderTest extends TestCase
 {

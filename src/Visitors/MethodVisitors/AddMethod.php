@@ -10,11 +10,11 @@ use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\DTO\MethodParamDTO;
+use RonasIT\Larabuilder\DTO\MethodParamsList;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
-use RonasIT\Larabuilder\DTO\MethodParamsList;
 
 class AddMethod extends BaseMethodVisitor implements InsertNodeContract
 {
