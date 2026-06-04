@@ -9,7 +9,6 @@ use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
-use RonasIT\Larabuilder\Contracts\ShouldRestrictParentNodeTypes;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
@@ -21,7 +20,9 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 {
     protected const array ANY_TYPE = [];
 
-    public array $allowedParentNodesTypes = self::ANY_TYPE;
+    abstract protected array $allowedParentNodesTypes {
+        get;
+    }
 
     protected bool $hasParentNode = false;
     protected NodeInserter $nodeInserter;
@@ -43,7 +44,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
-        if ($this instanceof ShouldRestrictParentNodeTypes && !$this->hasParentNode) {
+        if (!empty($allowedParentNodesTypes) && !$this->hasParentNode) {
             throw new InvalidStructureTypeException(class_basename(get_called_class()), $this->getReadableAllowedParentNodesTypes());
         }
 
@@ -60,10 +61,6 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function isParentNode(Node $node): bool
     {
-        if (!$this instanceof ShouldRestrictParentNodeTypes) {
-            return false;
-        }
-
         return array_any($this->allowedParentNodesTypes, fn ($type) => $node instanceof $type);
     }
 

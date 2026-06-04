@@ -8,6 +8,8 @@ use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
 
 class RemoveMethod extends AbstractNodeVisitor implements RemoveNodeContract
 {
+    protected array $allowedParentNodesTypes = self::ANY_TYPE;
+
     public function __construct(
         protected string $methodName,
     ) {
