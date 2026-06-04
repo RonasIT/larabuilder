@@ -553,10 +553,10 @@ class PHPFileBuilderTest extends TestCase
                 ',
                 params: new MethodParamsList(
                     new MethodParamDTO(name: 'request', type: 'StoreUserRequest'),
-                    new MethodParamDTO(name: 'count', type: 'int', byRef: true),
+                    new MethodParamDTO(name: 'count', type: 'int', isReference: true),
                     new MethodParamDTO(name: 'search', type: '?string', default: null),
                     new MethodParamDTO(name: 'limit', type: 'int', default: 10),
-                    new MethodParamDTO(name: 'ids', type: 'int', variadic: true),
+                    new MethodParamDTO(name: 'ids', type: 'int', isVariadic: true),
                 ),
                 returnType: 'JsonResponse',
             )

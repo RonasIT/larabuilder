@@ -66,8 +66,8 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
             var: new Variable($param->name),
             default: $param->default !== DefaultValue::None ? BuilderHelpers::normalizeValue($param->default) : null,
             type: $param->type !== null ? BuilderHelpers::normalizeType($param->type) : null,
-            byRef: $param->byRef,
-            variadic: $param->variadic,
+            byRef: $param->isReference,
+            variadic: $param->isVariadic,
         ), $this->paramsList->toArray());
     }
 }

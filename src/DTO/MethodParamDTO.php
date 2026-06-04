@@ -10,8 +10,8 @@ readonly class MethodParamDTO
         public string $name,
         public ?string $type = null,
         public mixed $default = DefaultValue::None,
-        public bool $variadic = false,
-        public bool $byRef = false,
+        public bool $isVariadic = false,
+        public bool $isReference = false,
     ) {
     }
 }
