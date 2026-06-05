@@ -79,7 +79,7 @@ new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
 
 #### removeClassAttribute
 
-Remove a [PHP attribute](https://www.php.net/manual/en/language.attributes.overview.php) from the specified class. If the class does not exist in the file a `NodeNotExistException` is thrown.
+Remove a [PHP attribute](https://www.php.net/manual/en/language.attributes.overview.php) from the class. If the class does not exist in the file a `NodeNotExistException` is thrown.
 
 ## Special Laravel structure builders
 
