@@ -126,7 +126,7 @@ class Printer extends Standard
 
     protected function pExpr_MethodCall(MethodCall $node): string
     {
-        if ($node->getAttribute('wasCreated')) {
+        if ($node->getAttribute(StatementAttributeEnum::WasCreated->value)) {
             $this->indent();
 
             $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $this->pMaybeMultiline($node->args) . ')';

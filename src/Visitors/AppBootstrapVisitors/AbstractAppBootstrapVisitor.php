@@ -14,10 +14,13 @@ use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
 abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
+    protected const string LAST_BOOTSTRAP_METHOD_NAME = 'create';
+
     protected const array FORBIDDEN_NODES = [
         Class_::class,
         Trait_::class,
@@ -25,9 +28,8 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         Enum_::class,
     ];
 
-    protected static array $existingParentNodes = [];
-
-    abstract protected function getInsertableNode(): Expression;
+    // Store the list of existed key bootstrap methods like withExceptions, withSchedule, etc.
+    protected static array $existingKeyMethods = [];
 
     public function __construct(
         protected string $parentMethod,
@@ -36,9 +38,12 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
     ) {
     }
 
+    abstract protected function getInsertableNode(): Expression;
+
+    // Clear key nodes list after all visitors complete traverse, to keep unique state for each file
     public function afterTraverse(array $nodes): ?array
     {
-        static::$existingParentNodes = [];
+        static::$existingKeyMethods = [];
 
         return null;
     }
@@ -52,18 +57,18 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof MethodCall && $node->name->toString() === $this->parentMethod) {
-            static::$existingParentNodes[] = $this->parentMethod;
+            static::$existingKeyMethods[] = $this->parentMethod;
         }
     }
 
     public function leaveNode(Node $node): Node
     {
-        if ($node instanceof MethodCall && $node->name->toString() === 'create') {
-            if (!in_array($this->parentMethod, static::$existingParentNodes)) {
+        if ($node instanceof MethodCall && $node->name->toString() === self::LAST_BOOTSTRAP_METHOD_NAME) {
+            if (!in_array($this->parentMethod, static::$existingKeyMethods)) {
                 $node = $this->insertParentNode($node);
             }
 
-            if ($node->var->getAttribute('wasCreated')) {
+            if ($node->var->getAttribute(StatementAttributeEnum::WasCreated->value)) {
                 $node->var = $this->handleParentNode($node->var);
             }
         }
@@ -81,7 +86,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
     protected function insertParentNode(Node $node): Node
     {
-        static::$existingParentNodes[] = $this->parentMethod;
+        static::$existingKeyMethods[] = $this->parentMethod;
 
         $closure = new Closure([
             'params' => $this->closureParams,
@@ -89,9 +94,9 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         ]);
 
         $parentCall = new MethodCall($node->var, new Identifier($this->parentMethod), [new Arg($closure)]);
-        $parentCall->setAttribute('wasCreated', true);
+        $parentCall->setAttribute(StatementAttributeEnum::WasCreated->value, true);
 
-        return new MethodCall($parentCall, new Identifier('create'));
+        return new MethodCall($parentCall, new Identifier(self::LAST_BOOTSTRAP_METHOD_NAME));
     }
 
     protected function handleParentNode(MethodCall $node): Node
@@ -132,7 +137,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         $currentStatements = $node->args[0]->value->stmts;
         $statement = $this->getInsertableNode();
 
-        if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
+        if (count($currentStatements) === 1 && head($currentStatements) instanceof Nop) {
             $node->args[0]->value->stmts = [$statement];
 
             return $node;
@@ -140,7 +145,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 
         $lastExistingStatement = end($currentStatements);
 
-        $statement->setAttribute('previous', $lastExistingStatement);
+        $statement->setAttribute(StatementAttributeEnum::Previous->value, $lastExistingStatement);
 
         $node->args[0]->value->stmts[] = $statement;
 

@@ -10,21 +10,15 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Expression;
-use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
-    protected Expression $renderStatement;
-
     public function __construct(
         protected string $exceptionClass,
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
-        $this->renderStatement = $this->buildRenderCall();
-
         parent::__construct(
             parentMethod: 'withExceptions',
             targetMethod: 'render',
@@ -37,23 +31,9 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         );
     }
 
-    protected function insertNode(MethodCall $node): MethodCall
+    protected function getInsertableNode(): Expression
     {
-        $currentStatements = $node->args[0]->value->stmts;
-
-        if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
-            $node->args[0]->value->stmts = [$this->renderStatement];
-
-            return $node;
-        }
-
-        $lastExistingStatement = end($currentStatements);
-
-        $this->renderStatement->setAttribute(StatementAttributeEnum::Previous->value, $lastExistingStatement);
-
-        $node->args[0]->value->stmts[] = $this->renderStatement;
-
-        return $node;
+        return $this->buildRenderCall();
     }
 
     protected function buildRenderCall(): Expression
@@ -102,10 +82,5 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
         $typeName = $paramType->toString();
 
         return $typeName === $this->exceptionClass || $typeName === class_basename($this->exceptionClass);
-    }
-
-    protected function getInsertableNode(): Expression
-    {
-        return $this->renderStatement;
     }
 }
