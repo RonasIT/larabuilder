@@ -18,6 +18,7 @@ use RonasIT\Larabuilder\Visitors\MethodVisitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
+use RonasIT\Larabuilder\Visitors\RemoveClassAttribute;
 
 class PHPFileBuilder
 {
@@ -97,6 +98,13 @@ class PHPFileBuilder
     public function insertCodeToMethod(string $methodName, string $code, InsertPositionEnum $position = InsertPositionEnum::End): self
     {
         $this->traverser->addVisitor(new InsertCodeToMethod($methodName, $code, $position));
+
+        return $this;
+    }
+
+    public function removeClassAttribute(string $attributeName): self
+    {
+        $this->traverser->addVisitor(new RemoveClassAttribute($attributeName));
 
         return $this;
     }
