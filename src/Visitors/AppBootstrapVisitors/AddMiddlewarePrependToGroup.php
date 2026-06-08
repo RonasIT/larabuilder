@@ -17,15 +17,13 @@ use PhpParser\Node\Stmt\Nop;
 
 class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 {
-    private const string methodName = 'prependToGroup';
-
     public function __construct(
         protected string $group,
         protected array $middlewares,
     ) {
         parent::__construct(
             parentMethod: 'withMiddleware',
-            targetMethod: 'render',
+            targetMethod: 'prependToGroup',
         );
     }
 
@@ -34,12 +32,12 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         /** @var Closure $closure */
         $closure = $node->args[0]->value;
 
-        $this->prepareClosure($closure);
+        $this->removeNopPlaceholder($closure);
 
-        $statementIndex = $this->findExistsMiddlewareGroupIndex($closure->stmts);
+        $statementIndex = $this->findMiddlewareGroupIndex($closure->stmts);
 
         if (is_null($statementIndex)) {
-            $closure->stmts[] = $this->buildRenderCall();
+            $closure->stmts[] = $this->buildPrependToGroupCall();
         } else {
             $this->updateMiddlewareGroupStatement($closure, $statementIndex);
         }
@@ -47,29 +45,29 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         return $node;
     }
 
-    protected function prepareClosure(Closure $closure): void
+    protected function removeNopPlaceholder(Closure $closure): void
     {
-        if (!empty($closure->stmts) && get_class(array_first($closure->stmts)) === Nop::class) {
+        if (!empty($closure->stmts) && array_first($closure->stmts) instanceof Nop) {
             array_shift($closure->stmts);
         }
     }
 
-    protected function findExistsMiddlewareGroupIndex(array $stmts): ?int
+    protected function findMiddlewareGroupIndex(array $stmts): ?int
     {
-        return array_find_key($stmts, function ($stmt) {
+        return array_find_key($stmts, function (Expression $stmt) {
             return !empty($stmt->expr->name)
-                && $stmt->expr->name->toString() === self::methodName
+                && $stmt->expr->name->toString() === $this->targetMethod
                 && $stmt->expr->args[0]->value->value === $this->group;
         });
     }
 
-    protected function updateMiddlewareGroupStatement(Closure $closure, int $indexForReplace): void
+    protected function updateMiddlewareGroupStatement(Closure $closure, int $groupIndex): void
     {
-        $originalMiddlewareList = $closure->stmts[$indexForReplace]->expr->args[1]->value->items;
+        $originalMiddlewareList = $closure->stmts[$groupIndex]->expr->args[1]->value->items;
 
-        $changedMiddlewareList = $this->mergeMiddlewares($originalMiddlewareList, $this->getMiddlewareList());
+        $merged = $this->mergeMiddlewares($originalMiddlewareList, $this->getMiddlewareList());
 
-        $closure->stmts[$indexForReplace]->expr->args[1]->value->items = $changedMiddlewareList;
+        $closure->stmts[$groupIndex]->expr->args[1]->value->items = $merged;
     }
 
     protected function mergeMiddlewares(array $originalMiddlewareList, array $newMiddlewareList): array
@@ -89,20 +87,22 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     private function isSameMiddleware(ArrayItem $newMiddleware, ArrayItem $originalMiddleware): bool
     {
-        $original = $originalMiddleware->value->class->name
-            ?? $originalMiddleware->value->value;
+        $original = ($originalMiddleware->value instanceof ClassConstFetch)
+            ? $originalMiddleware->value->class->name
+            : $originalMiddleware->value->value;
 
-        $new = $newMiddleware->value->class->name
-            ?? $newMiddleware->value->value;
+        $new = ($newMiddleware->value instanceof ClassConstFetch)
+            ? $newMiddleware->value->class->name
+            : $newMiddleware->value->value;
 
         return $original === $new;
     }
 
-    protected function buildRenderCall(): Expression
+    protected function buildPrependToGroupCall(): Expression
     {
         $middlewareList = $this->getMiddlewareList();
 
-        $methodCall = new MethodCall(new Variable('middleware'), new Identifier(self::methodName), [
+        $methodCall = new MethodCall(new Variable('middleware'), new Identifier($this->targetMethod), [
             new Arg(new String_($this->group)),
             new Arg(new Array_($middlewareList)),
         ]);
