@@ -180,6 +180,7 @@ class AppBootstrapBuilderTest extends TestCase
             ->addMiddlewarePrependToGroup('api', [
                 FakeClass::class,
                 'throttle:60,10',
+                'some_middleware',
             ])
             ->save();
     }
