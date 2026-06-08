@@ -149,15 +149,15 @@ class AppBootstrapBuilderTest extends TestCase
         );
 
         new AppBootstrapBuilder($file)
-            ->AddMiddlewarePrependToGroup(
+            ->addMiddlewarePrependToGroup(
                 group: 'api',
                 middleware: FakeClass::class,
             )
-            ->AddMiddlewarePrependToGroup(
+            ->addMiddlewarePrependToGroup(
                 group: 'api',
                 middleware: 'throttle:60,10',
             )
-            ->AddMiddlewarePrependToGroup(
+            ->addMiddlewarePrependToGroup(
                 group: 'web',
                 middleware: [
                     'throttle:10,10',
@@ -177,7 +177,7 @@ class AppBootstrapBuilderTest extends TestCase
         );
 
         new AppBootstrapBuilder($file)
-            ->AddMiddlewarePrependToGroup('api', [
+            ->addMiddlewarePrependToGroup('api', [
                 FakeClass::class,
                 'throttle:60,10',
             ])
