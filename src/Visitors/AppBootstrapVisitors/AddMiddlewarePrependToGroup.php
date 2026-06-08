@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
@@ -39,7 +40,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         if (is_null($statementIndex)) {
             $closure->stmts[] = $this->buildPrependToGroupCall();
         } else {
-            $this->updateMiddlewareGroupStatement($closure, $statementIndex);
+            $this->updateMiddlewareGroup($closure, $statementIndex);
         }
 
         return $node;
@@ -61,13 +62,18 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         });
     }
 
-    protected function updateMiddlewareGroupStatement(Closure $closure, int $groupIndex): void
+    protected function updateMiddlewareGroup(Closure $closure, int $groupIndex): void
     {
-        $originalMiddlewareList = $closure->stmts[$groupIndex]->expr->args[1]->value->items;
+        $originalMiddlewares = $closure->stmts[$groupIndex]->expr->args[1]->value->value
+            ?? $closure->stmts[$groupIndex]->expr->args[1]->value->items;
 
-        $merged = $this->mergeMiddlewares($originalMiddlewareList, $this->getMiddlewareList());
+        $originalMiddlewares = is_string($originalMiddlewares)
+            ? [$this->makeArrayItem($originalMiddlewares)]
+            : $originalMiddlewares;
 
-        $closure->stmts[$groupIndex]->expr->args[1]->value->items = $merged;
+        $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares, $this->getMiddlewareList());
+
+        $closure->stmts[$groupIndex]->expr->args[1] = $this->buildMiddlewareArg($mergedMiddlewares);
     }
 
     protected function mergeMiddlewares(array $originalMiddlewareList, array $newMiddlewareList): array
@@ -104,10 +110,15 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
         $methodCall = new MethodCall(new Variable('middleware'), new Identifier($this->targetMethod), [
             new Arg(new String_($this->group)),
-            new Arg(new Array_($middlewareList)),
+            $this->buildMiddlewareArg($middlewareList),
         ]);
 
         return new Expression($methodCall);
+    }
+
+    protected function buildMiddlewareArg(array $middlewares)
+    {
+        return new Arg(new Array_($middlewares));
     }
 
     protected function getMiddlewareList(): array

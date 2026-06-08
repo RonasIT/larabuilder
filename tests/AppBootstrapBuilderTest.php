@@ -184,4 +184,20 @@ class AppBootstrapBuilderTest extends TestCase
             ])
             ->save();
     }
+
+    public function testAddMiddlewarePrependToGroupMiddlewareExistsAsString()
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_with_prepend_group_as_string.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_with_prepend_group_as_string.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->addMiddlewarePrependToGroup('api', [
+                'some_middleware',
+            ])
+            ->save();
+    }
 }
