@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
-use Illuminate\Support\Arr;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
