@@ -8,7 +8,7 @@ use PhpParser\Node\Stmt\Trait_;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Visitors\AbstractNodeVisitor;
 
-abstract class AbstractMethodVisitor extends AbstractNodeVisitor
+abstract class BaseMethodVisitor extends AbstractNodeVisitor
 {
     protected bool $hasTargetMethod = false;
 

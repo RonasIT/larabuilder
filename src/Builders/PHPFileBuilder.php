@@ -5,13 +5,13 @@ namespace RonasIT\Larabuilder\Builders;
 use PhpParser\Error;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
+use RonasIT\Larabuilder\DTO\MethodParamsList;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
-use RonasIT\Larabuilder\ValueOptions\MethodParams;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\AddItemToReturnArray;
@@ -85,13 +85,13 @@ class PHPFileBuilder
     public function addMethod(
         string $name,
         string $code,
-        MethodParams $params = new MethodParams(),
+        MethodParamsList $params = new MethodParamsList(),
         ?string $returnType = null,
         AccessModifierEnum $accessModifier = AccessModifierEnum::Public,
-        bool $static = false,
-        bool $returnsByRef = false,
+        bool $isStatic = false,
+        bool $isReturnsByRef = false,
     ): self {
-        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $static, $returnsByRef));
+        $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $isStatic, $isReturnsByRef));
 
         return $this;
     }
