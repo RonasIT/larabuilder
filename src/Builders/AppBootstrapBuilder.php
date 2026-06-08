@@ -3,6 +3,7 @@
 namespace RonasIT\Larabuilder\Builders;
 
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
+use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddMiddlewarePrependToGroup;
 
 class AppBootstrapBuilder extends PHPFileBuilder
 {
@@ -22,6 +23,21 @@ class AppBootstrapBuilder extends PHPFileBuilder
         }
 
         $this->addImports($imports);
+
+        return $this;
+    }
+
+    public function addMiddlewarePrependToGroup(string $group, string|array $middleware): self
+    {
+        $middlewares = is_string($middleware) ? [$middleware] : $middleware;
+
+        $this->traverser->addVisitor(new AddMiddlewarePrependToGroup($group, $middlewares));
+
+        $imports = array_filter($middlewares, fn ($middleware) => class_exists($middleware));
+
+        if (!empty($imports)) {
+            $this->addImports($imports);
+        }
 
         return $this;
     }

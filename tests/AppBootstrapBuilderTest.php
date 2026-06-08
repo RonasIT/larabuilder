@@ -7,6 +7,8 @@ use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
+use RonasIT\Larabuilder\Tests\Support\Classes\FakeClass;
+use RonasIT\Larabuilder\Tests\Support\SomeClass;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -135,6 +137,51 @@ class AppBootstrapBuilderTest extends TestCase
                 exceptionClass: HttpException::class,
                 renderBody: 'return;',
             )
+            ->save();
+    }
+
+    public function testAddMiddlewarePrependToGroup()
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_empty.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_with_prepend_group.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->AddMiddlewarePrependToGroup(
+                group: 'api',
+                middleware: FakeClass::class,
+            )
+            ->AddMiddlewarePrependToGroup(
+                group: 'api',
+                middleware: 'throttle:60,10',
+            )
+            ->AddMiddlewarePrependToGroup(
+                group: 'web',
+                middleware: [
+                    'throttle:10,10',
+                    FakeClass::class,
+                ],
+            )
+            ->save();
+    }
+
+    public function testAddMiddlewarePrependToGroupExistsMiddlewares()
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_with_prepend_group.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'bootstrap_with_changed_prepend_group.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->AddMiddlewarePrependToGroup('api', [
+                FakeClass::class,
+                'throttle:60,10',
+            ])
             ->save();
     }
 }
