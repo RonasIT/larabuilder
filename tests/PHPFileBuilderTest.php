@@ -12,6 +12,7 @@ use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
 use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
+use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use RonasIT\Larabuilder\ValueOptions\MethodParam;
 use RonasIT\Larabuilder\ValueOptions\MethodParams;
@@ -676,6 +677,108 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addMethod('store', 'return;')
+            ->save();
+    }
+
+    public function testAddItemToReturnArray(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_return_array_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('casts', 'datetime', 'created_at')
+            ->addItemToReturnArray('casts', 'RoleEnum::class', 'role')
+            ->addItemToReturnArray('getAvailableRelations', 'logo')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayUpdatesExistingKey(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_return_array_item_updated.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('casts', 'encrypted', 'password')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayInTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('trait.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'trait_with_return_array_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('getUserData', "['admin', 'editor']", 'roles')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayInEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'enum_with_return_array_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('updatableStatuses', 'self::Second')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayThrowsOnNonArrayReturn(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'void'.");
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('someMethod', 'value', 'key')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayThrowsOnMethodNotFound(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('noMethod', 'value', 'key')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayNotClassTraitEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('interface.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddItemToReturnArray' operation may only be applied to: Class, Trait, Enum.");
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('casts', 'datetime', 'created_at')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayInvalidCode(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'??invalid\'.');
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('someMethod', '??invalid')
             ->save();
     }
 }
