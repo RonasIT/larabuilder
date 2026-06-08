@@ -112,7 +112,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     protected function getMiddlewareList(): array
     {
-        return array_map(fn($middleware) => $this->makeArrayItem($middleware), $this->middlewares);
+        return array_map(fn ($middleware) => $this->makeArrayItem($middleware), $this->middlewares);
     }
 
     protected function makeArrayItem(string $middleware): ArrayItem
