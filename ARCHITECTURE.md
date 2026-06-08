@@ -43,11 +43,9 @@ For modifying classes, traits, enums, etc. The base class handles:
 #### Contracts
 
 - **`UpdateNodeContract`** — The visitor can update an existing node. Requires `shouldUpdateNode(Node): bool` and `updateNode(Node): void`. The base class iterates over child statements and calls `updateNode()` on the first match.
-- **`InsertNodeContract`** — The visitor can insert a new node. Requires `getInsertableNode(): Node`. The base class handles positioning (via `NodeInserter`) and empty line insertion.
+- **`InsertNodeContract`** — The visitor inserts a single node. Requires `getInsertableNode(): Node`. The base class handles positioning (via `NodeInserter`) and empty line insertion.
 
-A visitor may implement both contracts. In that case, update is attempted first — insertion happens only if no existing node matched.
-
-**Bulk insertion visitors** extend `InsertNodesAbstractVisitor` (which extends `AbstractNodeVisitor`) and handle inserting multiple nodes with built-in duplicate filtering.
+A visitor may implement both contracts. Update is attempted first — insertion happens only if no existing node matched.
 
 ### App bootstrap visitors (`AbstractAppBootstrapVisitor`)
 
@@ -71,8 +69,10 @@ Located in `src/Support/`:
 
 ## Creating a New Visitor
 
-1. Extend `AbstractNodeVisitor` (or `AbstractInsertNodesVisitor` for bulk insertions).
+1. Extend `AbstractNodeVisitor`.
 2. Set `$allowedParentNodesTypes` to the node types your visitor targets.
-3. Implement `InsertNodeContract`, `UpdateNodeContract`, or both.
+3. Implement the appropriate contract(s):
+   - `InsertNodeContract` — for inserting a single node, implement `getInsertableNode(): Node`
+   - `UpdateNodeContract` — for updating an existing node, implement `shouldUpdateNode(Node): bool` and `updateNode(Node): void`
 4. Add a corresponding fluent method in `PHPFileBuilder` that creates and registers the visitor.
 5. Add fixture files and a test case.
