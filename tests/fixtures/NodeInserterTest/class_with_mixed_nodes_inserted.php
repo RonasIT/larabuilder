@@ -70,6 +70,20 @@ class SomeClass implements Test, Some
         ];
     }
 
+    public function viaQueues(): array
+    {
+        $shouldThrottle = function () {
+            return now()->isWeekend();
+        };
+
+        return [
+            ExpoChannel::class => $shouldThrottle
+                ? QueueEnum::Low
+                : QueueEnum::PushNotifications,
+            BroadcastChannel::class => QueueEnum::Broadcasts,
+        ];
+    }
+
     public function newMethod()
     {
     }

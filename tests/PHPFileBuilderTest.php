@@ -698,6 +698,7 @@ class PHPFileBuilderTest extends TestCase
             ->addItemToReturnArray('casts', 'true', 'is_active')
             ->addItemToReturnArray('casts', 'false', 'is_archived')
             ->addItemToReturnArray('getAvailableRelations', 'logo')
+            ->addItemToReturnArray('viaQueues', 'QueueEnum::Database', 'MailChannel::class')
             ->save();
     }
 

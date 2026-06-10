@@ -2,12 +2,13 @@
 
 namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
-use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
@@ -44,7 +45,7 @@ class AddItemToReturnArray extends BaseMethodVisitor implements UpdateNodeContra
 
     public function updateNode(Node $node): void
     {
-        $returnNodes = new NodeFinder()->findInstanceOf($node->stmts ?? [], Return_::class);
+        $returnNodes = $this->findReturnsInScope($node->stmts ?? []);
 
         if (count($returnNodes) > 1) {
             throw new MultipleReturnStatementsException($this->methodName);
@@ -76,5 +77,32 @@ class AddItemToReturnArray extends BaseMethodVisitor implements UpdateNodeContra
         }
 
         $returnNode->expr->items[] = new ArrayItem($this->valueExpr, $this->keyExpr);
+    }
+
+    protected function findReturnsInScope(array $nodes): array
+    {
+        $returns = [];
+
+        foreach ($nodes as $node) {
+            if ($node instanceof Return_) {
+                $returns[] = $node;
+
+                continue;
+            }
+
+            if ($node instanceof FunctionLike) {
+                continue;
+            }
+
+            foreach ($node->getSubNodeNames() as $name) {
+                foreach (Arr::wrap($node->$name) as $child) {
+                    if ($child instanceof Node) {
+                        $returns = [...$returns, ...$this->findReturnsInScope([$child])];
+                    }
+                }
+            }
+        }
+
+        return $returns;
     }
 }
