@@ -5,8 +5,6 @@ namespace RonasIT\Larabuilder\Nodes;
 use Illuminate\Support\Str;
 use PhpParser\Error;
 use PhpParser\Node\Expr;
-use PhpParser\Node\Expr\ConstFetch;
-use PhpParser\Node\Stmt\Expression;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 
@@ -15,19 +13,21 @@ use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
  */
 class PreformattedExpression extends Expr
 {
-    public readonly array $code;
-
     public function __construct(
         public string $value,
         public array $attributes = [],
     ) {
         parent::__construct($this->attributes);
 
-        $this->value = Str::chopStart($this->value, '<?php');
-        $this->value = trim($this->value);
-        $this->value = Str::chopEnd($this->value, ';');
+        if ($this->isPlainStringValue($value)) {
+            $this->value = "'{$value}'";
+        } else {
+            $this->value = Str::chopStart($this->value, '<?php');
+            $this->value = trim($this->value);
+            $this->value = Str::chopEnd($this->value, ';');
 
-        $this->code = $this->parsePHPCode($this->value);
+            $this->validatePHPCode($this->value);
+        }
     }
 
     public function getSubNodeNames(): array
@@ -40,21 +40,16 @@ class PreformattedExpression extends Expr
         return 'Expr_PreformattedExpression';
     }
 
-    protected function parsePHPCode(string $code): array
+    protected function isPlainStringValue(string $value): bool
+    {
+        return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value) === 1
+            && !in_array(strtolower($value), ['null', 'true', 'false']);
+    }
+
+    protected function validatePHPCode(string $code): void
     {
         try {
-            $stmts = new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}?>");
-
-            if (
-                count($stmts) === 1
-                && $stmts[0] instanceof Expression
-                && $stmts[0]->expr instanceof ConstFetch
-                && !in_array(strtolower($stmts[0]->expr->name->name), ['null', 'true', 'false'])
-            ) {
-                $this->value = "'{$code}'";
-            }
-
-            return $stmts;
+            new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}?>");
         } catch (Error) {
             throw new InvalidPHPCodeException($code);
         }

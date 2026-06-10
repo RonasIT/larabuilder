@@ -693,6 +693,10 @@ class PHPFileBuilderTest extends TestCase
         new PHPFileBuilder($file)
             ->addItemToReturnArray('casts', 'datetime', 'created_at')
             ->addItemToReturnArray('casts', 'RoleEnum::class', 'role')
+            ->addItemToReturnArray('casts', 'array', 'settings')
+            ->addItemToReturnArray('casts', 'null', 'deleted_at')
+            ->addItemToReturnArray('casts', 'true', 'is_active')
+            ->addItemToReturnArray('casts', 'false', 'is_archived')
             ->addItemToReturnArray('getAvailableRelations', 'logo')
             ->save();
     }

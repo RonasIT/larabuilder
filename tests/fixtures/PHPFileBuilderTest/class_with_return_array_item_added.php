@@ -41,6 +41,10 @@ class SomeClass implements Test, Some
             'password' => 'hashed',
             'created_at' => 'datetime',
             'role' => RoleEnum::class,
+            'settings' => 'array',
+            'deleted_at' => null,
+            'is_active' => true,
+            'is_archived' => false,
         ];
     }
 
