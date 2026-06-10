@@ -24,6 +24,8 @@ class PreformattedExpression extends Expr
         parent::__construct($this->attributes);
 
         $this->value = Str::chopStart($this->value, '<?php');
+        $this->value = trim($this->value);
+        $this->value = Str::chopEnd($this->value, ';');
 
         $this->code = $this->parsePHPCode($this->value);
     }
@@ -41,7 +43,7 @@ class PreformattedExpression extends Expr
     protected function parsePHPCode(string $code): array
     {
         try {
-            $stmts = new ParserFactory()->createForHostVersion()->parse("<?php\n{$code};");
+            $stmts = new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}?>");
 
             if (
                 count($stmts) === 1
