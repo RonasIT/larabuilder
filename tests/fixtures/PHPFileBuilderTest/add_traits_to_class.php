@@ -52,4 +52,16 @@ class SomeClass implements Test, Some
             'tags',
         ];
     }
+
+    protected function getRelations(): array
+    {
+        if ($this->isGuest) {
+            return ['name' => 'Guest'];
+        }
+
+        return [
+            'comments',
+            'tags',
+        ];
+    }
 }

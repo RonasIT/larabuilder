@@ -40,10 +40,6 @@ trait SomeTrait {
 
     protected function getUserData(): array
     {
-        if ($this->isGuest) {
-            return ['name' => 'Guest'];
-        }
-
         return [
             'name' => 'John',
             'email' => 'john@example.com',

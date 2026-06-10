@@ -7,8 +7,10 @@ use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
+use PhpParser\NodeFinder;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\DefaultValue;
+use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 use RonasIT\Larabuilder\Printer;
@@ -42,7 +44,13 @@ class AddItemToReturnArray extends BaseMethodVisitor implements UpdateNodeContra
 
     public function updateNode(Node $node): void
     {
-        $returnNode = array_find(array_reverse($node->stmts ?? []), fn ($stmt) => $stmt instanceof Return_);
+        $returnNodes = new NodeFinder()->findInstanceOf($node->stmts ?? [], Return_::class);
+
+        if (count($returnNodes) > 1) {
+            throw new MultipleReturnStatementsException($this->methodName);
+        }
+
+        $returnNode = $returnNodes[0] ?? null;
 
         if (!$returnNode?->expr instanceof Array_) {
             throw new UnexpectedReturnTypeException($this->methodName, 'array', $node->returnType?->toString());

@@ -11,6 +11,7 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
+use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
@@ -746,6 +747,17 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addItemToReturnArray('someMethod', 'value', 'key')
+            ->save();
+    }
+
+    public function testAddItemToReturnArrayThrowsOnMultipleReturnStatements(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(MultipleReturnStatementsException::class, "Method 'getRelations' contains multiple return statements.");
+
+        new PHPFileBuilder($file)
+            ->addItemToReturnArray('getRelations', 'admin')
             ->save();
     }
 

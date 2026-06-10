@@ -57,7 +57,7 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 #### addItemToReturnArray
 
-Add or update an item in the array returned by a method. Targets the top-level `return` statement of the method body. If a key is given and already exists, its value is updated; otherwise the item is appended. Works with classes, traits, and enums.
+Add or update an item in the array returned by a method. The method must have a single `return` statement with an array literal. If a key is given and already exists, its value is updated; otherwise the item is appended. Works with classes, traits, and enums.
 
 ```php
 new PHPFileBuilder(app_path('Models/User.php'))
