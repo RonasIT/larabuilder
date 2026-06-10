@@ -52,4 +52,12 @@ trait SomeTrait {
             'value' => $value,
         ]);
     }
+
+    protected function getUserData(): array
+    {
+        return [
+            'name' => 'John',
+            'email' => 'john@example.com',
+        ];
+    }
 }

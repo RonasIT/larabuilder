@@ -40,11 +40,7 @@ trait SomeTrait {
         return [
             'name' => 'John',
             'email' => 'john@example.com',
+            'roles' => ['admin', 'editor'],
         ];
-    }
-
-    public function handle(): bool
-    {
-        return $this->process();
     }
 }
