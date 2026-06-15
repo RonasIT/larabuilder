@@ -73,27 +73,25 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
             ? [new ArrayItem($closure->stmts[$groupIndex]->expr->args[1]->value)]
             : $originalMiddlewares;
 
-        $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares, $this->getMiddlewareList());
+        $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares);
 
         $closure->stmts[$groupIndex]->expr->args[1] = $this->buildMiddlewareArg($mergedMiddlewares);
     }
 
-    protected function mergeMiddlewares(array $originalMiddlewareList, array $newMiddlewareList): array
+    protected function mergeMiddlewares(array $originalMiddlewareList): array
     {
         $filteredNewList = [];
 
-        foreach ($newMiddlewareList as $newMiddleware) {
+        foreach ($this->middlewares as $middleware) {
             $sameMiddlewareKey = array_find_key(
                 $originalMiddlewareList,
-                fn ($originalMiddleware) => $this->isSameMiddleware($newMiddleware, $originalMiddleware),
+                fn ($originalMiddleware) => $this->isSameMiddleware($middleware, $originalMiddleware),
             );
 
             if (!is_null($sameMiddlewareKey)) {
                 $this->normalizeMiddleware($originalMiddlewareList[$sameMiddlewareKey]);
             } else {
-                $this->normalizeMiddleware($newMiddleware);
-
-                $filteredNewList[] = $newMiddleware;
+                $filteredNewList[] = $this->makeArrayItem($middleware);
             }
         }
 
@@ -103,17 +101,16 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         };
     }
 
-    private function isSameMiddleware(ArrayItem $newMiddleware, ArrayItem $originalMiddleware): bool
+    private function isSameMiddleware(string $newMiddleware, ArrayItem $originalMiddleware): bool
     {
-        $original = ($originalMiddleware->value instanceof ClassConstFetch)
-            ? class_basename($originalMiddleware->value->class->name)
-            : $originalMiddleware->value->value;
+        if ($originalMiddleware->value instanceof ClassConstFetch) {
+            $originalName = $originalMiddleware->value->class->toString();
 
-        $new = ($newMiddleware->value instanceof ClassConstFetch)
-            ? class_basename($newMiddleware->value->class->name)
-            : $newMiddleware->value->value;
+            return $originalName === $newMiddleware
+                || $originalName === class_basename($newMiddleware);
+        }
 
-        return $original === $new;
+        return $originalMiddleware->value->value === $newMiddleware;
     }
 
     protected function normalizeMiddleware(ArrayItem $middleware): void
