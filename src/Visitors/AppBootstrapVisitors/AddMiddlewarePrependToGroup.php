@@ -89,29 +89,18 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
             );
 
             if (!is_null($sameMiddlewareKey)) {
-                if ($originalMiddlewareList[$sameMiddlewareKey]->value instanceof ClassConstFetch) {
-                    $this->setClassBaseName($originalMiddlewareList[$sameMiddlewareKey]->value);
-                }
+                $this->normalizeMiddleware($originalMiddlewareList[$sameMiddlewareKey]);
+            } else {
+                $this->normalizeMiddleware($newMiddleware);
 
-                continue;
+                $filteredNewList[] = $newMiddleware;
             }
-
-            if ($newMiddleware->value instanceof ClassConstFetch) {
-                $this->setClassBaseName($newMiddleware->value);
-            }
-
-            $filteredNewList[] = $newMiddleware;
         }
 
         return match ($this->position) {
             InsertPositionEnum::Start => [...$filteredNewList, ...$originalMiddlewareList],
             InsertPositionEnum::End => [...$originalMiddlewareList, ...$filteredNewList],
         };
-    }
-
-    protected function setClassBaseName(ClassConstFetch $class): void
-    {
-        $class->class->name = class_basename($class->class->name);
     }
 
     private function isSameMiddleware(ArrayItem $newMiddleware, ArrayItem $originalMiddleware): bool
@@ -125,6 +114,18 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
             : $newMiddleware->value->value;
 
         return $original === $new;
+    }
+
+    protected function normalizeMiddleware(ArrayItem $middleware): void
+    {
+        if ($middleware->value instanceof ClassConstFetch) {
+            $this->setClassBaseName($middleware->value);
+        }
+    }
+
+    protected function setClassBaseName(ClassConstFetch $class): void
+    {
+        $class->class->name = class_basename($class->class->name);
     }
 
     protected function buildPrependToGroupCall(): Expression
