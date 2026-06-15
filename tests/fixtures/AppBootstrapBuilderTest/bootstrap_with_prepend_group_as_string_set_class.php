@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use RonasIT\Larabuilder\Tests\Support\Classes\FakeClass;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,8 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prependToGroup('api', ['throttle:60,10', FakeClass::class]);
-        $middleware->prependToGroup('web', ['throttle:10,10', FakeClass::class]);
+        $middleware->prependToGroup('api', [Illuminate\Auth\Middleware\Authenticate::class, 'some_middleware']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

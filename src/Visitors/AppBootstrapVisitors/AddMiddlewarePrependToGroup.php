@@ -14,12 +14,14 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
+use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 
 class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 {
     public function __construct(
         protected string $group,
         protected array $middlewares,
+        protected InsertPositionEnum $position,
     ) {
         parent::__construct(
             parentMethod: 'withMiddleware',
@@ -47,7 +49,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     protected function removeNopPlaceholder(Closure $closure): void
     {
-        if (!empty($closure->stmts) && array_first($closure->stmts) instanceof Nop) {
+        if (!empty($closure->stmts) && ($closure->stmts[0] ?? null) instanceof Nop) {
             array_shift($closure->stmts);
         }
     }
@@ -64,40 +66,64 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
     protected function updateMiddlewareGroup(Closure $closure, int $groupIndex): void
     {
         $originalMiddlewares = $closure->stmts[$groupIndex]->expr->args[1]->value->value
+            ?? $closure->stmts[$groupIndex]->expr->args[1]->value->class->name
             ?? $closure->stmts[$groupIndex]->expr->args[1]->value->items;
 
         $originalMiddlewares = is_string($originalMiddlewares)
-            ? [$this->makeArrayItem($originalMiddlewares)]
+            ? [new ArrayItem($closure->stmts[$groupIndex]->expr->args[1]->value)]
             : $originalMiddlewares;
 
         $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares, $this->getMiddlewareList());
+
+        $this->collection = $mergedMiddlewares;
 
         $closure->stmts[$groupIndex]->expr->args[1] = $this->buildMiddlewareArg($mergedMiddlewares);
     }
 
     protected function mergeMiddlewares(array $originalMiddlewareList, array $newMiddlewareList): array
     {
-        $filteredNewList = array_filter($newMiddlewareList, function ($newMiddleware) use ($originalMiddlewareList) {
-            foreach ($originalMiddlewareList as $originalMiddleware) {
-                if ($this->isSameMiddleware($newMiddleware, $originalMiddleware)) {
-                    return false;
+        $filteredNewList = [];
+
+        foreach ($newMiddlewareList as $newMiddleware) {
+            $sameMiddlewareKey = array_find_key(
+                $originalMiddlewareList,
+                fn ($originalMiddleware) => $this->isSameMiddleware($newMiddleware, $originalMiddleware),
+            );
+
+            if (!is_null($sameMiddlewareKey)) {
+                if ($originalMiddlewareList[$sameMiddlewareKey]->value instanceof ClassConstFetch) {
+                    $this->setClassBaseName($originalMiddlewareList[$sameMiddlewareKey]->value);
                 }
+
+                continue;
             }
 
-            return true;
-        });
+            if ($newMiddleware->value instanceof ClassConstFetch) {
+                $this->setClassBaseName($newMiddleware->value);
+            }
 
-        return [...$originalMiddlewareList, ...$filteredNewList];
+            $filteredNewList[] = $newMiddleware;
+        }
+
+        return match ($this->position) {
+            InsertPositionEnum::Start => [...$filteredNewList, ...$originalMiddlewareList],
+            InsertPositionEnum::End => [...$originalMiddlewareList, ...$filteredNewList],
+        };
+    }
+
+    protected function setClassBaseName(ClassConstFetch $class): void
+    {
+        $class->class->name = class_basename($class->class->name);
     }
 
     private function isSameMiddleware(ArrayItem $newMiddleware, ArrayItem $originalMiddleware): bool
     {
         $original = ($originalMiddleware->value instanceof ClassConstFetch)
-            ? $originalMiddleware->value->class->name
+            ? class_basename($originalMiddleware->value->class->name)
             : $originalMiddleware->value->value;
 
         $new = ($newMiddleware->value instanceof ClassConstFetch)
-            ? $newMiddleware->value->class->name
+            ? class_basename($newMiddleware->value->class->name)
             : $newMiddleware->value->value;
 
         return $original === $new;
@@ -115,7 +141,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         return new Expression($methodCall);
     }
 
-    protected function buildMiddlewareArg(array $middlewares)
+    protected function buildMiddlewareArg(array $middlewares): Arg
     {
         return new Arg(new Array_($middlewares));
     }

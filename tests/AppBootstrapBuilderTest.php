@@ -2,9 +2,11 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
+use Illuminate\Auth\Middleware\Authenticate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Larabuilder\Builders\AppBootstrapBuilder;
+use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Tests\Support\Classes\FakeClass;
@@ -156,6 +158,7 @@ class AppBootstrapBuilderTest extends TestCase
             ->addMiddlewarePrependToGroup(
                 group: 'api',
                 middleware: 'throttle:60,10',
+                position: InsertPositionEnum::Start,
             )
             ->addMiddlewarePrependToGroup(
                 group: 'web',
@@ -181,18 +184,31 @@ class AppBootstrapBuilderTest extends TestCase
                 FakeClass::class,
                 'throttle:60,10',
                 'some_middleware',
+                Authenticate::class,
             ])
             ->save();
     }
 
-    public function testAddMiddlewarePrependToGroupMiddlewareExistsAsString()
+    public static function provideMiddlewareAsString(): array
     {
-        $file = $this->generateOriginalStructurePath('bootstrap_with_prepend_group_as_string.php');
+        return [
+            [
+                'original' => 'bootstrap_with_prepend_group_as_string.php',
+                'result' => 'bootstrap_with_prepend_group_as_string.php',
+            ],
+            [
+                'original' => 'bootstrap_with_prepend_group_as_string_set_class.php',
+                'result' => 'bootstrap_with_prepend_group_as_string_set_class.php',
+            ],
+        ];
+    }
 
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'bootstrap_with_prepend_group_as_string.php'),
-        );
+    #[DataProvider('provideMiddlewareAsString')]
+    public function testAddMiddlewarePrependToGroupMiddlewareAsString(string $original, string $result): void
+    {
+        $file = $this->generateOriginalStructurePath($original);
+
+        $this->mockNativeFunction('RonasIT\Larabuilder\Builders', $this->callFilePutContent($file, $result));
 
         new AppBootstrapBuilder($file)
             ->addMiddlewarePrependToGroup('api', [
