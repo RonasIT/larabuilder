@@ -75,8 +75,6 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
         $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares, $this->getMiddlewareList());
 
-        $this->collection = $mergedMiddlewares;
-
         $closure->stmts[$groupIndex]->expr->args[1] = $this->buildMiddlewareArg($mergedMiddlewares);
     }
 
