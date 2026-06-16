@@ -1,10 +1,11 @@
 <?php
 
-namespace RonasIT\Larabuilder\Visitors;
+namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
+use RonasIT\Larabuilder\Visitors\AbstractNodeVisitor;
 
 class RemoveMethod extends AbstractNodeVisitor implements RemoveNodeContract
 {

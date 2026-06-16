@@ -15,10 +15,10 @@ use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\AddMethod;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\InsertCodeToMethod;
+use RonasIT\Larabuilder\Visitors\MethodVisitors\RemoveMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
-use RonasIT\Larabuilder\Visitors\RemoveMethod;
 
 class PHPFileBuilder
 {
