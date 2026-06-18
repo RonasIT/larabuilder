@@ -38,7 +38,7 @@ class SomeClass implements Test, Some
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password' => 'encrypted',
         ];
     }
 
@@ -74,10 +74,5 @@ class SomeClass implements Test, Some
                 : QueueEnum::PushNotifications,
             BroadcastChannel::class => QueueEnum::Broadcasts,
         ];
-    }
-
-    protected function boot()
-    {
-        parent::boot();
     }
 }

@@ -7,12 +7,14 @@ use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\DTO\MethodParamsList;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
+use RonasIT\Larabuilder\Visitors\MethodVisitors\AddItemToReturnArray;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\AddMethod;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\RemoveMethod;
@@ -91,6 +93,13 @@ class PHPFileBuilder
         bool $isReturnsByRef = false,
     ): self {
         $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $isStatic, $isReturnsByRef));
+
+        return $this;
+    }
+
+    public function addItemToReturnArray(string $methodName, string $value, string|DefaultValue $key = DefaultValue::None): self
+    {
+        $this->traverser->addVisitor(new AddItemToReturnArray($methodName, $value, $key));
 
         return $this;
     }

@@ -17,7 +17,7 @@ class SomeClass implements Test, Some
     {
     }
 
-    public function someMethod()
+    public function someMethod(): void
     {
         $a = 1;
         $b = 2;
@@ -32,5 +32,47 @@ class SomeClass implements Test, Some
         $db->table('users')->where('id', 1)->first();
 
         Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    protected function getAvailableRelations(): array
+    {
+        return [
+            'comments',
+            'tags',
+        ];
+    }
+
+    protected function getRelations(): array
+    {
+        if ($this->isGuest) {
+            return ['name' => 'Guest'];
+        }
+
+        return [
+            'comments',
+            'tags',
+        ];
+    }
+
+    public function viaQueues(): array
+    {
+        $shouldThrottle = function () {
+            return now()->isWeekend();
+        };
+
+        return [
+            ExpoChannel::class => $shouldThrottle
+                ? QueueEnum::Low
+                : QueueEnum::PushNotifications,
+            BroadcastChannel::class => QueueEnum::Broadcasts,
+        ];
     }
 }
