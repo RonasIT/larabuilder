@@ -44,6 +44,7 @@ For modifying classes, traits, enums, etc. The base class handles:
 
 - **`UpdateNodeContract`** — The visitor can update an existing node. Requires `shouldUpdateNode(Node): bool` and `updateNode(Node): void`. The base class iterates over child statements and calls `updateNode()` on the first match.
 - **`InsertNodeContract`** — The visitor inserts a single node. Requires `getInsertableNode(): Node`. The base class handles positioning (via `NodeInserter`) and empty line insertion.
+- **`RemoveNodeContract`** — The visitor can remove an existing node. Requires `shouldRemoveNode(Node): bool`. The base class iterates over child statements and removes the first matching node.
 
 A visitor may implement both contracts. Update is attempted first — insertion happens only if no existing node matched.
 
@@ -71,8 +72,6 @@ Located in `src/Support/`:
 
 1. Extend `AbstractNodeVisitor`.
 2. Set `$allowedParentNodesTypes` to the node types your visitor targets.
-3. Implement the appropriate contract(s):
-   - `InsertNodeContract` — for inserting a single node, implement `getInsertableNode(): Node`
-   - `UpdateNodeContract` — for updating an existing node, implement `shouldUpdateNode(Node): bool` and `updateNode(Node): void`
+3. Implement `InsertNodeContract`, `UpdateNodeContract`, `RemoveNodeContract`, or a combination.
 4. Add a corresponding fluent method in `PHPFileBuilder` that creates and registers the visitor.
 5. Add fixture files and a test case.

@@ -7,8 +7,10 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Contracts\RemoveNodeContract;
 use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
@@ -25,8 +27,12 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
     protected bool $hasParentNode = false;
     protected NodeInserter $nodeInserter;
 
-    public function leaveNode(Node $node): Node
+    public function leaveNode(Node $node): Node|int
     {
+        if ($this instanceof RemoveNodeContract && $this->shouldRemoveNode($node)) {
+            return NodeVisitor::REMOVE_NODE;
+        }
+
         if ($this->isParentNode($node)) {
             $this->hasParentNode = true;
 
