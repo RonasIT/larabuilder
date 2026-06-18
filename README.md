@@ -77,6 +77,10 @@ new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
     ->save();
 ```
 
+#### removeMethod
+
+Remove a method by name from a class, trait, enum, or interface.
+
 #### removeClassAttribute
 
 Remove a [PHP attribute](https://www.php.net/manual/en/language.attributes.overview.php) from the class. If the class does not exist in the file a `NodeNotExistException` is thrown.

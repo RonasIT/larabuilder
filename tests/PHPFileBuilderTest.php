@@ -679,6 +679,52 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public static function provideRemoveMethod(): array
+    {
+        return [
+            [
+                'structure' => 'class.php',
+                'method' => 'someMethod',
+                'result' => 'class_method_removed.php',
+            ],
+            [
+                'structure' => 'class.php',
+                'method' => 'save',
+                'result' => 'class_unchanged.php',
+            ],
+            [
+                'structure' => 'trait.php',
+                'method' => 'method1',
+                'result' => 'trait_method_removed.php',
+            ],
+            [
+                'structure' => 'interface.php',
+                'method' => 'someMethod',
+                'result' => 'interface_method_removed.php',
+            ],
+            [
+                'structure' => 'enum.php',
+                'method' => 'toArray',
+                'result' => 'enum_method_removed.php',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideRemoveMethod')]
+    public function testRemoveMethod(string $structure, string $method, string $result): void
+    {
+        $file = $this->generateOriginalStructurePath($structure);
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, $result),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeMethod($method)
+            ->save();
+    }
+
     public function testRemoveClassAttributeNotClass(): void
     {
         $file = $this->generateOriginalStructurePath('interface.php');
