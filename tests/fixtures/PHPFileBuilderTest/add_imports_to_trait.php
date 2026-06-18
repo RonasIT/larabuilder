@@ -7,7 +7,8 @@ use RonasIT\Larabuilder\Tests\Support\FirstClass;
 use RonasIT\Larabuilder\Tests\Support\SecondClass;
 use RonasIT\Larabuilder\Tests\Support\ThirdClass;
 
-trait SomeTrait {
+trait SomeTrait
+{
     public float $floatProperty;
 
     protected array $fillable = [
