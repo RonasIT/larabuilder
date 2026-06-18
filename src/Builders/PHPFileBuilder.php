@@ -19,6 +19,7 @@ use RonasIT\Larabuilder\Visitors\MethodVisitors\RemoveMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
+use RonasIT\Larabuilder\Visitors\RemoveImport;
 
 class PHPFileBuilder
 {
@@ -68,6 +69,15 @@ class PHPFileBuilder
     public function addImports(array $imports): self
     {
         $this->traverser->addVisitor(new AddImports($imports));
+
+        return $this;
+    }
+
+    public function removeImports(array $imports, bool $force = false): self
+    {
+        foreach ($imports as $import) {
+            $this->traverser->addVisitor(new RemoveImport($import, $force));
+        }
 
         return $this;
     }
