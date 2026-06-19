@@ -29,8 +29,6 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         );
     }
 
-    // TODO: create withMiddleware() closure if absent
-    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     protected function insertNode(MethodCall $node): MethodCall
     {
         /** @var Closure $closure */
@@ -65,8 +63,6 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         });
     }
 
-    // TODO: handle inline FQCN namespace in array instead of use import
-    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     protected function updateMiddlewareGroup(Closure $closure, int $groupIndex): void
     {
         $originalMiddlewares = $closure->stmts[$groupIndex]->expr->args[1]->value->value
@@ -103,8 +99,6 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         };
     }
 
-    // TODO: fix deduplication when same class has FQCN in one place and short imported name in another
-    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     private function isSameMiddleware(string $newMiddleware, ArrayItem $originalMiddleware): bool
     {
         if ($originalMiddleware->value instanceof ClassConstFetch) {
@@ -129,8 +123,6 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         return new Expression($methodCall);
     }
 
-    // TODO: preserve original multiline formatting of middleware array
-    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     protected function buildMiddlewareArg(array $middlewares): Arg
     {
         return new Arg(new Array_($middlewares));
