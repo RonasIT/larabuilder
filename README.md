@@ -77,6 +77,10 @@ new PHPFileBuilder(app_path('Http/Controllers/UserController.php'))
     ->save();
 ```
 
+#### removeMethod
+
+Remove a method by name from a class, trait, enum, or interface.
+
 ## Special Laravel structure builders
 
 ### Bootstrap app
