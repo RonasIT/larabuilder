@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prependToGroup('api', Illuminate\Auth\Middleware\Authenticate::class);
+        $middleware->prependToGroup('api', \Illuminate\Auth\Middleware\Authenticate::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

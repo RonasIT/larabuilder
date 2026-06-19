@@ -29,6 +29,8 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         );
     }
 
+    // TODO: create withMiddleware() closure if absent
+    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     protected function insertNode(MethodCall $node): MethodCall
     {
         /** @var Closure $closure */
@@ -63,15 +65,17 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         });
     }
 
+    // TODO: handle inline FQCN namespace in array instead of use import
+    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     protected function updateMiddlewareGroup(Closure $closure, int $groupIndex): void
     {
         $originalMiddlewares = $closure->stmts[$groupIndex]->expr->args[1]->value->value
             ?? $closure->stmts[$groupIndex]->expr->args[1]->value->class->name
             ?? $closure->stmts[$groupIndex]->expr->args[1]->value->items;
 
-        $originalMiddlewares = is_string($originalMiddlewares)
-            ? [new ArrayItem($closure->stmts[$groupIndex]->expr->args[1]->value)]
-            : $originalMiddlewares;
+        $originalMiddlewares = is_array($originalMiddlewares)
+            ? $originalMiddlewares
+            : [new ArrayItem($closure->stmts[$groupIndex]->expr->args[1]->value)];
 
         $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares);
 
@@ -88,9 +92,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
                 fn ($originalMiddleware) => $this->isSameMiddleware($middleware, $originalMiddleware),
             );
 
-            if (!is_null($sameMiddlewareKey)) {
-                $this->normalizeMiddleware($originalMiddlewareList[$sameMiddlewareKey]);
-            } else {
+            if (is_null($sameMiddlewareKey)) {
                 $filteredNewList[] = $this->makeArrayItem($middleware);
             }
         }
@@ -101,28 +103,18 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         };
     }
 
+    // TODO: fix deduplication when same class has FQCN in one place and short imported name in another
+    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     private function isSameMiddleware(string $newMiddleware, ArrayItem $originalMiddleware): bool
     {
         if ($originalMiddleware->value instanceof ClassConstFetch) {
-            $originalName = $originalMiddleware->value->class->toString();
+            $originalName = $originalMiddleware->value->class->name;
 
             return $originalName === $newMiddleware
                 || $originalName === class_basename($newMiddleware);
         }
 
         return $originalMiddleware->value->value === $newMiddleware;
-    }
-
-    protected function normalizeMiddleware(ArrayItem $middleware): void
-    {
-        if ($middleware->value instanceof ClassConstFetch) {
-            $this->setClassBaseName($middleware->value);
-        }
-    }
-
-    protected function setClassBaseName(ClassConstFetch $class): void
-    {
-        $class->class->name = class_basename($class->class->name);
     }
 
     protected function buildPrependToGroupCall(): Expression
@@ -137,6 +129,8 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         return new Expression($methodCall);
     }
 
+    // TODO: preserve original multiline formatting of middleware array
+    // https://github.com/RonasIT/larabuilder/issues/73#issuecomment-4718330712
     protected function buildMiddlewareArg(array $middlewares): Arg
     {
         return new Arg(new Array_($middlewares));

@@ -181,9 +181,7 @@ class AppBootstrapBuilderTest extends TestCase
 
         new AppBootstrapBuilder($file)
             ->addMiddlewarePrependToGroup('api', [
-                FakeClass::class,
                 'throttle:60,10',
-                'some_middleware',
                 Authenticate::class,
             ])
             ->save();
