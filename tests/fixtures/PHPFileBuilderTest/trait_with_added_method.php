@@ -35,4 +35,9 @@ trait SomeTrait
             'value' => $value,
         ]);
     }
+
+    public function handle(): bool
+    {
+        return $this->process();
+    }
 }
