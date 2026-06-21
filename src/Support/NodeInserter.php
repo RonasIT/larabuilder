@@ -7,6 +7,7 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Enum_;
+use PhpParser\Node\Stmt\EnumCase;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Property;
@@ -24,6 +25,7 @@ class NodeInserter
         Trait_::class,
         Enum_::class,
         TraitUse::class,
+        EnumCase::class,
         ClassConst::class,
         Property::class,
         ClassMethod::class,

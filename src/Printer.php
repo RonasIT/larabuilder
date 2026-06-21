@@ -79,23 +79,23 @@ class Printer extends Standard
 
     protected function pStmt_Expression(Expression $node): string
     {
-        $newLine = ($this->shouldAddNewlineBeforeIfTypeSame($node, Expression::class)) ? $this->nl : '';
+        $newLine = ($this->shouldAddNewlineBeforeIfPreviousNodeExists($node)) ? $this->nl : '';
 
         return $newLine . parent::pStmt_Expression($node);
     }
 
     protected function pStmt_ClassMethod(ClassMethod $node): string
     {
-        $newLine = ($this->shouldAddNewlineBeforeIfTypeSame($node, ClassMethod::class)) ? $this->nl : '';
+        $newLine = ($this->shouldAddNewlineBeforeIfPreviousNodeExists($node)) ? $this->nl : '';
 
         return $newLine . parent::pStmt_ClassMethod($node);
     }
 
-    protected function shouldAddNewlineBeforeIfTypeSame(Node $node, string $type): bool
+    protected function shouldAddNewlineBeforeIfPreviousNodeExists(Node $node): bool
     {
         $previousNode = $node->getAttribute(StatementAttributeEnum::Previous->value);
 
-        return $previousNode !== null && $previousNode instanceof $type;
+        return $previousNode !== null;
     }
 
     protected function pStmt_PreformattedCode(PreformattedCode $node): string

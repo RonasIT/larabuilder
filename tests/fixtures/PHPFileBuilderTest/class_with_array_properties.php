@@ -43,15 +43,4 @@ class SomeClass extends Some
     public array $bool = [
         true,
     ];
-
-    public function __construct()
-    {
-        if ($boolProperty) {
-            $nullProperty = null;
-        }
-    }
-
-    public function someMethod(): void
-    {
-    }
 }

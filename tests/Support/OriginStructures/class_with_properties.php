@@ -29,15 +29,4 @@ class SomeClass extends Some
         'string1',
     ];
     public array $notArray = [];
-
-    public function __construct()
-    {
-        if ($boolProperty) {
-            $nullProperty = null;
-        }
-    }
-
-    public function someMethod(): void
-    {
-    }
 }

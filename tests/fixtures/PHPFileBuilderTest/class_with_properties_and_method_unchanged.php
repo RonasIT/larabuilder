@@ -30,8 +30,14 @@ class SomeClass extends Some
     ];
     public array $notArray = [];
 
-    public static function create(): static
+    public function __construct()
     {
-        return new static();
+        if ($boolProperty) {
+            $nullProperty = null;
+        }
+    }
+
+    public function someMethod(): void
+    {
     }
 }
