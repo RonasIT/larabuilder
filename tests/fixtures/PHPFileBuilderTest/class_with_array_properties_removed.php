@@ -25,15 +25,4 @@ class SomeClass extends Some
         'arrayProperty2' => [1, 2, 3],
     ];
     public array $notArray = [];
-
-    public function __construct()
-    {
-        if ($boolProperty) {
-            $nullProperty = null;
-        }
-    }
-
-    public function someMethod(): void
-    {
-    }
 }

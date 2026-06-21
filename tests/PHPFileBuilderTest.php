@@ -373,7 +373,7 @@ class PHPFileBuilderTest extends TestCase
 
     public function testInsertCodeToMethodToTheEndPosition(): void
     {
-        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties_and_method.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -387,7 +387,7 @@ class PHPFileBuilderTest extends TestCase
 
     public function testInsertCodeToMethodToTheStartPosition(): void
     {
-        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties_and_method.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -440,11 +440,11 @@ class PHPFileBuilderTest extends TestCase
 
     public function testInsertCodeToMethodEmptyString(): void
     {
-        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties_and_method.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'class_with_properties_unchanged.php'),
+            $this->callFilePutContent($file, 'class_with_properties_and_method_unchanged.php'),
         );
 
         new PHPFileBuilder($file)
@@ -476,7 +476,7 @@ class PHPFileBuilderTest extends TestCase
 
     public function testInsertCodeToMethodWhenMethodNotExist(): void
     {
-        $file = $this->generateOriginalStructurePath('class_with_properties.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties_and_method.php');
 
         $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
 
@@ -596,7 +596,7 @@ class PHPFileBuilderTest extends TestCase
 
     public function testAddStaticMethod(): void
     {
-        $file = $this->generateOriginalStructurePath('class.php');
+        $file = $this->generateOriginalStructurePath('class_with_properties.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
@@ -646,6 +646,29 @@ class PHPFileBuilderTest extends TestCase
                 code: 'return $this->name;',
                 returnType: 'string',
                 isReturnsByRef: true,
+            )
+            ->save();
+    }
+
+    public function testAddMethodToEnumWithoutMethod(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum_without_method.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'enum_without_method_with_added_method.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addMethod(
+                name: 'updatableStatuses',
+                code: '
+                    return [
+                        self::Paid,
+                    ];
+                ',
+                returnType: 'array',
+                isStatic: true,
             )
             ->save();
     }
