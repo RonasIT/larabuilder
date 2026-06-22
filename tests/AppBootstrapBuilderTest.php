@@ -176,7 +176,7 @@ class AppBootstrapBuilderTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'bootstrap_with_changed_prepend_group.php'),
+            $this->callFilePutContent($file, 'bootstrap_without_changed_prepend_group.php'),
         );
 
         new AppBootstrapBuilder($file)
