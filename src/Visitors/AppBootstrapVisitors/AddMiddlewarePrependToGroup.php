@@ -99,7 +99,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         };
     }
 
-    private function isSameMiddleware(string $newMiddleware, ArrayItem $originalMiddleware): bool
+    protected function isSameMiddleware(string $newMiddleware, ArrayItem $originalMiddleware): bool
     {
         if ($originalMiddleware->value instanceof ClassConstFetch) {
             $originalName = $originalMiddleware->value->class->name;
