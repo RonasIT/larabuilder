@@ -102,6 +102,24 @@ render for the passed exception class.
 
 **Note** Need to provide the full exception class name (FQCN) to the method, it automatically imports it.
 
+#### addMiddlewarePrependToGroup
+
+Adds middleware to a named group via `prependToGroup` inside the `withMiddleware` closure. 
+Accepts a single class name or string, or an array of them. Skips values that already exist in the target group. 
+Does not affect other groups.
+Supports `InsertPositionEnum::Start` and `InsertPositionEnum::End` to control the insertion position. `End` is used by default.
+
+```php
+new AppBootstrapBuilder(bootstrap_path('app.php'))
+    ->addMiddlewarePrependToGroup('api', [
+        MyMiddleware::class,
+        'throttle:60,1',
+    ])
+    ->addMiddlewarePrependToGroup('web', WebMiddleware::class,, InsertPositionEnum::Start)
+    ->save();
+
+**Note:** Provide the full class name (FQCN) for class-based middleware — the method imports it automatically.
+
 ## Contributing
 
 Thank you for considering contributing to Laravel Builder package! The contribution guide
