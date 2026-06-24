@@ -16,7 +16,6 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
 use RonasIT\Larabuilder\Enums\ExpressionAttributeEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
-use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 
 class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 {
