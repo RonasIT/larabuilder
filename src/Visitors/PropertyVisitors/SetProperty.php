@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Property;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 use RonasIT\Larabuilder\DTO\NodeValueDTO;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
+use RonasIT\Larabuilder\Enums\ExpressionAttributeEnum;
 use RonasIT\Larabuilder\Support\NodeValueFactory;
 
 class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
@@ -24,7 +25,11 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
     ) {
         parent::__construct($name);
 
-        $this->property = NodeValueFactory::make($value);
+        $attributes = is_array($value)
+            ? [ExpressionAttributeEnum::SetArrayMultiline->value => true]
+            : [];
+
+        $this->property = NodeValueFactory::make($value, $attributes);
 
         $this->propertyItem = new PropertyItem($this->name, $this->property->node);
         $this->typeIdentifier = $this->property->typeNode;
