@@ -4,5 +4,5 @@ namespace RonasIT\Larabuilder\Enums;
 
 enum ExpressionAttributeEnum: string
 {
-    case SetArrayMultiline = 'set-array-multiline';
+    case IsArrayMultiline = 'is_array_multiline';
 }

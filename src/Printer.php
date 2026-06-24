@@ -42,7 +42,7 @@ class Printer extends Standard
 
     protected function pExpr_Array(Array_ $node): string
     {
-        $isMultiline = $node->getAttribute(ExpressionAttributeEnum::SetArrayMultiline->value, false);
+        $isMultiline = $node->getAttribute(ExpressionAttributeEnum::IsArrayMultiline->value, false);
 
         if ($isMultiline) {
             return '[' . $this->pCommaSeparatedMultiline($node->items, true) . $this->nl . ']';

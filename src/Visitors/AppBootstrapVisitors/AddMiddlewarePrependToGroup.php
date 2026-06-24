@@ -128,7 +128,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
     protected function buildMiddlewareArg(array $middlewares): Arg
     {
         return new Arg(new Array_($middlewares, [
-            ExpressionAttributeEnum::SetArrayMultiline->value => true,
+            ExpressionAttributeEnum::IsArrayMultiline->value => true,
         ]));
     }
 

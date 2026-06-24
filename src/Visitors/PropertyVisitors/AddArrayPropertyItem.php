@@ -23,7 +23,7 @@ class AddArrayPropertyItem extends SetProperty
 
         $this->arrayItem = new ArrayItem($this->property->node);
         $arrayNode = new Array_([$this->arrayItem], [
-            ExpressionAttributeEnum::SetArrayMultiline->value => true,
+            ExpressionAttributeEnum::IsArrayMultiline->value => true,
         ]);
 
         $this->propertyItem = new PropertyItem($this->name, $arrayNode);

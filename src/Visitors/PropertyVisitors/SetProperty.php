@@ -26,7 +26,7 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
         parent::__construct($name);
 
         $attributes = is_array($value)
-            ? [ExpressionAttributeEnum::SetArrayMultiline->value => true]
+            ? [ExpressionAttributeEnum::IsArrayMultiline->value => true]
             : [];
 
         $this->property = NodeValueFactory::make($value, $attributes);
