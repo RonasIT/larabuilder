@@ -4,11 +4,14 @@ namespace RonasIT\Larabuilder\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Larabuilder\Builders\PHPFileBuilder;
+use RonasIT\Larabuilder\DTO\MethodParamDTO;
+use RonasIT\Larabuilder\DTO\MethodParamsList;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
+use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
@@ -570,6 +573,197 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->insertCodeToMethod('someMethod', $code)
+            ->save();
+    }
+
+    public function testAddMethod(): void
+    {
+        $file = $this->generateOriginalStructurePath('class_empty.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_added_method.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addMethod(
+                name: 'store',
+                code: '
+                    $user = User::find($id);
+
+                    return response()->json($user);
+                ',
+                params: new MethodParamsList(
+                    new MethodParamDTO(name: 'request', type: 'StoreUserRequest'),
+                    new MethodParamDTO(name: 'count', type: 'int', isReference: true),
+                    new MethodParamDTO(name: 'search', type: '?string', default: null),
+                    new MethodParamDTO(name: 'limit', type: 'int', default: 10),
+                    new MethodParamDTO(name: 'ids', type: 'int', isVariadic: true),
+                ),
+                returnType: 'JsonResponse',
+            )
+            ->addMethod(
+                name: 'delete',
+                code: '
+                    $service->delete($id);
+
+                    return response()->noContent();
+                ',
+                params: new MethodParamsList(
+                    new MethodParamDTO(name: 'request', type: 'DeleteUserRequest'),
+                    new MethodParamDTO(name: 'service', type: 'UserService'),
+                    new MethodParamDTO(name: 'id', type: 'int'),
+                ),
+                returnType: 'Response',
+            )
+            ->addImports([
+                'Symfony\Component\HttpFoundation\Response',
+                'App\Http\Requests\StoreUserRequest',
+                'App\Http\Requests\DeleteUserRequest',
+                'App\Services\UserService',
+            ])
+            ->save();
+    }
+
+    public function testAddMethodAlreadyExists(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(NodeAlreadyExistsException::class, "Method 'someMethod' already exists.");
+
+        new PHPFileBuilder($file)
+            ->addMethod('someMethod', 'return;')
+            ->save();
+    }
+
+    public function testAddStaticMethod(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_added_static_method.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addMethod(
+                name: 'create',
+                code: 'return new static();',
+                returnType: 'static',
+                isStatic: true,
+            )
+            ->save();
+    }
+
+    public function testAddProtectedMethod(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_added_protected_method.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addMethod(
+                name: 'boot',
+                code: 'parent::boot();',
+                accessModifier: AccessModifierEnum::Protected,
+            )
+            ->save();
+    }
+
+    public function testAddMethodToEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'enum_with_added_method.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addMethod(
+                name: 'label',
+                code: 'return $this->name;',
+                returnType: 'string',
+                isReturnsByRef: true,
+            )
+            ->save();
+    }
+
+    public function testAddMethodToTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('trait.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'trait_with_added_method.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addMethod(
+                name: 'handle',
+                code: 'return $this->process();',
+                returnType: 'bool',
+            )
+            ->save();
+    }
+
+    public function testAddMethodNotClassTraitEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('interface.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddMethod' operation may only be applied to: Class, Trait, Enum.");
+
+        new PHPFileBuilder($file)
+            ->addMethod('store', 'return;')
+            ->save();
+    }
+
+    public static function provideRemoveMethod(): array
+    {
+        return [
+            [
+                'structure' => 'class.php',
+                'method' => 'someMethod',
+                'result' => 'class_method_removed.php',
+            ],
+            [
+                'structure' => 'class.php',
+                'method' => 'save',
+                'result' => 'class_unchanged.php',
+            ],
+            [
+                'structure' => 'trait.php',
+                'method' => 'method1',
+                'result' => 'trait_method_removed.php',
+            ],
+            [
+                'structure' => 'interface.php',
+                'method' => 'someMethod',
+                'result' => 'interface_method_removed.php',
+            ],
+            [
+                'structure' => 'enum.php',
+                'method' => 'toArray',
+                'result' => 'enum_method_removed.php',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideRemoveMethod')]
+    public function testRemoveMethod(string $structure, string $method, string $result): void
+    {
+        $file = $this->generateOriginalStructurePath($structure);
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, $result),
+        );
+
+        new PHPFileBuilder($file)
+            ->removeMethod($method)
             ->save();
     }
 }

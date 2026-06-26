@@ -2,6 +2,8 @@
 
 namespace RonasIT\Larabuilder\Tests\Support;
 
-class SomeClass
+enum SomeEnum
 {
+    case First;
+    case Second;
 }
