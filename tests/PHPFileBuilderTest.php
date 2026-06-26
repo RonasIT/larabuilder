@@ -22,7 +22,7 @@ class PHPFileBuilderTest extends TestCase
 
     public function testSetNamespaceOnFileWithoutNamespace(): void
     {
-        $file = $this->generateOriginalStructurePath('class_empty.php');
+        $file = $this->generateOriginalStructurePath('class_without_namespace.php');
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
