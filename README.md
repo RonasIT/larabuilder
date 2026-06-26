@@ -102,6 +102,44 @@ render for the passed exception class.
 
 **Note** Need to provide the full exception class name (FQCN) to the method, it automatically imports it.
 
+#### addScheduleCommand
+
+Adds a scheduled command into the `withSchedule` method closure.
+If `withSchedule` does not exist, it will be automatically created. The new scheduled command will then be inserted into its closure.
+Automatically adds `use Illuminate\Support\Facades\Schedule;` to the file imports.
+
+Example usage:
+
+```php
+new AppBootstrapBuilder()
+    ->addScheduleCommand(
+        'command', 
+        new ScheduleOptionDTO('environments', ['production']),
+        new ScheduleOptionDTO('daily'),
+        new ScheduleOptionDTO(
+            method: 'timezone',
+            attributes: ['America/New_York'],
+        ),
+    )
+    ->save();
+```
+
+#### addRoutingOption
+
+Adds or updates a named argument in the `withRouting` method call. Supports all keys of Laravel's `withRouting` method.
+If `withRouting` does not exist, it will be automatically created.
+
+**Note:** Use `PreformattedExpression` for complex values like closures or PHP expressions.
+
+Example usage:
+
+```php
+new AppBootstrapBuilder()
+    ->addRoutingOption('api', new PreformattedExpression("__DIR__.'/../routes/api.php'"))
+    ->addRoutingOption('apiPrefix', '')
+    ->save();
+```
+
 ## Contributing
 
 Thank you for considering contributing to Laravel Builder package! The contribution guide

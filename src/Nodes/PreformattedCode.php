@@ -2,18 +2,18 @@
 
 namespace RonasIT\Larabuilder\Nodes;
 
-use Illuminate\Support\Str;
 use PhpParser\Error;
 use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
+use RonasIT\Larabuilder\Traits\PreformattedNodesHelperTrait;
 
 /**
  * Used to insert code with saving original formatting
  */
 class PreformattedCode extends Stmt
 {
-    public readonly array $code;
+    use PreformattedNodesHelperTrait;
 
     public function __construct(
         public string $value,
@@ -21,9 +21,7 @@ class PreformattedCode extends Stmt
     ) {
         parent::__construct($this->attributes);
 
-        $this->value = Str::chopStart($this->value, '<?php');
-
-        $this->code = $this->parsePHPCode($this->value);
+        $this->initPreformattedNode($this->value);
     }
 
     public function getSubNodeNames(): array

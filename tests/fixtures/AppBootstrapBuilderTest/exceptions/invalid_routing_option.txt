@@ -1,0 +1,11 @@
+Unknown routing key `invalid_key`.
+Allowed keys:
+using
+web
+api
+commands
+channels
+pages
+health
+apiPrefix
+then
