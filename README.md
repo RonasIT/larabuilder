@@ -30,7 +30,7 @@ new PHPFileBuilder(app_path('Models/User.php'))
 
 #### setNamespace
 
-Set or replace the namespace declaration in a PHP file. If the file has no namespace, it will be added. If the namespace is already the same, no changes are made.
+Set or replace the namespace declaration in a class, trait, enum, or interface file. If the file has no namespace, it will be added. If the namespace is already the same, no changes are made.
 
 #### setProperty
 
