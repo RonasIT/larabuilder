@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\ValueOptions;
 
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\ManagesAttributes;
 use Illuminate\Console\Scheduling\ManagesFrequencies;
 use InvalidArgumentException;
@@ -22,6 +23,7 @@ readonly class ScheduleOption
         $methods = array_merge(
             $this->getMethods(ManagesAttributes::class),
             $this->getMethods(ManagesFrequencies::class),
+            $this->getMethods(Event::class),
         );
 
         if (!in_array($method, $methods, true)) {

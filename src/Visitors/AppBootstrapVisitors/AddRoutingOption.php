@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
-use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
@@ -22,26 +21,16 @@ class AddRoutingOption extends AbstractAppBootstrapVisitor
         new RoutingOption($key);
 
         $this->value = $value instanceof PreformattedExpression ? $value : new String_($value);
+
+        parent::__construct(
+            parentMethod: 'withRouting',
+            targetMethod: $key,
+        );
     }
 
-    public function getInsertableNode(): Node
+    protected function getInsertableNode(): Expression
     {
         return new Expression($this->value);
-    }
-
-    protected function getParentMethod(): string
-    {
-        return 'withRouting';
-    }
-
-    protected function getTargetMethod(): string
-    {
-        return $this->key;
-    }
-
-    protected function makeParentArgs(): array
-    {
-        return [];
     }
 
     protected function shouldInsertNode(MethodCall $node): bool

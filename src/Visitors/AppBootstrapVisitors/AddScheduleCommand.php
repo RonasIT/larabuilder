@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
-use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
@@ -10,46 +9,29 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Expression;
-use RonasIT\Larabuilder\Support\ValueNodeFactory;
+use RonasIT\Larabuilder\Support\NodeValueFactory;
 use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 
 class AddScheduleCommand extends AbstractAppBootstrapVisitor
 {
-    protected ValueNodeFactory $valueNodeFactory;
-    protected Expression $scheduleStatement;
     protected array $options = [];
 
     public function __construct(
         protected string $command,
         ScheduleOption ...$options,
     ) {
-        $this->valueNodeFactory = new ValueNodeFactory();
-
         $this->options = $options;
 
-        $this->scheduleStatement = $this->buildScheduleCall();
+        parent::__construct(
+            parentMethod: 'withSchedule',
+            targetMethod: 'command',
+            initialArgs: [new Arg(new Closure(['returnType' => new Identifier('void')]))],
+        );
     }
 
-    public function getInsertableNode(): Node
+    protected function getInsertableNode(): Expression
     {
-        return $this->scheduleStatement;
-    }
-
-    protected function getParentMethod(): string
-    {
-        return 'withSchedule';
-    }
-
-    protected function getTargetMethod(): string
-    {
-        return 'command';
-    }
-
-    protected function makeParentArgs(): array
-    {
-        $closure = new Closure(['returnType' => new Identifier('void')]);
-
-        return [new Arg($closure)];
+        return $this->buildScheduleCall();
     }
 
     protected function buildScheduleCall(): Expression
@@ -58,12 +40,12 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
             class: new Name('Schedule'),
             name: new Identifier('command'),
             args: [
-                $this->makeArgument($this->command),
+                new Arg(NodeValueFactory::make($this->command)->node),
             ],
         );
 
         foreach ($this->options as $option) {
-            $arguments = array_map(fn ($argument) => $this->makeArgument($argument), $option->arguments);
+            $arguments = array_map(fn ($argument) => new Arg(NodeValueFactory::make($argument)->node), $option->arguments);
 
             $call = new MethodCall(
                 var: $call,
@@ -73,12 +55,5 @@ class AddScheduleCommand extends AbstractAppBootstrapVisitor
         }
 
         return new Expression($call);
-    }
-
-    protected function makeArgument(mixed $value): Arg
-    {
-        list($value) = $this->valueNodeFactory->makeNode($value);
-
-        return new Arg($value);
     }
 }

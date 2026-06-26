@@ -14,11 +14,13 @@ use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\NodeVisitorAbstract;
-use RonasIT\Larabuilder\Contracts\InsertNodeContract;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidBootstrapAppFileException;
 
-abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implements InsertNodeContract
+abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
 {
+    protected const string LAST_BOOTSTRAP_METHOD_NAME = 'create';
+
     protected const array FORBIDDEN_NODES = [
         Class_::class,
         Trait_::class,
@@ -26,17 +28,22 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
         Enum_::class,
     ];
 
-    protected static array $existingParentNodes = [];
+    // Store the list of existed key bootstrap methods like withExceptions, withSchedule, etc.
+    protected static array $existingKeyMethods = [];
 
-    abstract protected function getParentMethod(): string;
+    public function __construct(
+        protected string $parentMethod,
+        protected string $targetMethod,
+        protected array $initialArgs = [],
+    ) {
+    }
 
-    abstract protected function getTargetMethod(): string;
+    abstract protected function getInsertableNode(): Expression;
 
-    abstract protected function makeParentArgs(): array;
-
-    public function beforeTraverse(array $nodes): ?array
+    // Clear key nodes list after all visitors complete traverse, to keep unique state for each file
+    public function afterTraverse(array $nodes): ?array
     {
-        static::$existingParentNodes = [];
+        static::$existingKeyMethods = [];
 
         return null;
     }
@@ -49,25 +56,23 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
             throw new InvalidBootstrapAppFileException(class_basename($node));
         }
 
-        if ($node instanceof MethodCall && $node->name->toString() === $this->getParentMethod()) {
-            if ($this->isApplicationBootstrapChain($node)) {
-                static::$existingParentNodes[] = $this->getParentMethod();
-            }
+        if ($node instanceof MethodCall && $node->name->toString() === $this->parentMethod) {
+            static::$existingKeyMethods[] = $this->parentMethod;
         }
     }
 
     public function leaveNode(Node $node): Node
     {
-        if ($node instanceof MethodCall && $node->name->toString() === 'create') {
+        if ($node instanceof MethodCall && $node->name->toString() === self::LAST_BOOTSTRAP_METHOD_NAME) {
             if (!$this->isApplicationBootstrapChain($node)) {
                 return $node;
             }
 
-            if (!in_array($this->getParentMethod(), static::$existingParentNodes)) {
+            if (!in_array($this->parentMethod, static::$existingKeyMethods)) {
                 $node = $this->insertParentNode($node);
             }
 
-            if ($node->var->getAttribute('wasCreated')) {
+            if ($node->var->getAttribute(StatementAttributeEnum::WasCreated->value)) {
                 $node->var = $this->handleParentNode($node->var);
             }
         }
@@ -85,12 +90,12 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
 
     protected function insertParentNode(Node $node): Node
     {
-        static::$existingParentNodes[] = $this->getParentMethod();
+        static::$existingKeyMethods[] = $this->parentMethod;
 
-        $parentCall = new MethodCall($node->var, new Identifier($this->getParentMethod()), $this->makeParentArgs());
-        $parentCall->setAttribute('wasCreated', true);
+        $parentCall = new MethodCall($node->var, new Identifier($this->parentMethod), $this->initialArgs);
+        $parentCall->setAttribute(StatementAttributeEnum::WasCreated->value, true);
 
-        return new MethodCall($parentCall, new Identifier('create'));
+        return new MethodCall($parentCall, new Identifier(self::LAST_BOOTSTRAP_METHOD_NAME));
     }
 
     protected function handleParentNode(MethodCall $node): Node
@@ -104,7 +109,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
 
     protected function isParentNode(Node $node): bool
     {
-        return $node instanceof MethodCall && $node->name->toString() === $this->getParentMethod();
+        return $node instanceof MethodCall && $node->name->toString() === $this->parentMethod;
     }
 
     protected function shouldInsertNode(MethodCall $node): bool
@@ -131,7 +136,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
         $currentStatements = $node->args[0]->value->stmts;
         $statement = $this->getInsertableNode();
 
-        if (count($currentStatements) === 1 && $currentStatements[0] instanceof Nop) {
+        if (count($currentStatements) === 1 && head($currentStatements) instanceof Nop) {
             $node->args[0]->value->stmts = [$statement];
 
             return $node;
@@ -139,7 +144,7 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
 
         $lastExistingStatement = end($currentStatements);
 
-        $statement->setAttribute('previous', $lastExistingStatement);
+        $statement->setAttribute(StatementAttributeEnum::Previous->value, $lastExistingStatement);
 
         $node->args[0]->value->stmts[] = $statement;
 
@@ -168,6 +173,6 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract implement
 
     protected function isCallbackCall(Expression $stmt): bool
     {
-        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->getTargetMethod();
+        return $stmt->expr instanceof MethodCall && $stmt->expr->name->toString() === $this->targetMethod;
     }
 }

@@ -137,7 +137,7 @@ class Printer extends Standard
 
     protected function pExpr_MethodCall(MethodCall $node): string
     {
-        if ($node->getAttribute('wasCreated')) {
+        if ($node->getAttribute(StatementAttributeEnum::WasCreated->value)) {
             $this->indent();
 
             $args = $this->isMultilineMethodCall($node)

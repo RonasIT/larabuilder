@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
-use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\MethodCall;
@@ -15,34 +14,12 @@ use RonasIT\Larabuilder\Nodes\PreformattedCode;
 
 class AddExceptionsRender extends AbstractAppBootstrapVisitor
 {
-    protected Expression $renderStatement;
-
     public function __construct(
         protected string $exceptionClass,
         protected string $renderBody,
         protected bool $includeRequestArg,
     ) {
-        $this->renderStatement = $this->buildRenderCall();
-    }
-
-    public function getInsertableNode(): Node
-    {
-        return $this->renderStatement;
-    }
-
-    protected function getParentMethod(): string
-    {
-        return 'withExceptions';
-    }
-
-    protected function getTargetMethod(): string
-    {
-        return 'render';
-    }
-
-    protected function makeParentArgs(): array
-    {
-        $closure = new Closure([
+        $initialArgs = new Arg(new Closure([
             'params' => [
                 new Param(
                     var: new Variable('exceptions'),
@@ -50,9 +27,18 @@ class AddExceptionsRender extends AbstractAppBootstrapVisitor
                 ),
             ],
             'returnType' => new Identifier('void'),
-        ]);
+        ]));
 
-        return [new Arg($closure)];
+        parent::__construct(
+            parentMethod: 'withExceptions',
+            targetMethod: 'render',
+            initialArgs: [$initialArgs],
+        );
+    }
+
+    protected function getInsertableNode(): Expression
+    {
+        return $this->buildRenderCall();
     }
 
     protected function buildRenderCall(): Expression
