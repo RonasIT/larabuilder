@@ -19,6 +19,7 @@ use RonasIT\Larabuilder\Visitors\MethodVisitors\RemoveMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\RemoveArrayPropertyItem;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\SetProperty;
+use RonasIT\Larabuilder\Visitors\SetNamespace;
 
 class PHPFileBuilder
 {
@@ -42,6 +43,13 @@ class PHPFileBuilder
         $this->oldTokens = $parser->getTokens();
 
         $this->traverser = new NodeTraverser();
+    }
+
+    public function setNamespace(string $namespace): self
+    {
+        $this->traverser->addVisitor(new SetNamespace($namespace));
+
+        return $this;
     }
 
     public function setProperty(string $name, mixed $value, AccessModifierEnum $accessModifier = AccessModifierEnum::Public): self

@@ -20,6 +20,59 @@ class PHPFileBuilderTest extends TestCase
 {
     use PHPFileBuilderTestMockTrait;
 
+    public function testSetNamespaceOnFileWithoutNamespace(): void
+    {
+        $file = $this->generateOriginalStructurePath('class_without_namespace.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'namespace_set.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->setNamespace('App\\Models')
+            ->save();
+    }
+
+    public function testSetNamespaceReplacesExistingNamespace(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'namespace_update.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->setNamespace('App\\Models')
+            ->save();
+    }
+
+    public function testSetNamespaceDoesNothingWhenSameNamespace(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_unchanged.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->setNamespace('RonasIT\Larabuilder\Tests\Support')
+            ->save();
+    }
+
+    public function testSetNamespaceNotClassTraitEnumInterface(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_empty.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'SetNamespace' operation may only be applied to: Class, Trait, Enum, Interface.");
+
+        new PHPFileBuilder($file)
+            ->setNamespace('RonasIT\Larabuilder\Tests\Support')
+            ->save();
+    }
+
     public function testSetProperty(): void
     {
         $file = $this->generateOriginalStructurePath('class_with_properties.php');
