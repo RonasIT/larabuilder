@@ -3,12 +3,22 @@
 namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Declare_;
+use PhpParser\Node\Stmt\Enum_;
+use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Stmt\Trait_;
 
-class SetNamespace extends NodeVisitorAbstract
+class SetNamespace extends AbstractNodeVisitor
 {
+    protected array $allowedParentNodesTypes = [
+        Class_::class,
+        Trait_::class,
+        Enum_::class,
+        Interface_::class,
+    ];
+
     public function __construct(
         protected string $namespace,
     ) {
@@ -16,6 +26,8 @@ class SetNamespace extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes): ?array
     {
+        parent::afterTraverse($nodes);
+
         $declares = [];
 
         foreach ($nodes as $key => $node) {

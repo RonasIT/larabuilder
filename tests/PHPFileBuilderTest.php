@@ -62,6 +62,17 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testSetNamespaceNotClassTraitEnumInterface(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_empty.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'SetNamespace' operation may only be applied to: Class, Trait, Enum, Interface.");
+
+        new PHPFileBuilder($file)
+            ->setNamespace('RonasIT\Larabuilder\Tests\Support')
+            ->save();
+    }
+
     public function testSetProperty(): void
     {
         $file = $this->generateOriginalStructurePath('class_with_properties.php');
