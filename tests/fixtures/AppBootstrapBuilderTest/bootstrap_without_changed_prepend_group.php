@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Routing\Controllers\Middleware as SomeMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToGroup('api', [
             'throttle:60,10',
             Authenticate::class,
+            SomeMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
