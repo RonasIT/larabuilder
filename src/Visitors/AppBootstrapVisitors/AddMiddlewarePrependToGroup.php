@@ -22,7 +22,7 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 
 class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 {
-    protected array $originalNamespaces = [];
+    protected array $importedNamespaces = [];
 
     public function __construct(
         protected string $group,
@@ -38,7 +38,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
     public function leaveNode(Node $node): Node
     {
         if ($node instanceof UseItem) {
-            $this->originalNamespaces[] = [
+            $this->importedNamespaces[] = [
                 'namespace' => $node->name->toString(),
                 'alias' => $node->alias?->toString() ?? null,
             ];
@@ -85,11 +85,11 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
     {
         $middlewares = $closure->stmts[$groupIndex]->expr->args[1];
 
-        $originalMiddlewares = ($middlewares->value instanceof Array_)
+        $originMiddlewares = ($middlewares->value instanceof Array_)
             ? $middlewares->value->items
             : [new ArrayItem($middlewares->value)];
 
-        $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares);
+        $mergedMiddlewares = $this->mergeMiddlewares($originMiddlewares);
 
         $closure->stmts[$groupIndex]->expr->args[1] = $this->buildMiddlewareArg($mergedMiddlewares);
     }
@@ -101,7 +101,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         $filteredNewList = [];
 
         foreach ($this->middlewares as $middleware) {
-            if (!in_array($middleware, $originalResolved)) {
+            if (!in_array($middleware, $originalResolved, true)) {
                 $filteredNewList[] = $this->makeArrayItem($middleware);
             }
         }
@@ -125,7 +125,7 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         }
 
         if ($isClass) {
-            $found = array_find($this->originalNamespaces, function (array $namespace) use ($middleware) {
+            $found = array_find($this->importedNamespaces, function (array $namespace) use ($middleware) {
                 return $middleware->value->class->name === class_basename($namespace['namespace'])
                     || $middleware->value->class->name === $namespace['alias'];
             });
@@ -148,16 +148,16 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
         return new Expression($methodCall);
     }
 
+    protected function getMiddlewareList(): array
+    {
+        return array_map(fn ($middleware) => $this->makeArrayItem($middleware), $this->middlewares);
+    }
+
     protected function buildMiddlewareArg(array $middlewares): Arg
     {
         return new Arg(new Array_($middlewares, [
             ExpressionAttributeEnum::IsArrayMultiline->value => true,
         ]));
-    }
-
-    protected function getMiddlewareList(): array
-    {
-        return array_map(fn ($middleware) => $this->makeArrayItem($middleware), $this->middlewares);
     }
 
     protected function makeArrayItem(string $middleware): ArrayItem
