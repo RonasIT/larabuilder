@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors\AppBootstrapVisitors;
 
+use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
@@ -11,13 +12,18 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
+use PhpParser\Node\UseItem;
+use RonasIT\Larabuilder\Enums\ExpressionAttributeEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 
 class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 {
+    protected array $originalNamespaces = [];
+
     public function __construct(
         protected string $group,
         protected array $middlewares,
@@ -27,6 +33,18 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
             parentMethod: 'withMiddleware',
             targetMethod: 'prependToGroup',
         );
+    }
+
+    public function leaveNode(Node $node): Node
+    {
+        if ($node instanceof UseItem) {
+            $this->originalNamespaces[] = [
+                'namespace' => $node->name->toString(),
+                'alias' => $node->alias?->toString() ?? null,
+            ];
+        }
+
+        return parent::leaveNode($node);
     }
 
     protected function insertNode(MethodCall $node): MethodCall
@@ -65,50 +83,57 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     protected function updateMiddlewareGroup(Closure $closure, int $groupIndex): void
     {
-        $originalMiddlewares = $closure->stmts[$groupIndex]->expr->args[1]->value->value
-            ?? $closure->stmts[$groupIndex]->expr->args[1]->value->class->name
-            ?? $closure->stmts[$groupIndex]->expr->args[1]->value->items;
+        $middlewares = $closure->stmts[$groupIndex]->expr->args[1];
 
-        $originalMiddlewares = is_array($originalMiddlewares)
-            ? $originalMiddlewares
-            : [new ArrayItem($closure->stmts[$groupIndex]->expr->args[1]->value)];
+        $originalMiddlewares = ($middlewares->value instanceof Array_)
+            ? $middlewares->value->items
+            : [new ArrayItem($middlewares->value)];
 
         $mergedMiddlewares = $this->mergeMiddlewares($originalMiddlewares);
 
         $closure->stmts[$groupIndex]->expr->args[1] = $this->buildMiddlewareArg($mergedMiddlewares);
     }
 
-    protected function mergeMiddlewares(array $originalMiddlewareList): array
+    protected function mergeMiddlewares(array $originMiddlewares): array
     {
+        $originalResolved = array_map(fn ($middleware) => $this->resolveMiddlewareName($middleware), $originMiddlewares);
+
         $filteredNewList = [];
 
         foreach ($this->middlewares as $middleware) {
-            $sameMiddlewareKey = array_find_key(
-                $originalMiddlewareList,
-                fn ($originalMiddleware) => $this->isSameMiddleware($middleware, $originalMiddleware),
-            );
-
-            if (is_null($sameMiddlewareKey)) {
+            if (!in_array($middleware, $originalResolved)) {
                 $filteredNewList[] = $this->makeArrayItem($middleware);
             }
         }
 
         return match ($this->position) {
-            InsertPositionEnum::Start => [...$filteredNewList, ...$originalMiddlewareList],
-            InsertPositionEnum::End => [...$originalMiddlewareList, ...$filteredNewList],
+            InsertPositionEnum::Start => [...$filteredNewList, ...$originMiddlewares],
+            InsertPositionEnum::End => [...$originMiddlewares, ...$filteredNewList],
         };
     }
 
-    protected function isSameMiddleware(string $newMiddleware, ArrayItem $originalMiddleware): bool
+    protected function resolveMiddlewareName($middleware): ?string
     {
-        if ($originalMiddleware->value instanceof ClassConstFetch) {
-            $originalName = $originalMiddleware->value->class->name;
-
-            return $originalName === $newMiddleware
-                || $originalName === class_basename($newMiddleware);
+        if ($middleware->value instanceof String_) {
+            return $middleware->value->value;
         }
 
-        return $originalMiddleware->value->value === $newMiddleware;
+        $isClass = $middleware->value instanceof ClassConstFetch;
+
+        if ($isClass && $middleware->value->class instanceof FullyQualified) {
+            return $middleware->value->class->name;
+        }
+
+        if ($isClass) {
+            $found = array_find($this->originalNamespaces, function (array $namespace) use ($middleware) {
+                return $middleware->value->class->name === class_basename($namespace['namespace'])
+                    || $middleware->value->class->name === $namespace['alias'];
+            });
+
+            return $found['namespace'] ?? null;
+        }
+
+        return null;
     }
 
     protected function buildPrependToGroupCall(): Expression
@@ -125,7 +150,9 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     protected function buildMiddlewareArg(array $middlewares): Arg
     {
-        return new Arg(new Array_($middlewares));
+        return new Arg(new Array_($middlewares, [
+            ExpressionAttributeEnum::IsArrayMultiline->value => true,
+        ]));
     }
 
     protected function getMiddlewareList(): array
