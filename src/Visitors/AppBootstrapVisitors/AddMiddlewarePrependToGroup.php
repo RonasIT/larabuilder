@@ -74,8 +74,9 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     protected function findMiddlewareGroupIndex(array $stmts): ?int
     {
-        return array_find_key($stmts, function (Expression $stmt) {
-            return !empty($stmt->expr->name)
+        return array_find_key($stmts, function (Node $stmt) {
+            return $stmt instanceof Expression
+                && !empty($stmt->expr->name)
                 && $stmt->expr->name->toString() === $this->targetMethod
                 && $stmt->expr->args[0]->value->value === $this->group;
         });

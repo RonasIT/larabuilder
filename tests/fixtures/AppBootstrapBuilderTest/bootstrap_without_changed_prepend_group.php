@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        if (app()->environment('production')) {
+            $middleware->append('auth');
+        }
+
         $middleware->prependToGroup('api', [
             'throttle:60,10',
             Authenticate::class,
