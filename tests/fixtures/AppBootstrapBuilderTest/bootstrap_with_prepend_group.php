@@ -12,8 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prependToGroup('api', ['throttle:60,10', FakeClass::class]);
-        $middleware->prependToGroup('web', ['throttle:10,10', FakeClass::class]);
+        $middleware->prependToGroup('api', [
+            'throttle:60,10',
+            FakeClass::class,
+        ]);
+        $middleware->prependToGroup('web', [
+            'throttle:10,10',
+            FakeClass::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -183,6 +183,7 @@ class AppBootstrapBuilderTest extends TestCase
             ->addMiddlewarePrependToGroup('api', [
                 'throttle:60,10',
                 Authenticate::class,
+                \Illuminate\Routing\Controllers\Middleware::class,
             ])
             ->save();
     }

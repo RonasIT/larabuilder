@@ -115,8 +115,9 @@ new AppBootstrapBuilder(bootstrap_path('app.php'))
         MyMiddleware::class,
         'throttle:60,1',
     ])
-    ->addMiddlewarePrependToGroup('web', WebMiddleware::class,, InsertPositionEnum::Start)
+    ->addMiddlewarePrependToGroup('web', WebMiddleware::class, InsertPositionEnum::Start)
     ->save();
+```
 
 **Note:** Provide the full class name (FQCN) for class-based middleware — the method imports it automatically.
 
