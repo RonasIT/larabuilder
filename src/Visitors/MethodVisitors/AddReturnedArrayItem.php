@@ -7,22 +7,20 @@ use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\FunctionLike;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
-use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 use RonasIT\Larabuilder\Printer;
 
-class AddReturnedArrayItem extends BaseMethodVisitor implements UpdateNodeContract
+class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
 {
     protected PreformattedExpression $valueExpr;
     protected ?PreformattedExpression $keyExpr;
 
     public function __construct(
-        protected string $methodName,
+        string $methodName,
         string $value,
         string|DefaultValue $key = DefaultValue::None,
     ) {
@@ -30,17 +28,6 @@ class AddReturnedArrayItem extends BaseMethodVisitor implements UpdateNodeContra
 
         $this->valueExpr = new PreformattedExpression($value);
         $this->keyExpr = ($key === DefaultValue::None) ? null : new PreformattedExpression($key);
-    }
-
-    public function shouldUpdateNode(Node $node): bool
-    {
-        $isTarget = $node instanceof ClassMethod && $this->methodName === $node->name->name;
-
-        if ($isTarget) {
-            $this->hasTargetMethod = true;
-        }
-
-        return $isTarget;
     }
 
     public function updateNode(Node $node): void

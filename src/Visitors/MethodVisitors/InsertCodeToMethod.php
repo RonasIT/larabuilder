@@ -3,20 +3,18 @@
 namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
-use RonasIT\Larabuilder\Contracts\UpdateNodeContract;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Nodes\PreformattedCode;
 use RonasIT\Larabuilder\Support\StatementDuplicateChecker;
 
-class InsertCodeToMethod extends BaseMethodVisitor implements UpdateNodeContract
+class InsertCodeToMethod extends AbstractUpdateMethodVisitor
 {
     protected PreformattedCode $code;
     protected StatementDuplicateChecker $statementDuplicateChecker;
 
     public function __construct(
-        protected string $methodName,
+        string $methodName,
         string $code,
         protected InsertPositionEnum $insertPosition,
     ) {
@@ -28,14 +26,8 @@ class InsertCodeToMethod extends BaseMethodVisitor implements UpdateNodeContract
 
     public function shouldUpdateNode(Node $node): bool
     {
-        $isTargetMethod = $node instanceof ClassMethod && $this->methodName === $node->name->name;
-
-        if ($isTargetMethod) {
-            $this->hasTargetMethod = true;
-        }
-
-        return !empty($this->code->value)
-            && $isTargetMethod
+        return parent::shouldUpdateNode($node)
+            && !empty($this->code->value)
             && !$this->statementDuplicateChecker->isDuplicated($node->stmts ?? [], $this->code->code);
     }
 
