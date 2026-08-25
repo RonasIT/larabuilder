@@ -16,8 +16,8 @@ use RonasIT\Larabuilder\Printer;
 
 class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
 {
-    protected PreformattedExpression $valueExpr;
-    protected ?PreformattedExpression $keyExpr;
+    protected PreformattedExpression $value;
+    protected ?PreformattedExpression $key;
 
     public function __construct(
         string $methodName,
@@ -26,8 +26,8 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
     ) {
         parent::__construct($methodName);
 
-        $this->valueExpr = new PreformattedExpression($value);
-        $this->keyExpr = (!is_null($key)) ? new PreformattedExpression($key) : null;
+        $this->value = new PreformattedExpression($value);
+        $this->key = (!is_null($key)) ? new PreformattedExpression($key) : null;
     }
 
     public function updateNode(Node $node): void
@@ -38,8 +38,8 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
             throw new UnexpectedReturnTypeException($this->methodName, 'array', $node->returnType?->toString());
         }
 
-        if (is_null($this->keyExpr)) {
-            $returnNode->expr->items[] = new ArrayItem($this->valueExpr);
+        if (is_null($this->key)) {
+            $returnNode->expr->items[] = new ArrayItem($this->value);
 
             return;
         }
@@ -49,15 +49,15 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
         foreach ($returnNode->expr->items as $item) {
             if ($item instanceof ArrayItem
                 && !empty($item->key)
-                && $printer->prettyPrintExpr($item->key) === $this->keyExpr->value
+                && $printer->prettyPrintExpr($item->key) === $this->key->value
             ) {
-                $item->value = $this->valueExpr;
+                $item->value = $this->value;
 
                 return;
             }
         }
 
-        $returnNode->expr->items[] = new ArrayItem($this->valueExpr, $this->keyExpr);
+        $returnNode->expr->items[] = new ArrayItem($this->value, $this->key);
     }
 
     protected function findReturnInScope(array $nodes, ?Return_ $foundReturn = null): ?Return_
