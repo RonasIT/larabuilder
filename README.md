@@ -57,14 +57,26 @@ Add new `use TraitName;` statements to a class, trait, or enum. This method auto
 
 #### addReturnedArrayItem
 
-Add or update an item in the array returned by a method. The method must have a single `return` statement with an array literal. If a key is given and already exists, its value is updated; otherwise the item is appended. Works with classes, traits, and enums.
+Add or update an item in the array returned by a method. The method must have a single `return` statement with an array
+literal. If a key is given and already exists, its value is updated; otherwise the item is appended. Works with classes,
+traits, and enums.
+
+Both `$value` and `$key` are passed as strings. A bare identifier (`logo`, `datetime`) is inserted as a string literal;
+anything else — `null`, `true`, `false`, numbers, `RoleEnum::class`, `self::Second`, `['admin', 'editor']` — is inserted as raw PHP code.
 
 ```php
 new PHPFileBuilder(app_path('Models/User.php'))
-    ->addReturnedArrayItem('casts', 'RoleEnum::class', 'role')
-    ->addReturnedArrayItem('getAvailableRelations', 'logo')
+    ->addReturnedArrayItem('casts', 'RoleEnum::class', 'role')  // 'role' => RoleEnum::class
+    ->addReturnedArrayItem('casts', 'datetime', 'created_at')   // 'created_at' => 'datetime'
+    ->addReturnedArrayItem('getAvailableRelations', 'logo')     // 'logo'
     ->save();
 ```
+
+Throws:
+- `NodeNotExistException` if the method does not exist
+- `MultipleReturnStatementsException` if the method has more than one `return`
+- `UnexpectedReturnTypeException` if the returned value is not an array literal
+- `InvalidPHPCodeException` if the given value or key cannot be parsed.
 
 #### addMethod
 
