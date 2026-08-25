@@ -32,7 +32,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
 
     public function updateNode(Node $node): void
     {
-        $returnNode = $this->findReturnInScope($node->stmts ?? []);
+        $returnNode = $this->findReturnNode($node->stmts ?? []);
 
         if (!$returnNode?->expr instanceof Array_) {
             throw new UnexpectedReturnTypeException($this->methodName, 'array', $node->returnType?->toString());
@@ -60,7 +60,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
         $returnNode->expr->items[] = new ArrayItem($this->value, $this->key);
     }
 
-    protected function findReturnInScope(array $nodes, ?Return_ $foundReturn = null): ?Return_
+    protected function findReturnNode(array $nodes, ?Return_ $foundReturn = null): ?Return_
     {
         foreach ($nodes as $node) {
             if ($node instanceof Return_) {
@@ -77,7 +77,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
                 continue;
             }
 
-            $foundReturn = $this->findReturnInScope($this->getChildNodes($node), $foundReturn);
+            $foundReturn = $this->findReturnNode($this->getChildNodes($node), $foundReturn);
         }
 
         return $foundReturn;
