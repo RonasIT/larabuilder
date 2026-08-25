@@ -39,6 +39,12 @@ class SomeClass implements Test, Some
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'created_at' => 'datetime',
+            'role' => RoleEnum::class,
+            'settings' => 'array',
+            'deleted_at' => null,
+            'is_active' => true,
+            'is_archived' => false,
         ];
     }
 
@@ -47,6 +53,7 @@ class SomeClass implements Test, Some
         return [
             'comments',
             'tags',
+            'logo',
         ];
     }
 
@@ -73,11 +80,7 @@ class SomeClass implements Test, Some
                 ? QueueEnum::Low
                 : QueueEnum::PushNotifications,
             BroadcastChannel::class => QueueEnum::Broadcasts,
+            MailChannel::class => QueueEnum::Database,
         ];
-    }
-
-    protected function boot()
-    {
-        parent::boot();
     }
 }
