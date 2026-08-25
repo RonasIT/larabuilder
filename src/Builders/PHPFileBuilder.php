@@ -7,7 +7,6 @@ use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use RonasIT\Larabuilder\DTO\MethodParamsList;
 use RonasIT\Larabuilder\Enums\AccessModifierEnum;
-use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
@@ -97,7 +96,7 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function addReturnedArrayItem(string $methodName, string $value, string|DefaultValue $key = DefaultValue::None): self
+    public function addReturnedArrayItem(string $methodName, string $value, ?string $key = null): self
     {
         $this->traverser->addVisitor(new AddReturnedArrayItem($methodName, $value, $key));
 

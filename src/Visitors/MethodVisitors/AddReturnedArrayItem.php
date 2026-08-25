@@ -8,7 +8,6 @@ use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Stmt\Return_;
-use RonasIT\Larabuilder\Enums\DefaultValue;
 use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Nodes\PreformattedExpression;
@@ -22,12 +21,12 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
     public function __construct(
         string $methodName,
         string $value,
-        string|DefaultValue $key = DefaultValue::None,
+        ?string $key = null,
     ) {
         parent::__construct($methodName);
 
         $this->valueExpr = new PreformattedExpression($value);
-        $this->keyExpr = ($key === DefaultValue::None) ? null : new PreformattedExpression($key);
+        $this->keyExpr = (!is_null($key)) ? new PreformattedExpression($key) : null;
     }
 
     public function updateNode(Node $node): void
@@ -44,7 +43,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
             throw new UnexpectedReturnTypeException($this->methodName, 'array', $node->returnType?->toString());
         }
 
-        if (empty($this->keyExpr)) {
+        if (is_null($this->keyExpr)) {
             $returnNode->expr->items[] = new ArrayItem($this->valueExpr);
 
             return;
