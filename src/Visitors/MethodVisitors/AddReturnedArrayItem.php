@@ -7,6 +7,7 @@ use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\FunctionLike;
+use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Return_;
 use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
@@ -31,13 +32,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
 
     public function updateNode(Node $node): void
     {
-        $returnNodes = $this->findReturnsInScope($node->stmts ?? []);
-
-        if (count($returnNodes) > 1) {
-            throw new MultipleReturnStatementsException($this->methodName);
-        }
-
-        $returnNode = $returnNodes[0] ?? null;
+        $returnNode = $this->findReturnInScope($node->stmts ?? []);
 
         if (!$returnNode?->expr instanceof Array_) {
             throw new UnexpectedReturnTypeException($this->methodName, 'array', $node->returnType?->toString());
@@ -65,30 +60,41 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
         $returnNode->expr->items[] = new ArrayItem($this->valueExpr, $this->keyExpr);
     }
 
-    protected function findReturnsInScope(array $nodes): array
+    protected function findReturnInScope(array $nodes, ?Return_ $foundReturn = null): ?Return_
     {
-        $returns = [];
-
         foreach ($nodes as $node) {
             if ($node instanceof Return_) {
-                $returns[] = $node;
+                if (!is_null($foundReturn)) {
+                    throw new MultipleReturnStatementsException($this->methodName);
+                }
+
+                $foundReturn = $node;
 
                 continue;
             }
 
-            if ($node instanceof FunctionLike) {
+            if ($node instanceof FunctionLike || $node instanceof ClassLike) {
                 continue;
             }
 
-            foreach ($node->getSubNodeNames() as $name) {
-                foreach (Arr::wrap($node->$name) as $child) {
-                    if ($child instanceof Node) {
-                        $returns = [...$returns, ...$this->findReturnsInScope([$child])];
-                    }
+            $foundReturn = $this->findReturnInScope($this->getChildNodes($node), $foundReturn);
+        }
+
+        return $foundReturn;
+    }
+
+    protected function getChildNodes(Node $node): array
+    {
+        $childNodes = [];
+
+        foreach ($node->getSubNodeNames() as $subNodeName) {
+            foreach (Arr::wrap($node->$subNodeName) as $subNode) {
+                if ($subNode instanceof Node) {
+                    $childNodes[] = $subNode;
                 }
             }
         }
 
-        return $returns;
+        return $childNodes;
     }
 }
