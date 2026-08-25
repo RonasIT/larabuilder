@@ -794,7 +794,7 @@ class PHPFileBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
-        $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'void'.");
+        $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'true'.");
 
         new PHPFileBuilder($file)
             ->addReturnedArrayItem('someMethod', 'value', 'key')
