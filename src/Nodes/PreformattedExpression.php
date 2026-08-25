@@ -3,10 +3,8 @@
 namespace RonasIT\Larabuilder\Nodes;
 
 use Illuminate\Support\Str;
-use PhpParser\Error;
 use PhpParser\Node\Expr;
-use PhpParser\ParserFactory;
-use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
+use RonasIT\Larabuilder\Support\PHPCodeParser;
 
 /**
  * Used to insert expression code with saving original formatting
@@ -48,10 +46,6 @@ class PreformattedExpression extends Expr
 
     protected function validatePHPCode(string $code): void
     {
-        try {
-            new ParserFactory()->createForHostVersion()->parse("<?php\n{$code}?>");
-        } catch (Error) {
-            throw new InvalidPHPCodeException($code);
-        }
+        PHPCodeParser::parse($code, '?>');
     }
 }
