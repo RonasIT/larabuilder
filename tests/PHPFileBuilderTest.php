@@ -727,7 +727,7 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testAddItemToReturnArray(): void
+    public function testAddReturnedArrayItem(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
@@ -737,18 +737,18 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('casts', 'datetime', 'created_at')
-            ->addItemToReturnArray('casts', 'RoleEnum::class', 'role')
-            ->addItemToReturnArray('casts', 'array', 'settings')
-            ->addItemToReturnArray('casts', 'null', 'deleted_at')
-            ->addItemToReturnArray('casts', 'true', 'is_active')
-            ->addItemToReturnArray('casts', 'false', 'is_archived')
-            ->addItemToReturnArray('getAvailableRelations', 'logo')
-            ->addItemToReturnArray('viaQueues', 'QueueEnum::Database', 'MailChannel::class')
+            ->addReturnedArrayItem('casts', 'datetime', 'created_at')
+            ->addReturnedArrayItem('casts', 'RoleEnum::class', 'role')
+            ->addReturnedArrayItem('casts', 'array', 'settings')
+            ->addReturnedArrayItem('casts', 'null', 'deleted_at')
+            ->addReturnedArrayItem('casts', 'true', 'is_active')
+            ->addReturnedArrayItem('casts', 'false', 'is_archived')
+            ->addReturnedArrayItem('getAvailableRelations', 'logo')
+            ->addReturnedArrayItem('viaQueues', 'QueueEnum::Database', 'MailChannel::class')
             ->save();
     }
 
-    public function testAddItemToReturnArrayUpdatesExistingKey(): void
+    public function testAddReturnedArrayItemUpdatesExistingKey(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
@@ -758,11 +758,11 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('casts', 'encrypted', 'password')
+            ->addReturnedArrayItem('casts', 'encrypted', 'password')
             ->save();
     }
 
-    public function testAddItemToReturnArrayInTrait(): void
+    public function testAddReturnedArrayItemInTrait(): void
     {
         $file = $this->generateOriginalStructurePath('trait.php');
 
@@ -772,11 +772,11 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('getUserData', "['admin', 'editor']", 'roles')
+            ->addReturnedArrayItem('getUserData', "['admin', 'editor']", 'roles')
             ->save();
     }
 
-    public function testAddItemToReturnArrayInEnum(): void
+    public function testAddReturnedArrayItemInEnum(): void
     {
         $file = $this->generateOriginalStructurePath('enum.php');
 
@@ -786,62 +786,62 @@ class PHPFileBuilderTest extends TestCase
         );
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('updatableStatuses', 'self::Second')
+            ->addReturnedArrayItem('updatableStatuses', 'self::Second')
             ->save();
     }
 
-    public function testAddItemToReturnArrayThrowsOnNonArrayReturn(): void
+    public function testAddReturnedArrayItemThrowsOnNonArrayReturn(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
         $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'void'.");
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('someMethod', 'value', 'key')
+            ->addReturnedArrayItem('someMethod', 'value', 'key')
             ->save();
     }
 
-    public function testAddItemToReturnArrayThrowsOnMultipleReturnStatements(): void
+    public function testAddReturnedArrayItemThrowsOnMultipleReturnStatements(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
         $this->assertExceptionThrew(MultipleReturnStatementsException::class, "Method 'getRelations' contains multiple return statements.");
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('getRelations', 'admin')
+            ->addReturnedArrayItem('getRelations', 'admin')
             ->save();
     }
 
-    public function testAddItemToReturnArrayThrowsOnMethodNotFound(): void
+    public function testAddReturnedArrayItemThrowsOnMethodNotFound(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
         $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('noMethod', 'value', 'key')
+            ->addReturnedArrayItem('noMethod', 'value', 'key')
             ->save();
     }
 
-    public function testAddItemToReturnArrayNotClassTraitEnum(): void
+    public function testAddReturnedArrayItemNotClassTraitEnum(): void
     {
         $file = $this->generateOriginalStructurePath('interface.php');
 
-        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddItemToReturnArray' operation may only be applied to: Class, Trait, Enum.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddReturnedArrayItem' operation may only be applied to: Class, Trait, Enum.");
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('casts', 'datetime', 'created_at')
+            ->addReturnedArrayItem('casts', 'datetime', 'created_at')
             ->save();
     }
 
-    public function testAddItemToReturnArrayInvalidCode(): void
+    public function testAddReturnedArrayItemInvalidCode(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
         $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'??invalid\'.');
 
         new PHPFileBuilder($file)
-            ->addItemToReturnArray('someMethod', '??invalid')
+            ->addReturnedArrayItem('someMethod', '??invalid')
             ->save();
     }
 }

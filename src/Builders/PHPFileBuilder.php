@@ -14,8 +14,8 @@ use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
 use RonasIT\Larabuilder\Visitors\AddImports;
 use RonasIT\Larabuilder\Visitors\AddTraits;
-use RonasIT\Larabuilder\Visitors\MethodVisitors\AddItemToReturnArray;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\AddMethod;
+use RonasIT\Larabuilder\Visitors\MethodVisitors\AddReturnedArrayItem;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\RemoveMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
@@ -97,9 +97,9 @@ class PHPFileBuilder
         return $this;
     }
 
-    public function addItemToReturnArray(string $methodName, string $value, string|DefaultValue $key = DefaultValue::None): self
+    public function addReturnedArrayItem(string $methodName, string $value, string|DefaultValue $key = DefaultValue::None): self
     {
-        $this->traverser->addVisitor(new AddItemToReturnArray($methodName, $value, $key));
+        $this->traverser->addVisitor(new AddReturnedArrayItem($methodName, $value, $key));
 
         return $this;
     }

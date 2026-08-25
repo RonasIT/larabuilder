@@ -16,7 +16,7 @@ use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 use RonasIT\Larabuilder\Printer;
 
-class AddItemToReturnArray extends BaseMethodVisitor implements UpdateNodeContract
+class AddReturnedArrayItem extends BaseMethodVisitor implements UpdateNodeContract
 {
     protected PreformattedExpression $valueExpr;
     protected ?PreformattedExpression $keyExpr;
