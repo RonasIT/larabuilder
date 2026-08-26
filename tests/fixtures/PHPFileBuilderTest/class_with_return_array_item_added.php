@@ -45,6 +45,7 @@ class SomeClass implements Test, Some
             'deleted_at' => null,
             'is_active' => true,
             'is_archived' => false,
+            'video_links' => DataCollection::class . ':' . VideoLink::class,
         ];
     }
 

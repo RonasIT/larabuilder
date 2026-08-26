@@ -745,6 +745,7 @@ class PHPFileBuilderTest extends TestCase
             ->addReturnedArrayItem('casts', 'false', 'is_archived')
             ->addReturnedArrayItem('getAvailableRelations', 'logo')
             ->addReturnedArrayItem('viaQueues', 'QueueEnum::Database', 'MailChannel::class')
+            ->addReturnedArrayItem('casts', "DataCollection::class . ':' . VideoLink::class", 'video_links')
             ->save();
     }
 
