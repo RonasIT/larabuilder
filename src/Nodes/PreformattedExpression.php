@@ -4,6 +4,8 @@ namespace RonasIT\Larabuilder\Nodes;
 
 use Illuminate\Support\Str;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Stmt\Expression;
+use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Support\PHPCodeParser;
 
 /**
@@ -11,6 +13,8 @@ use RonasIT\Larabuilder\Support\PHPCodeParser;
  */
 class PreformattedExpression extends Expr
 {
+    public readonly Expr $parsedExpr;
+
     public function __construct(
         public string $value,
         public array $attributes = [],
@@ -23,9 +27,9 @@ class PreformattedExpression extends Expr
             $this->value = Str::chopStart($this->value, '<?php');
             $this->value = trim($this->value);
             $this->value = Str::chopEnd($this->value, ';');
-
-            $this->validatePHPCode($this->value);
         }
+
+        $this->parsedExpr = $this->parsePHPExpression($this->value);
     }
 
     public function getSubNodeNames(): array
@@ -44,8 +48,14 @@ class PreformattedExpression extends Expr
             && !in_array(strtolower($value), ['null', 'true', 'false']);
     }
 
-    protected function validatePHPCode(string $code): void
+    protected function parsePHPExpression(string $code): Expr
     {
-        PHPCodeParser::parse($code, '?>');
+        $statements = PHPCodeParser::parse($code, '?>');
+
+        if (count($statements) !== 1 || !$statements[0] instanceof Expression) {
+            throw new InvalidPHPCodeException($code);
+        }
+
+        return $statements[0]->expr;
     }
 }

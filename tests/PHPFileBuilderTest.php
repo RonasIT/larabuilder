@@ -745,6 +745,7 @@ class PHPFileBuilderTest extends TestCase
             ->addReturnedArrayItem('casts', 'false', 'is_archived')
             ->addReturnedArrayItem('getAvailableRelations', 'logo')
             ->addReturnedArrayItem('viaQueues', 'QueueEnum::Database', 'MailChannel::class')
+            ->addReturnedArrayItem('casts', "DataCollection::class . ':' . VideoLink::class", 'video_links')
             ->save();
     }
 
@@ -794,7 +795,7 @@ class PHPFileBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('class.php');
 
-        $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'void'.");
+        $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'true'.");
 
         new PHPFileBuilder($file)
             ->addReturnedArrayItem('someMethod', 'value', 'key')

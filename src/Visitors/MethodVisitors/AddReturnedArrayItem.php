@@ -5,8 +5,10 @@ namespace RonasIT\Larabuilder\Visitors\MethodVisitors;
 use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\FunctionLike;
+use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Return_;
 use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
@@ -18,6 +20,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
 {
     protected PreformattedExpression $value;
     protected ?PreformattedExpression $key;
+    protected Printer $printer;
 
     public function __construct(
         string $methodName,
@@ -28,6 +31,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
 
         $this->value = new PreformattedExpression($value);
         $this->key = (!is_null($key)) ? new PreformattedExpression($key) : null;
+        $this->printer = new Printer();
     }
 
     public function updateNode(Node $node): void
@@ -35,7 +39,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
         $returnNode = $this->findReturnNode($node->stmts ?? []);
 
         if (!$returnNode?->expr instanceof Array_) {
-            throw new UnexpectedReturnTypeException($this->methodName, 'array', $node->returnType?->toString());
+            throw new UnexpectedReturnTypeException($this->methodName, 'array', $this->getReturnedValueCode($returnNode));
         }
 
         if (is_null($this->key)) {
@@ -44,13 +48,8 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
             return;
         }
 
-        $printer = new Printer();
-
         foreach ($returnNode->expr->items as $item) {
-            if ($item instanceof ArrayItem
-                && !empty($item->key)
-                && $printer->prettyPrintExpr($item->key) === $this->key->value
-            ) {
+            if ($item instanceof ArrayItem && $this->isSameKey($item->key)) {
                 $item->value = $this->value;
 
                 return;
@@ -58,6 +57,22 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
         }
 
         $returnNode->expr->items[] = new ArrayItem($this->value, $this->key);
+    }
+
+    protected function isSameKey(?Expr $itemKey): bool
+    {
+        if (is_null($itemKey)) {
+            return false;
+        }
+
+        return ($itemKey instanceof Scalar && $this->key->parsedExpr instanceof Scalar)
+            ? $itemKey->value === $this->key->parsedExpr->value
+            : $this->printer->prettyPrintExpr($itemKey) === $this->key->value;
+    }
+
+    protected function getReturnedValueCode(?Return_ $returnNode): ?string
+    {
+        return (!is_null($returnNode?->expr)) ? $this->printer->prettyPrintExpr($returnNode->expr) : null;
     }
 
     protected function findReturnNode(array $nodes, ?Return_ $foundReturn = null): ?Return_
