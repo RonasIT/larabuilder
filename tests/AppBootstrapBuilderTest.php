@@ -16,12 +16,7 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testAddExceptionsRenderEmpty(): void
     {
-        $file = $this->generateOriginalStructurePath('bootstrap_empty.php');
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'bootstrap_empty.php'),
-        );
+        $file = $this->mockFileSave('bootstrap_empty.php');
 
         new AppBootstrapBuilder($file)
             ->addExceptionsRender(
@@ -40,12 +35,7 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testAddExceptionsRenderCustom(): void
     {
-        $file = $this->generateOriginalStructurePath('bootstrap_configured.php');
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'bootstrap_configured.php'),
-        );
+        $file = $this->mockFileSave('bootstrap_configured.php');
 
         new AppBootstrapBuilder($file)
             ->addExceptionsRender(
@@ -68,12 +58,7 @@ class AppBootstrapBuilderTest extends TestCase
 
     public function testAddExceptionsRenderExist(): void
     {
-        $file = $this->generateOriginalStructurePath('bootstrap_with_render.php');
-
-        $this->mockNativeFunction(
-            'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'bootstrap_with_render.php'),
-        );
+        $file = $this->mockFileSave('bootstrap_with_render.php');
 
         new AppBootstrapBuilder($file)
             ->addExceptionsRender(
@@ -88,6 +73,7 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('bootstrap_configured.php');
 
+        $this->expectNoFileSave();
         $this->assertExceptionThrew(
             expectedClassName: InvalidPHPCodeException::class,
             expectedMessage: 'Cannot parse provided code: \'return ($request->expectsJson()\'.',
@@ -128,6 +114,7 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath($fixture);
 
+        $this->expectNoFileSave();
         $this->assertExceptionThrew(InvalidBootstrapAppFileException::class, "Bootstrap app file must not contain {$type} declarations");
 
         new AppBootstrapBuilder($file)
