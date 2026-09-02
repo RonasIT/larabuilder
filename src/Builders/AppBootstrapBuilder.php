@@ -2,7 +2,10 @@
 
 namespace RonasIT\Larabuilder\Builders;
 
+use Illuminate\Support\Arr;
+use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddExceptionsRender;
+use RonasIT\Larabuilder\Visitors\AppBootstrapVisitors\AddMiddlewarePrependToGroup;
 
 class AppBootstrapBuilder extends PHPFileBuilder
 {
@@ -22,6 +25,21 @@ class AppBootstrapBuilder extends PHPFileBuilder
         }
 
         $this->addImports($imports);
+
+        return $this;
+    }
+
+    public function addMiddlewarePrependToGroup(string $group, string|array $middleware, InsertPositionEnum $position = InsertPositionEnum::End): self
+    {
+        $middlewares = Arr::wrap($middleware);
+
+        $this->traverser->addVisitor(new AddMiddlewarePrependToGroup($group, $middlewares, $position));
+
+        $imports = array_filter($middlewares, fn ($middleware) => class_exists($middleware));
+
+        if (!empty($imports)) {
+            $this->addImports($imports);
+        }
 
         return $this;
     }
