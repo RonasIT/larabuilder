@@ -54,6 +54,18 @@ trait SomeTrait
         ]);
     }
 
+    protected function getInlineOptions(): array
+    {
+        return ['first' => 1, 'second' => 2];
+    }
+
+    protected function getDefaultFilters(): array
+    {
+        return [
+            'is_active',
+        ];
+    }
+
     protected function getUserData(): array
     {
         return [

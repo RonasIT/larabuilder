@@ -36,6 +36,23 @@ trait SomeTrait
         ]);
     }
 
+    protected function getInlineOptions(): array
+    {
+        return [
+            'first' => 1,
+            'second' => 2,
+            'third' => 3,
+        ];
+    }
+
+    protected function getDefaultFilters(): array
+    {
+        return [
+            'is_active',
+            'is_published',
+        ];
+    }
+
     protected function getUserData(): array
     {
         return [

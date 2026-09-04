@@ -30,6 +30,11 @@ enum SomeEnum
         return self::cases();
     }
 
+    public static function defaultStatuses(): array
+    {
+        return [];
+    }
+
     public static function updatableStatuses(): array
     {
         return [self::First];

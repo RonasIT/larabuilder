@@ -774,6 +774,8 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addReturnedArrayItem('getUserData', "['admin', 'editor']", 'roles')
+            ->addReturnedArrayItem('getDefaultFilters', 'is_published')
+            ->addReturnedArrayItem('getInlineOptions', '3', 'third')
             ->save();
     }
 
@@ -788,6 +790,7 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addReturnedArrayItem('updatableStatuses', 'self::Second')
+            ->addReturnedArrayItem('defaultStatuses', 'self::First')
             ->save();
     }
 
