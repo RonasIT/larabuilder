@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
+use Illuminate\Support\Arr;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
@@ -40,13 +41,59 @@ class Printer extends Standard
         return preg_replace("/(\r?\n){3,}/", "\n\n", $code);
     }
 
+    protected function pArray(
+        array $nodes,
+        array $origNodes,
+        int &$pos,
+        int $indentAdjustment,
+        string $parentNodeClass,
+        string $subNodeName,
+        ?int $fixup,
+    ): ?string {
+        $modifiedArray = ($parentNodeClass === Array_::class && $subNodeName === 'items')
+            ? $this->findModifiedArray($nodes)
+            : null;
+
+        if (!is_null($modifiedArray)) {
+            $isMultiline = $this->wasMultiline($origNodes, $pos) || count($nodes) > 2;
+
+            $modifiedArray->setAttribute(StatementAttributeEnum::Multiline->value, $isMultiline);
+
+            return null;
+        }
+
+        return parent::pArray($nodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+    }
+
     protected function pExpr_Array(Array_ $node): string
     {
-        if ($this->hasParentOfType($node, PropertyItem::class)) {
+        $isMultiline = $node->getAttribute(StatementAttributeEnum::Multiline->value);
+
+        if ($this->hasParentOfType($node, PropertyItem::class) || $isMultiline === true) {
             return '[' . $this->pCommaSeparatedMultiline($node->items, true) . $this->nl . ']';
         }
 
-        return parent::pExpr_Array($node);
+        return ($isMultiline === false)
+            ? '[' . $this->pCommaSeparated($node->items) . ']'
+            : parent::pExpr_Array($node);
+    }
+
+    protected function findModifiedArray(array $items): ?Array_
+    {
+        $modifiedItem = Arr::first(
+            $items,
+            fn (?Node $item) => $item?->getAttribute(StatementAttributeEnum::Modified->value) === true,
+        );
+
+        return $modifiedItem?->getAttribute(StatementAttributeEnum::Parent->value);
+    }
+
+    protected function wasMultiline(array $origNodes, int $pos): bool
+    {
+        $firstItem = $origNodes[0] ?? null;
+        $endPos = $firstItem?->getStartTokenPos() ?? $this->origTokens->findRight($pos, ']');
+
+        return str_contains($this->origTokens->getTokenCode($pos, $endPos, 0), "\n");
     }
 
     protected function hasParentOfType(Node $node, string $type): bool
