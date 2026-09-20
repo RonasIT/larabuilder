@@ -54,6 +54,24 @@ trait SomeTrait
         ]);
     }
 
+    protected function getValidationRules(): array
+    {
+        return [
+            // profile
+            'name' => 'required|string',
+            'email' => 'required|email',
+
+            // address
+            'city' => 'nullable|string',
+        ];
+    }
+
+    protected function getExtraFilters(): array
+    {
+        return [
+        ];
+    }
+
     protected function getInlineOptions(): array
     {
         return ['first' => 1, 'second' => 2];
@@ -71,6 +89,10 @@ trait SomeTrait
         return [
             'name' => 'John',
             'email' => 'john@example.com',
+            'settings' => [
+                'locale' => 'en',
+                'timezone' => 'UTC',
+            ],
         ];
     }
 }

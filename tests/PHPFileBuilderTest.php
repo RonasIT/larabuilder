@@ -776,6 +776,8 @@ class PHPFileBuilderTest extends TestCase
             ->addReturnedArrayItem('getUserData', "['admin', 'editor']", 'roles')
             ->addReturnedArrayItem('getDefaultFilters', 'is_published')
             ->addReturnedArrayItem('getInlineOptions', '3', 'third')
+            ->addReturnedArrayItem('getValidationRules', "'nullable|string'", 'zip')
+            ->addReturnedArrayItem('getExtraFilters', 'is_hidden')
             ->save();
     }
 

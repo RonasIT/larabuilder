@@ -36,6 +36,25 @@ trait SomeTrait
         ]);
     }
 
+    protected function getValidationRules(): array
+    {
+        return [
+            // profile
+            'name' => 'required|string',
+            'email' => 'required|email',
+            // address
+            'city' => 'nullable|string',
+            'zip' => 'nullable|string',
+        ];
+    }
+
+    protected function getExtraFilters(): array
+    {
+        return [
+            'is_hidden',
+        ];
+    }
+
     protected function getInlineOptions(): array
     {
         return [
@@ -58,6 +77,10 @@ trait SomeTrait
         return [
             'name' => 'John',
             'email' => 'john@example.com',
+            'settings' => [
+                'locale' => 'en',
+                'timezone' => 'UTC',
+            ],
             'roles' => ['admin', 'editor'],
         ];
     }
