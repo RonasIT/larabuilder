@@ -54,7 +54,7 @@ class Printer extends Standard
             ? $this->findModifiedArray($nodes)
             : null;
 
-        if (!is_null($modifiedArray)) {
+        if (!is_null($modifiedArray) && !$this->isMultiline($origNodes)) {
             $isMultiline = $this->wasMultiline($origNodes, $pos) || count($nodes) > 2;
 
             $modifiedArray->setAttribute(StatementAttributeEnum::Multiline->value, $isMultiline);

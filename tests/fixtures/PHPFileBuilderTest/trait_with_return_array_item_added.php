@@ -42,6 +42,7 @@ trait SomeTrait
             // profile
             'name' => 'required|string',
             'email' => 'required|email',
+
             // address
             'city' => 'nullable|string',
             'zip' => 'nullable|string',
