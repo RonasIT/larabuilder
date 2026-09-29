@@ -48,7 +48,7 @@ class NodeInserterTest extends TestCase
             new TraitUse([new Name('NewTrait')]),
             new ClassConst([new Const_('ANOTHER_CONST', new Int_(0))], Modifiers::PUBLIC),
             new TraitUse([new Name('AnotherTrait')]),
-        ], true);
+        ]);
 
         $this->assertSame(
             $this->getFixture('class_with_mixed_nodes_inserted.php'),

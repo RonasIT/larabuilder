@@ -36,6 +36,14 @@ trait SomeTrait
         ]);
     }
 
+    protected function getUserData(): array
+    {
+        return [
+            'name' => 'John',
+            'email' => 'john@example.com',
+        ];
+    }
+
     public function handle(): bool
     {
         return $this->process();
