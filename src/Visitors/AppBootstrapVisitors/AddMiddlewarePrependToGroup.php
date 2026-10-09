@@ -14,6 +14,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Nop;
+use RonasIT\Larabuilder\Enums\ExpressionAttributeEnum;
 use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 
 class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
@@ -125,7 +126,9 @@ class AddMiddlewarePrependToGroup extends AbstractAppBootstrapVisitor
 
     protected function buildMiddlewareArg(array $middlewares): Arg
     {
-        return new Arg(new Array_($middlewares));
+        return new Arg(new Array_($middlewares, [
+            ExpressionAttributeEnum::IsArrayMultiline->value => true,
+        ]));
     }
 
     protected function getMiddlewareList(): array
