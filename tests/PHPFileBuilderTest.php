@@ -36,17 +36,50 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
-    public function testSetNamespaceReplacesExistingNamespace(): void
+    public static function provideSetNamespaceFiles(): array
     {
-        $file = $this->generateOriginalStructurePath('enum.php');
+        return [
+            [
+                'fixture' => 'class.php',
+            ],
+            [
+                'fixture' => 'trait.php',
+            ],
+            [
+                'fixture' => 'enum.php',
+            ],
+            [
+                'fixture' => 'interface.php',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideSetNamespaceFiles')]
+    public function testSetNamespaceReplacesExistingNamespace(string $fixture): void
+    {
+        $file = $this->generateOriginalStructurePath($fixture);
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'namespace_update.php'),
+            $this->callFilePutContent($file, "namespace_update_{$fixture}"),
         );
 
         new PHPFileBuilder($file)
             ->setNamespace('App\\Models')
+            ->save();
+    }
+
+    public function testSetNamespaceWithLeadingBackslash(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'namespace_update_class.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->setNamespace('\\App\\Models')
             ->save();
     }
 

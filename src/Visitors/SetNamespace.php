@@ -22,6 +22,7 @@ class SetNamespace extends AbstractNodeVisitor
     public function __construct(
         protected string $namespace,
     ) {
+        $this->namespace = ltrim($namespace, '\\');
     }
 
     public function afterTraverse(array $nodes): ?array
@@ -32,7 +33,9 @@ class SetNamespace extends AbstractNodeVisitor
 
         foreach ($nodes as $key => $node) {
             if ($node instanceof Namespace_) {
-                return $this->updateNamespace($node);
+                $this->updateNamespace($node);
+
+                return null;
             }
 
             if ($node instanceof Declare_) {
@@ -45,12 +48,10 @@ class SetNamespace extends AbstractNodeVisitor
         return [...$declares, new Namespace_(new Name($this->namespace), array_values($nodes))];
     }
 
-    protected function updateNamespace(Namespace_ $node): ?array
+    protected function updateNamespace(Namespace_ $node): void
     {
         if ($node->name->toString() !== $this->namespace) {
             $node->name = new Name($this->namespace);
         }
-
-        return null;
     }
 }
