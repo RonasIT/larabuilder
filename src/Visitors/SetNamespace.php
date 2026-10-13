@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder\Visitors;
 
+use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Declare_;
@@ -33,6 +34,7 @@ class SetNamespace extends AbstractNodeVisitor
 
         $declares = [];
         $stmts = [];
+        $previous = null;
 
         foreach ($nodes as $node) {
             if ($node instanceof Namespace_) {
@@ -47,11 +49,12 @@ class SetNamespace extends AbstractNodeVisitor
                 continue;
             }
 
-            if (!$node instanceof Use_) {
+            if (!$this->isSameUseBlock($node, $previous)) {
                 $stmts[] = new Nop();
             }
 
             $stmts[] = $node;
+            $previous = $node;
         }
 
         return [...$declares, new Nop(), new Namespace_(new Name($this->namespace), $stmts)];
@@ -62,5 +65,12 @@ class SetNamespace extends AbstractNodeVisitor
         if ($node->name?->toString() !== $this->namespace) {
             $node->name = new Name($this->namespace);
         }
+    }
+
+    protected function isSameUseBlock(Node $node, ?Node $previous): bool
+    {
+        return $node instanceof Use_
+            && $previous instanceof Use_
+            && $node->type === $previous->type;
     }
 }
