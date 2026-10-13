@@ -12,6 +12,7 @@ use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 use RonasIT\Larabuilder\ValueOptions\ScheduleOption;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AppBootstrapBuilderTest extends TestCase
 {
@@ -284,6 +285,23 @@ class AppBootstrapBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddRoutingOptionCreateWithRoutingInterleavedCalls(): void
+    {
+        $file = $this->generateOriginalStructurePath('bootstrap_without_with_calls.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'routing_create_interleaved_calls.php'),
+        );
+
+        new AppBootstrapBuilder($file)
+            ->addRoutingOption('health', '/status')
+            ->addExceptionsRender(HttpException::class, 'return;')
+            ->addRoutingOption('apiPrefix', '')
+            ->addRoutingOption('health', '/up')
+            ->save();
+    }
+
     public function testAddRoutingOptionInvalidKey(): void
     {
         $file = $this->generateOriginalStructurePath('bootstrap.php');
@@ -336,6 +354,10 @@ class AppBootstrapBuilderTest extends TestCase
             ->addScheduleCommand(
                 command: 'telescope:prune --set-hours=resolved_exception:1,completed_job:0.1 --hours=336',
                 options: new ScheduleOption('environments', ['production']),
+            )
+            ->addExceptionsRender(
+                exceptionClass: NotFoundHttpException::class,
+                renderBody: 'return;',
             )
             ->addScheduleCommand('telescope:prune --set-hours=resolved_exception_2')
             ->addScheduleCommand('telescope:prune --set-hours=resolved_exception_3')

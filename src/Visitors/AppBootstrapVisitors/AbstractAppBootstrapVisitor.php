@@ -72,8 +72,10 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
                 $node = $this->insertParentNode($node);
             }
 
-            if ($node->var->getAttribute(StatementAttributeEnum::WasCreated->value)) {
-                $node->var = $this->handleParentNode($node->var);
+            $createdParentNode = $this->findCreatedParentNode($node);
+
+            if (!is_null($createdParentNode) && $this->shouldInsertNode($createdParentNode)) {
+                $this->insertNode($createdParentNode);
             }
         }
 
@@ -98,13 +100,19 @@ abstract class AbstractAppBootstrapVisitor extends NodeVisitorAbstract
         return new MethodCall($parentCall, new Identifier(self::LAST_BOOTSTRAP_METHOD_NAME));
     }
 
-    protected function handleParentNode(MethodCall $node): Node
+    protected function findCreatedParentNode(MethodCall $node): ?MethodCall
     {
-        if ($this->isParentNode($node) && $this->shouldInsertNode($node)) {
-            return $this->insertNode($node);
+        $current = $node->var;
+
+        while ($current instanceof MethodCall && $current->getAttribute(StatementAttributeEnum::WasCreated->value)) {
+            if ($this->isParentNode($current)) {
+                return $current;
+            }
+
+            $current = $current->var;
         }
 
-        return $node;
+        return null;
     }
 
     protected function isParentNode(Node $node): bool

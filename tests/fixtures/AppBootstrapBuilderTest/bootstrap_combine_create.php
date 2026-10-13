@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Facades\Schedule;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $factory = ModelFactory::build()->create();
 
@@ -14,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (HttpException $exception) {
+            return;
+        });
+
+        $exceptions->render(function (NotFoundHttpException $exception) {
             return;
         });
     })
