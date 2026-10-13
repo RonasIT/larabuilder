@@ -2,7 +2,6 @@
 
 namespace RonasIT\Larabuilder\Tests;
 
-use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -264,7 +263,7 @@ class AppBootstrapBuilderTest extends TestCase
     {
         $file = $this->generateOriginalStructurePath('bootstrap.php');
 
-        $this->assertExceptionThrew(Exception::class, 'Syntax error, unexpected \'{\' on line 2');
+        $this->assertExceptionThrew(InvalidPHPCodeException::class, "Cannot parse provided code: 'function {}'.");
 
         new AppBootstrapBuilder($file)
             ->addRoutingOption('health', new PreformattedExpression('function {}'))
