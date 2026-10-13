@@ -26,6 +26,7 @@ class Printer extends Standard
     {
         $code = $this->removeTrailingWhitespaces($code);
         $code = $this->removeDuplicateEmptyLines($code);
+        $code = $this->ensureTrailingNewline($code);
 
         return $code;
     }
@@ -38,6 +39,11 @@ class Printer extends Standard
     protected function removeDuplicateEmptyLines(string $code): string
     {
         return preg_replace("/(\r?\n){3,}/", "\n\n", $code);
+    }
+
+    protected function ensureTrailingNewline(string $code): string
+    {
+        return rtrim($code, "\r\n") . "\n";
     }
 
     protected function pExpr_Array(Array_ $node): string
