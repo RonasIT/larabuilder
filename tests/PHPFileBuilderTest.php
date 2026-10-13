@@ -66,6 +66,9 @@ class PHPFileBuilderTest extends TestCase
             [
                 'fixture' => 'interface.php',
             ],
+            [
+                'fixture' => 'class_in_global_namespace.php',
+            ],
         ];
     }
 

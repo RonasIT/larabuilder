@@ -59,7 +59,7 @@ class SetNamespace extends AbstractNodeVisitor
 
     protected function updateNamespace(Namespace_ $node): void
     {
-        if ($node->name->toString() !== $this->namespace) {
+        if ($node->name?->toString() !== $this->namespace) {
             $node->name = new Name($this->namespace);
         }
     }
