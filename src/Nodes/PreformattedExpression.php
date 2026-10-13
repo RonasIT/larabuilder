@@ -25,7 +25,7 @@ class PreformattedExpression extends Expr
             $this->value = "'{$value}'";
         } else {
             $this->value = Str::chopStart($this->value, '<?php');
-            $this->value = trim($this->value);
+            $this->value = rtrim($this->value);
             $this->value = Str::chopEnd($this->value, ';');
         }
 

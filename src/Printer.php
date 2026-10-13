@@ -4,6 +4,7 @@ namespace RonasIT\Larabuilder;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
@@ -132,5 +133,29 @@ class Printer extends Standard
         $value = ltrim($value, "\n");
 
         return rtrim($value);
+    }
+
+    protected function pExpr_MethodCall(MethodCall $node): string
+    {
+        if ($node->getAttribute(StatementAttributeEnum::WasCreated->value)) {
+            $this->indent();
+
+            $args = $this->isMultilineMethodCall($node)
+                ? $this->pCommaSeparatedMultiline($node->args, true) . $this->nl
+                : $this->pMaybeMultiline($node->args);
+
+            $newCall = $this->nl . '->' . $this->pObjectProperty($node->name) . '(' . $args . ')';
+
+            $this->outdent();
+
+            return $this->pDereferenceLhs($node->var) . $newCall;
+        }
+
+        return parent::pExpr_MethodCall($node);
+    }
+
+    protected function isMultilineMethodCall(MethodCall $node): bool
+    {
+        return $node->name->toString() === 'withRouting';
     }
 }
