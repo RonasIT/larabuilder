@@ -22,13 +22,28 @@ class PHPFileBuilderTest extends TestCase
 {
     use PHPFileBuilderTestMockTrait;
 
-    public function testSetNamespaceOnFileWithoutNamespace(): void
+    public static function provideSetNamespaceOnFileWithoutNamespace(): array
     {
-        $file = $this->generateOriginalStructurePath('class_without_namespace.php');
+        return [
+            [
+                'structure' => 'class_without_namespace.php',
+                'result' => 'namespace_set.php',
+            ],
+            [
+                'structure' => 'class_without_namespace_and_declare.php',
+                'result' => 'namespace_set_without_declare.php',
+            ],
+        ];
+    }
+
+    #[DataProvider('provideSetNamespaceOnFileWithoutNamespace')]
+    public function testSetNamespaceOnFileWithoutNamespace(string $structure, string $result): void
+    {
+        $file = $this->generateOriginalStructurePath($structure);
 
         $this->mockNativeFunction(
             'RonasIT\Larabuilder\Builders',
-            $this->callFilePutContent($file, 'namespace_set.php'),
+            $this->callFilePutContent($file, $result),
         );
 
         new PHPFileBuilder($file)

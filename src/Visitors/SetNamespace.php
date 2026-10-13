@@ -8,7 +8,9 @@ use PhpParser\Node\Stmt\Declare_;
 use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Namespace_;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\Use_;
 
 class SetNamespace extends AbstractNodeVisitor
 {
@@ -30,8 +32,9 @@ class SetNamespace extends AbstractNodeVisitor
         parent::afterTraverse($nodes);
 
         $declares = [];
+        $stmts = [];
 
-        foreach ($nodes as $key => $node) {
+        foreach ($nodes as $node) {
             if ($node instanceof Namespace_) {
                 $this->updateNamespace($node);
 
@@ -41,11 +44,17 @@ class SetNamespace extends AbstractNodeVisitor
             if ($node instanceof Declare_) {
                 $declares[] = $node;
 
-                unset($nodes[$key]);
+                continue;
             }
+
+            if (!$node instanceof Use_) {
+                $stmts[] = new Nop();
+            }
+
+            $stmts[] = $node;
         }
 
-        return [...$declares, new Namespace_(new Name($this->namespace), array_values($nodes))];
+        return [...$declares, new Nop(), new Namespace_(new Name($this->namespace), $stmts)];
     }
 
     protected function updateNamespace(Namespace_ $node): void
