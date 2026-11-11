@@ -109,8 +109,13 @@ class Printer extends Standard
     protected function pTrailingComments(ArrayItem $item): string
     {
         $comments = [];
+        $pos = $item->getEndTokenPos();
 
-        for ($pos = $item->getEndTokenPos() + 1; $pos > 0 && isset($this->origTokenList[$pos]); $pos++) {
+        if ($pos < 0) {
+            return '';
+        }
+
+        while (isset($this->origTokenList[++$pos])) {
             $token = $this->origTokenList[$pos];
 
             if ($token->is([T_COMMENT, T_DOC_COMMENT])) {
