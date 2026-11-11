@@ -55,9 +55,9 @@ class Printer extends Standard
         string $subNodeName,
         ?int $fixup,
     ): ?string {
-        $modifiedArray = ($parentNodeClass === Array_::class && $subNodeName === 'items')
-            ? $this->findModifiedArray($nodes)
-            : null;
+        $isArrayItems = $parentNodeClass === Array_::class && $subNodeName === 'items';
+
+        $modifiedArray = ($isArrayItems) ? $this->findModifiedArray($nodes) : null;
 
         if (
             !is_null($modifiedArray)
@@ -69,7 +69,92 @@ class Printer extends Standard
             return null;
         }
 
-        return parent::pArray($nodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+        $appendedNodes = ($isArrayItems) ? $this->getAppendedNodes($nodes, $origNodes) : [];
+
+        $trailingCommentsEndPos = (empty($appendedNodes)) ? null : $this->findTrailingCommentsEndPos(end($origNodes));
+
+        if (is_null($trailingCommentsEndPos)) {
+            return parent::pArray($nodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+        }
+
+        $keptNodes = array_slice($nodes, 0, count($nodes) - count($appendedNodes));
+
+        $result = parent::pArray($keptNodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+
+        if (is_null($result)) {
+            return null;
+        }
+
+        $result .= $this->pAppendedNodes($appendedNodes, $origNodes, $pos, $trailingCommentsEndPos, $indentAdjustment);
+
+        $pos = $trailingCommentsEndPos;
+
+        return $result;
+    }
+
+    protected function getAppendedNodes(array $nodes, array $origNodes): array
+    {
+        $nodes = array_values($nodes);
+        $lastOrigNode = end($origNodes);
+
+        $lastOrigNodeIndex = array_find_key(
+            $nodes,
+            fn (?Node $node) => $lastOrigNode instanceof Node && $node?->getAttribute('origNode') === $lastOrigNode,
+        );
+
+        return (is_null($lastOrigNodeIndex)) ? [] : array_slice($nodes, $lastOrigNodeIndex + 1);
+    }
+
+    protected function findTrailingCommentsEndPos(Node $item): ?int
+    {
+        $endPos = null;
+        $pos = $item->getEndTokenPos();
+
+        while (isset($this->origTokenList[++$pos])) {
+            $token = $this->origTokenList[$pos];
+
+            if ($token->is([T_COMMENT, T_DOC_COMMENT])) {
+                $endPos = $pos + 1;
+
+                if (!str_starts_with($token->text, '/*')) {
+                    break;
+                }
+            } elseif ($token->is(',')) {
+                $endPos = (is_null($endPos)) ? null : $pos + 1;
+            } elseif (!$token->is(T_WHITESPACE) || str_contains($token->text, "\n")) {
+                break;
+            }
+        }
+
+        return $endPos;
+    }
+
+    protected function pAppendedNodes(array $nodes, array $origNodes, int $pos, int $endPos, int $indentAdjustment): string
+    {
+        $trailingCode = $this->origTokens->getTokenCode($pos, $endPos, $indentAdjustment);
+        $hasComma = $this->origTokens->haveTokenInRange($pos, $endPos, ',');
+        $hasLineComment = !str_starts_with($this->origTokenList[$endPos - 1]->text, '/*');
+
+        $trailingCode = match (true) {
+            $hasComma => $trailingCode,
+            $hasLineComment => ',' . $trailingCode,
+            default => $trailingCode . ',',
+        };
+
+        $origIndentLevel = $this->indentLevel;
+        $lastItemIndentLevel = $this->origTokens->getIndentationBefore(end($origNodes)->getStartTokenPos());
+
+        $this->setIndentLevel(max($lastItemIndentLevel + $indentAdjustment, 0));
+
+        $isMultiline = $this->isMultiline($origNodes) || str_contains($this->origTokenList[$endPos]->text, "\n");
+
+        $separator = ($isMultiline) ? $this->nl : ' ';
+
+        $items = array_map(fn (Node $node) => $this->p($node, self::MAX_PRECEDENCE, self::MAX_PRECEDENCE, true), $nodes);
+
+        $this->setIndentLevel($origIndentLevel);
+
+        return $trailingCode . $separator . implode(',' . $separator, $items) . (($hasComma) ? ',' : '');
     }
 
     protected function pExpr_Array(Array_ $node): string
