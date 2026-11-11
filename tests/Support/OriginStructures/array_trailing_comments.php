@@ -10,9 +10,18 @@ class ArrayTrailingComments
         'first', // keep
     ];
 
+    protected array $multilineBlockComment = [
+        'first' /* keep */
+    ];
+
     public function getInline(): array
     {
         return ['first' /* keep */];
+    }
+
+    public function getUpdated(): array
+    {
+        return ['first' => 1 /* keep */];
     }
 
     public function getMultiline(): array

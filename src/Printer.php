@@ -78,7 +78,9 @@ class Printer extends Standard
             return parent::pArray($nodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
         }
 
-        $result = parent::pArray($origNodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+        $keptNodes = array_slice($nodes, 0, count($origNodes));
+
+        $result = parent::pArray($keptNodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
 
         $result .= $this->pAppendedNodes($appendedNodes, $origNodes, $pos, $trailingCommentsEndPos, $indentAdjustment);
 
@@ -143,7 +145,9 @@ class Printer extends Standard
 
         $this->setIndentLevel(max($lastItemIndentLevel + $indentAdjustment, 0));
 
-        $separator = ($this->isMultiline($origNodes) || $hasLineComment) ? $this->nl : ' ';
+        $isMultiline = $this->isMultiline($origNodes) || str_contains($this->origTokenList[$endPos]->text, "\n");
+
+        $separator = ($isMultiline) ? $this->nl : ' ';
 
         $items = array_map(fn (Node $node) => $this->p($node, self::MAX_PRECEDENCE, self::MAX_PRECEDENCE, true), $nodes);
 

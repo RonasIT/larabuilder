@@ -11,9 +11,19 @@ class ArrayTrailingComments
         'second',
     ];
 
+    protected array $multilineBlockComment = [
+        'first' /* keep */,
+        'second'
+    ];
+
     public function getInline(): array
     {
         return ['first' /* keep */, 'second'];
+    }
+
+    public function getUpdated(): array
+    {
+        return ['first' => 2 /* keep */, 'second'];
     }
 
     public function getMultiline(): array
