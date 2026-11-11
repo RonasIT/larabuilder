@@ -774,14 +774,10 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addReturnedArrayItem('getUserData', "['admin', 'editor']", 'roles')
-            ->addReturnedArrayItem('getDefaultFilters', 'is_published')
-            ->addReturnedArrayItem('getInlineOptions', '3', 'third')
-            ->addReturnedArrayItem('getValidationRules', "'nullable|string'", 'zip')
-            ->addReturnedArrayItem('getExtraFilters', 'is_hidden')
             ->save();
     }
 
-    public function testAddReturnedArrayItemKeepsCommentsAndArraySyntax(): void
+    public function testAddReturnedArrayItemFormatting(): void
     {
         $file = $this->generateOriginalStructurePath('returned_array_formatting.php');
 
@@ -796,6 +792,11 @@ class PHPFileBuilderTest extends TestCase
             ->addReturnedArrayItem('getLastItemComment', "'third'")
             ->addReturnedArrayItem('getEmptyLongSyntax', "'first'")
             ->addReturnedArrayItem('getMultiline', "'second'")
+            ->addReturnedArrayItem('getEmpty', "'first'")
+            ->addReturnedArrayItem('getEmptyMultiline', "'first'")
+            ->addReturnedArrayItem('getInlineGrowing', '3', 'third')
+            ->addReturnedArrayItem('getCommentedGroups', "'nullable|string'", 'zip')
+            ->addReturnedArrayItem('getNested', "['admin', 'editor']", 'roles')
             ->save();
     }
 
@@ -810,7 +811,6 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->addReturnedArrayItem('updatableStatuses', 'self::Second')
-            ->addReturnedArrayItem('defaultStatuses', 'self::First')
             ->save();
     }
 

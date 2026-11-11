@@ -39,4 +39,50 @@ class ReturnedArrayFormatting
             'second',
         ];
     }
+
+    public function getEmpty(): array
+    {
+        return ['first'];
+    }
+
+    public function getEmptyMultiline(): array
+    {
+        return [
+            'first',
+        ];
+    }
+
+    public function getInlineGrowing(): array
+    {
+        return [
+            'first' => 1,
+            'second' => 2,
+            'third' => 3,
+        ];
+    }
+
+    public function getCommentedGroups(): array
+    {
+        return [
+            // profile
+            'name' => 'required|string',
+            'email' => 'required|email',
+
+            // address
+            'city' => 'nullable|string',
+            'zip' => 'nullable|string',
+        ];
+    }
+
+    public function getNested(): array
+    {
+        return [
+            'name' => 'John',
+            'settings' => [
+                'locale' => 'en',
+                'timezone' => 'UTC',
+            ],
+            'roles' => ['admin', 'editor'],
+        ];
+    }
 }

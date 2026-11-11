@@ -12,11 +12,6 @@ enum SomeEnum
         return self::cases();
     }
 
-    public static function defaultStatuses(): array
-    {
-        return [self::First];
-    }
-
     public static function updatableStatuses(): array
     {
         return [self::First, self::Second];
