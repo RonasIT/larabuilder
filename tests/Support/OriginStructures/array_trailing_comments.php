@@ -18,6 +18,11 @@ class ArrayTrailingComments
         'first' /* keep */,
     ];
 
+    protected array $removedAndAdded = [
+        'first',
+        'second' // keep
+    ];
+
     public function getInline(): array
     {
         return ['first' /* keep */];

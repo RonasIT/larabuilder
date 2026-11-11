@@ -21,6 +21,11 @@ class ArrayTrailingComments
         'second',
     ];
 
+    protected array $removedAndAdded = [
+        'second', // keep
+        'third'
+    ];
+
     public function getInline(): array
     {
         return ['first' /* keep */, 'second'];

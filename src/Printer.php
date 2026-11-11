@@ -3,7 +3,6 @@
 namespace RonasIT\Larabuilder;
 
 use Illuminate\Support\Arr;
-use PhpParser\Internal\DiffElem;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
@@ -78,9 +77,13 @@ class Printer extends Standard
             return parent::pArray($nodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
         }
 
-        $keptNodes = array_slice($nodes, 0, count($origNodes));
+        $keptNodes = array_slice($nodes, 0, count($nodes) - count($appendedNodes));
 
         $result = parent::pArray($keptNodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+
+        if (is_null($result)) {
+            return null;
+        }
 
         $result .= $this->pAppendedNodes($appendedNodes, $origNodes, $pos, $trailingCommentsEndPos, $indentAdjustment);
 
@@ -91,19 +94,15 @@ class Printer extends Standard
 
     protected function getAppendedNodes(array $nodes, array $origNodes): array
     {
-        if (empty($origNodes)) {
-            return [];
-        }
+        $nodes = array_values($nodes);
+        $lastOrigNode = end($origNodes);
 
-        $diff = $this->nodeListDiffer->diffWithReplacements($origNodes, $nodes);
+        $lastOrigNodeIndex = array_find_key(
+            $nodes,
+            fn (?Node $node) => $lastOrigNode instanceof Node && $node?->getAttribute('origNode') === $lastOrigNode,
+        );
 
-        $keptElements = array_slice($diff, 0, count($origNodes));
-        $addedElements = array_slice($diff, count($origNodes));
-
-        $isAppendOnly = array_all($keptElements, fn (DiffElem $element) => $element->type === DiffElem::TYPE_KEEP)
-            && array_all($addedElements, fn (DiffElem $element) => $element->type === DiffElem::TYPE_ADD);
-
-        return ($isAppendOnly) ? array_column($addedElements, 'new') : [];
+        return (is_null($lastOrigNodeIndex)) ? [] : array_slice($nodes, $lastOrigNodeIndex + 1);
     }
 
     protected function findTrailingCommentsEndPos(Node $item): ?int
