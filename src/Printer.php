@@ -2,6 +2,7 @@
 
 namespace RonasIT\Larabuilder;
 
+use PhpParser\Internal\DiffElem;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\PropertyItem;
@@ -15,8 +16,12 @@ use RonasIT\Larabuilder\Nodes\PreformattedExpression;
 
 class Printer extends Standard
 {
+    protected array $origTokenList = [];
+
     public function printFormatPreserving(array $stmts, array $origStmts, array $origTokens): string
     {
+        $this->origTokenList = $origTokens;
+
         $formattedCode = parent::printFormatPreserving($stmts, $origStmts, $origTokens);
 
         return $this->normalizeWhitespace($formattedCode);
@@ -38,6 +43,98 @@ class Printer extends Standard
     protected function removeDuplicateEmptyLines(string $code): string
     {
         return preg_replace("/(\r?\n){3,}/", "\n\n", $code);
+    }
+
+    protected function pArray(
+        array $nodes,
+        array $origNodes,
+        int &$pos,
+        int $indentAdjustment,
+        string $parentNodeClass,
+        string $subNodeName,
+        ?int $fixup,
+    ): ?string {
+        $appendedNodes = ($parentNodeClass === Array_::class && $subNodeName === 'items')
+            ? $this->getAppendedNodes($nodes, $origNodes)
+            : [];
+
+        $trailingCommentsEndPos = (empty($appendedNodes)) ? null : $this->findTrailingCommentsEndPos(end($origNodes));
+
+        if (is_null($trailingCommentsEndPos)) {
+            return parent::pArray($nodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+        }
+
+        $result = parent::pArray($origNodes, $origNodes, $pos, $indentAdjustment, $parentNodeClass, $subNodeName, $fixup);
+
+        $result .= $this->pAppendedNodes($appendedNodes, $origNodes, $pos, $trailingCommentsEndPos, $indentAdjustment);
+
+        $pos = $trailingCommentsEndPos;
+
+        return $result;
+    }
+
+    protected function getAppendedNodes(array $nodes, array $origNodes): array
+    {
+        if (empty($origNodes)) {
+            return [];
+        }
+
+        $diff = $this->nodeListDiffer->diffWithReplacements($origNodes, $nodes);
+
+        $keptElements = array_slice($diff, 0, count($origNodes));
+        $addedElements = array_slice($diff, count($origNodes));
+
+        $isAppendOnly = array_all($keptElements, fn (DiffElem $element) => $element->type === DiffElem::TYPE_KEEP)
+            && array_all($addedElements, fn (DiffElem $element) => $element->type === DiffElem::TYPE_ADD);
+
+        return ($isAppendOnly) ? array_column($addedElements, 'new') : [];
+    }
+
+    protected function findTrailingCommentsEndPos(Node $item): ?int
+    {
+        $endPos = null;
+
+        for ($pos = $item->getEndTokenPos() + 1; isset($this->origTokenList[$pos]); $pos++) {
+            $token = $this->origTokenList[$pos];
+
+            if ($token->is([T_COMMENT, T_DOC_COMMENT])) {
+                $endPos = $pos + 1;
+
+                if (!str_starts_with($token->text, '/*')) {
+                    break;
+                }
+            } elseif (!$token->is(',') && !($token->is(T_WHITESPACE) && !str_contains($token->text, "\n"))) {
+                break;
+            }
+        }
+
+        return $endPos;
+    }
+
+    protected function pAppendedNodes(array $nodes, array $origNodes, int $pos, int $endPos, int $indentAdjustment): string
+    {
+        $trailingCode = $this->origTokens->getTokenCode($pos, $endPos, $indentAdjustment);
+        $hasComma = $this->origTokens->haveTokenInRange($pos, $endPos, ',');
+        $hasLineComment = !str_starts_with($this->origTokenList[$endPos - 1]->text, '/*');
+
+        $trailingCode = match (true) {
+            $hasComma => $trailingCode,
+            $hasLineComment => ',' . $trailingCode,
+            default => $trailingCode . ',',
+        };
+
+        $origIndentLevel = $this->indentLevel;
+        $lastItemIndentLevel = $this->origTokens->getIndentationBefore(end($origNodes)->getStartTokenPos());
+
+        $this->setIndentLevel(max($lastItemIndentLevel + $indentAdjustment, 0));
+
+        $separator = ($this->isMultiline($origNodes) || $hasLineComment) ? $this->nl : ' ';
+
+        $items = array_map(fn (Node $node) => $this->p($node, self::MAX_PRECEDENCE, self::MAX_PRECEDENCE, true), $nodes);
+
+        $this->setIndentLevel($origIndentLevel);
+
+        return $trailingCode . $separator . implode(',' . $separator, $items) . (($hasComma) ? ',' : '');
     }
 
     protected function pExpr_Array(Array_ $node): string

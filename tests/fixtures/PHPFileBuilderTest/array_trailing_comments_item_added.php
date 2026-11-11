@@ -1,0 +1,36 @@
+<?php
+
+namespace App;
+
+class ArrayTrailingComments
+{
+    protected array $inline = ['first' /* keep */, 'second'];
+
+    protected array $multiline = [
+        'first', // keep
+        'second',
+    ];
+
+    public function getInline(): array
+    {
+        return ['first' /* keep */, 'second'];
+    }
+
+    public function getMultiline(): array
+    {
+        return [
+            'first', // first
+            'second', // second
+            'third',
+        ];
+    }
+
+    public function getMultilineWithoutTrailingComma(): array
+    {
+        return [
+            'first',
+            'second', // keep
+            'third'
+        ];
+    }
+}

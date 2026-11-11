@@ -791,6 +791,24 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddArrayItemKeepsTrailingCommentOfLastItem(): void
+    {
+        $file = $this->generateOriginalStructurePath('array_trailing_comments.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'array_trailing_comments_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addArrayPropertyItem('inline', 'second')
+            ->addArrayPropertyItem('multiline', 'second')
+            ->addReturnedArrayItem('getInline', "'second'")
+            ->addReturnedArrayItem('getMultiline', "'third'")
+            ->addReturnedArrayItem('getMultilineWithoutTrailingComma', "'third'")
+            ->save();
+    }
+
     public function testAddReturnedArrayItemThrowsOnNonArrayReturn(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
