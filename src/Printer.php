@@ -93,8 +93,9 @@ class Printer extends Standard
     protected function findTrailingCommentsEndPos(Node $item): ?int
     {
         $endPos = null;
+        $pos = $item->getEndTokenPos();
 
-        for ($pos = $item->getEndTokenPos() + 1; isset($this->origTokenList[$pos]); $pos++) {
+        while (isset($this->origTokenList[++$pos])) {
             $token = $this->origTokenList[$pos];
 
             if ($token->is([T_COMMENT, T_DOC_COMMENT])) {
