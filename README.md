@@ -64,6 +64,9 @@ traits, and enums.
 Both `$value` and `$key` are passed as strings. A bare identifier (`logo`, `datetime`) is inserted as a string literal;
 anything else — `null`, `true`, `false`, numbers, `RoleEnum::class`, `self::Second`, `['admin', 'editor']` — is inserted as raw PHP code.
 
+When an item is appended, the formatting of the array follows two rules: an array that was already multiline stays
+multiline, and an array that grows past two items becomes multiline. Otherwise the original style is kept.
+
 ```php
 new PHPFileBuilder(app_path('Models/User.php'))
     ->addReturnedArrayItem('casts', 'RoleEnum::class', 'role')  // 'role' => RoleEnum::class
