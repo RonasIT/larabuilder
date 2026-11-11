@@ -135,7 +135,7 @@ class Printer extends Standard
             }
         }
 
-        return empty($comments) ? '' : ' ' . implode(' ', $comments);
+        return (empty($comments)) ? '' : ' ' . implode(' ', $comments);
     }
 
     protected function findModifiedArray(array $items): ?Array_
