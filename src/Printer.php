@@ -120,7 +120,9 @@ class Printer extends Standard
                 if (!str_starts_with($token->text, '/*')) {
                     break;
                 }
-            } elseif (!$token->is(',') && !($token->is(T_WHITESPACE) && !str_contains($token->text, "\n"))) {
+            } elseif ($token->is(',')) {
+                $endPos = (is_null($endPos)) ? null : $pos + 1;
+            } elseif (!$token->is(T_WHITESPACE) || str_contains($token->text, "\n")) {
                 break;
             }
         }

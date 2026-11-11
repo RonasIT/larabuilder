@@ -827,6 +827,7 @@ class PHPFileBuilderTest extends TestCase
             ->addArrayPropertyItem('inline', 'second')
             ->addArrayPropertyItem('multiline', 'second')
             ->addArrayPropertyItem('multilineBlockComment', 'second')
+            ->addArrayPropertyItem('commaAfterComment', 'second')
             ->addReturnedArrayItem('getInline', "'second'")
             ->addReturnedArrayItem('getUpdated', '2', 'first')
             ->addReturnedArrayItem('getUpdated', "'second'")

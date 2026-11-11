@@ -16,6 +16,11 @@ class ArrayTrailingComments
         'second'
     ];
 
+    protected array $commaAfterComment = [
+        'first' /* keep */,
+        'second',
+    ];
+
     public function getInline(): array
     {
         return ['first' /* keep */, 'second'];
