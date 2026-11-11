@@ -11,6 +11,7 @@ use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Return_;
+use RonasIT\Larabuilder\Enums\StatementAttributeEnum;
 use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Nodes\PreformattedExpression;
@@ -43,7 +44,7 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
         }
 
         if (is_null($this->key)) {
-            $returnNode->expr->items[] = new ArrayItem($this->value);
+            $this->appendItem($returnNode->expr, new ArrayItem($this->value));
 
             return;
         }
@@ -56,7 +57,14 @@ class AddReturnedArrayItem extends AbstractUpdateMethodVisitor
             }
         }
 
-        $returnNode->expr->items[] = new ArrayItem($this->value, $this->key);
+        $this->appendItem($returnNode->expr, new ArrayItem($this->value, $this->key));
+    }
+
+    protected function appendItem(Array_ $array, ArrayItem $item): void
+    {
+        $item->setAttribute(StatementAttributeEnum::Modified->value, true);
+
+        $array->items[] = $item;
     }
 
     protected function isSameKey(?Expr $itemKey): bool

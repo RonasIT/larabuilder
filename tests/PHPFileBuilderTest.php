@@ -777,6 +777,29 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddReturnedArrayItemFormatting(): void
+    {
+        $file = $this->generateOriginalStructurePath('returned_array_formatting.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'returned_array_formatting_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('getLeadingComment', "'second'")
+            ->addReturnedArrayItem('getTrailingComment', "'third'")
+            ->addReturnedArrayItem('getLastItemComment', "'third'")
+            ->addReturnedArrayItem('getEmptyLongSyntax', "'first'")
+            ->addReturnedArrayItem('getMultiline', "'second'")
+            ->addReturnedArrayItem('getEmpty', "'first'")
+            ->addReturnedArrayItem('getEmptyMultiline', "'first'")
+            ->addReturnedArrayItem('getInlineGrowing', '3', 'third')
+            ->addReturnedArrayItem('getCommentedGroups', "'nullable|string'", 'zip')
+            ->addReturnedArrayItem('getNested', "['admin', 'editor']", 'roles')
+            ->save();
+    }
+
     public function testAddReturnedArrayItemInEnum(): void
     {
         $file = $this->generateOriginalStructurePath('enum.php');
