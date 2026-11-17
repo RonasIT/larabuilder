@@ -39,9 +39,9 @@ class AddImport extends AbstractNodeVisitor implements InsertNodeContract
         return new Use_([new UseItem(new Name($this->import))]);
     }
 
-    protected function isDuplicate(array $stmts): bool
+    public function shouldInsertNode(array $stmts): bool
     {
-        return array_any($stmts, fn ($stmt) => $stmt instanceof Use_
+        return !array_any($stmts, fn ($stmt) => $stmt instanceof Use_
             && array_any($stmt->uses, fn (UseItem $useItem) => $useItem->name->toString() === $this->import));
     }
 }

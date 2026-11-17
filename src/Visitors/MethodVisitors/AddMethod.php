@@ -34,15 +34,15 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
         $this->code = new PreformattedCode($code);
     }
 
-    protected function modify(Node $node): Node
+    public function shouldInsertNode(array $stmts): bool
     {
-        foreach ($node->stmts as $stmt) {
-            if ($stmt instanceof ClassMethod && $stmt->name->name === $this->methodName) {
-                throw new NodeAlreadyExistsException('Method', $this->methodName);
-            }
+        $exists = array_any($stmts, fn ($stmt) => $stmt instanceof ClassMethod && $stmt->name->name === $this->methodName);
+
+        if ($exists) {
+            throw new NodeAlreadyExistsException('Method', $this->methodName);
         }
 
-        return parent::modify($node);
+        return true;
     }
 
     public function getInsertableNode(): Node

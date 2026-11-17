@@ -94,7 +94,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function insertNode(array &$stmts): void
     {
-        if (!$this->isDuplicate($stmts)) {
+        if ($this->shouldInsertNode($stmts)) {
             $this->nodeInserter ??= new NodeInserter();
 
             $newNode = $this->getInsertableNode();
@@ -103,11 +103,6 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
             $this->nodeInserter->insertNode($stmts, $newNode);
         }
-    }
-
-    protected function isDuplicate(array $stmts): bool
-    {
-        return false;
     }
 
     protected function linkParents(Node $parent): void
