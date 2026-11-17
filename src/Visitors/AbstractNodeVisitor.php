@@ -81,7 +81,9 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
             $this->updatableNodeNotFoundHook();
         }
 
-        $this->insertNode($node->stmts);
+        if ($this instanceof InsertNodeContract) {
+            $this->insertNode($node->stmts);
+        }
 
         return $node;
     }
@@ -92,7 +94,7 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
 
     protected function insertNode(array &$stmts): void
     {
-        if ($this instanceof InsertNodeContract && !$this->isDuplicate($stmts)) {
+        if (!$this->isDuplicate($stmts)) {
             $this->nodeInserter ??= new NodeInserter();
 
             $newNode = $this->getInsertableNode();
