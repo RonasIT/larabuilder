@@ -14,4 +14,9 @@ abstract class BaseMethodVisitor extends AbstractNodeVisitor
         Trait_::class,
         Enum_::class,
     ];
+
+    public function __construct(
+        protected string $methodName,
+    ) {
+    }
 }

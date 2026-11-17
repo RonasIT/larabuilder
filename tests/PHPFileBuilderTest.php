@@ -11,9 +11,11 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPCodeException;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\Exceptions\InvalidStructureTypeException;
+use RonasIT\Larabuilder\Exceptions\MultipleReturnStatementsException;
 use RonasIT\Larabuilder\Exceptions\NodeAlreadyExistsException;
 use RonasIT\Larabuilder\Exceptions\NodeNotExistException;
 use RonasIT\Larabuilder\Exceptions\UnexpectedPropertyTypeException;
+use RonasIT\Larabuilder\Exceptions\UnexpectedReturnTypeException;
 use RonasIT\Larabuilder\Tests\Support\Traits\PHPFileBuilderTestMockTrait;
 
 class PHPFileBuilderTest extends TestCase
@@ -722,6 +724,172 @@ class PHPFileBuilderTest extends TestCase
 
         new PHPFileBuilder($file)
             ->removeMethod($method)
+            ->save();
+    }
+
+    public function testAddReturnedArrayItem(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_return_array_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('casts', 'datetime', 'created_at')
+            ->addReturnedArrayItem('casts', 'RoleEnum::class', 'role')
+            ->addReturnedArrayItem('casts', 'array', 'settings')
+            ->addReturnedArrayItem('casts', 'null', 'deleted_at')
+            ->addReturnedArrayItem('casts', 'true', 'is_active')
+            ->addReturnedArrayItem('casts', 'false', 'is_archived')
+            ->addReturnedArrayItem('getAvailableRelations', 'logo')
+            ->addReturnedArrayItem('viaQueues', 'QueueEnum::Database', 'MailChannel::class')
+            ->addReturnedArrayItem('casts', "DataCollection::class . ':' . VideoLink::class", 'video_links')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemUpdatesExistingKey(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'class_with_return_array_item_updated.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('casts', 'encrypted', 'password')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemInTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('trait.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'trait_with_return_array_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('getUserData', "['admin', 'editor']", 'roles')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemFormatting(): void
+    {
+        $file = $this->generateOriginalStructurePath('returned_array_formatting.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'returned_array_formatting_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('getLeadingComment', "'second'")
+            ->addReturnedArrayItem('getTrailingComment', "'third'")
+            ->addReturnedArrayItem('getLastItemComment', "'third'")
+            ->addReturnedArrayItem('getEmptyLongSyntax', "'first'")
+            ->addReturnedArrayItem('getMultiline', "'second'")
+            ->addReturnedArrayItem('getEmpty', "'first'")
+            ->addReturnedArrayItem('getEmptyMultiline', "'first'")
+            ->addReturnedArrayItem('getInlineGrowing', '3', 'third')
+            ->addReturnedArrayItem('getCommentedGroups', "'nullable|string'", 'zip')
+            ->addReturnedArrayItem('getNested', "['admin', 'editor']", 'roles')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemInEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('enum.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'enum_with_return_array_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('updatableStatuses', 'self::Second')
+            ->save();
+    }
+
+    public function testAddArrayItemKeepsTrailingCommentOfLastItem(): void
+    {
+        $file = $this->generateOriginalStructurePath('array_trailing_comments.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'array_trailing_comments_item_added.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addArrayPropertyItem('inline', 'second')
+            ->addArrayPropertyItem('multiline', 'second')
+            ->addArrayPropertyItem('multilineBlockComment', 'second')
+            ->addArrayPropertyItem('commaAfterComment', 'second')
+            ->removeArrayPropertyItem('removedAndAdded', ['first'])
+            ->addArrayPropertyItem('removedAndAdded', 'third')
+            ->addReturnedArrayItem('getInline', "'second'")
+            ->addReturnedArrayItem('getUpdated', '2', 'first')
+            ->addReturnedArrayItem('getUpdated', "'second'")
+            ->addReturnedArrayItem('getMultiline', "'third'")
+            ->addReturnedArrayItem('getMultilineWithoutTrailingComma', "'third'")
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemThrowsOnNonArrayReturn(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(UnexpectedReturnTypeException::class, "Method 'someMethod' return value has unexpected type. Expected 'array', actual 'true'.");
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('someMethod', 'value', 'key')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemThrowsOnMultipleReturnStatements(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(MultipleReturnStatementsException::class, "Method 'getRelations' contains multiple return statements.");
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('getRelations', 'admin')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemThrowsOnMethodNotFound(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(NodeNotExistException::class, "Method 'noMethod' does not exist.");
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('noMethod', 'value', 'key')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemNotClassTraitEnum(): void
+    {
+        $file = $this->generateOriginalStructurePath('interface.php');
+
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddReturnedArrayItem' operation may only be applied to: Class, Trait, Enum.");
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('casts', 'datetime', 'created_at')
+            ->save();
+    }
+
+    public function testAddReturnedArrayItemInvalidCode(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->assertExceptionThrew(InvalidPHPCodeException::class, 'Cannot parse provided code: \'??invalid\'.');
+
+        new PHPFileBuilder($file)
+            ->addReturnedArrayItem('someMethod', '??invalid')
             ->save();
     }
 }
