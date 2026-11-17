@@ -34,7 +34,7 @@ class AddTrait extends AbstractNodeVisitor implements InsertNodeContract
         return collect($stmts)
             ->whereInstanceOf(TraitUse::class)
             ->flatMap(fn (TraitUse $traitUse) => $traitUse->traits)
-            ->map(fn (Name $name) => $name->getLast())
+            ->map(fn (Name $name) => $name->toString())
             ->doesntContain($this->trait);
     }
 }

@@ -380,6 +380,20 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddTraitsWithSameBasenameAsQualifiedTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('class_with_qualified_trait.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'add_traits_to_class_with_qualified_trait.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addTraits(['New\FirstTrait'])
+            ->save();
+    }
+
     public function testAddTraitsWithDuplicatesAndEmptyValues(): void
     {
         $file = $this->generateOriginalStructurePath('class.php');
