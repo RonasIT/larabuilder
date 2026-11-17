@@ -39,7 +39,7 @@ class NodeInserterTest extends TestCase
 
         $classNode = (new NodeFinder())->findFirstInstanceOf($this->newSyntaxTree, Class_::class);
 
-        $this->inserter->insertNodes($classNode->stmts, [
+        $nodes = [
             new Property(Modifiers::PUBLIC, [new PropertyItem('anotherProperty')]),
             new ClassMethod('newMethod', ['flags' => Modifiers::PUBLIC]),
             new ClassConst([new Const_('NEW_CONST', new Int_(42))], Modifiers::PUBLIC),
@@ -48,7 +48,11 @@ class NodeInserterTest extends TestCase
             new TraitUse([new Name('NewTrait')]),
             new ClassConst([new Const_('ANOTHER_CONST', new Int_(0))], Modifiers::PUBLIC),
             new TraitUse([new Name('AnotherTrait')]),
-        ]);
+        ];
+
+        foreach ($nodes as $node) {
+            $this->inserter->insertNode($classNode->stmts, $node);
+        }
 
         $this->assertSame(
             $this->getFixture('class_with_mixed_nodes_inserted.php'),

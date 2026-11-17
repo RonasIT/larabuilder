@@ -277,6 +277,26 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddImportsWithDuplicatesAndEmptyValues(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'add_imports_to_class.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addImports([
+                'RonasIT\Larabuilder\Tests\Support\FirstClass',
+                '',
+                'RonasIT\Larabuilder\Tests\Support\SecondClass',
+                'RonasIT\Larabuilder\Tests\Support\ThirdClass',
+                'RonasIT\Larabuilder\Tests\Support\SecondClass',
+            ])
+            ->save();
+    }
+
     public function testAddImportsToFileWithoutNamespace(): void
     {
         $file = $this->generateOriginalStructurePath('empty_php_file.php');
@@ -360,11 +380,45 @@ class PHPFileBuilderTest extends TestCase
             ->save();
     }
 
+    public function testAddTraitsWithSameBasenameAsQualifiedTrait(): void
+    {
+        $file = $this->generateOriginalStructurePath('class_with_qualified_trait.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'add_traits_to_class_with_qualified_trait.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addTraits(['New\FirstTrait'])
+            ->save();
+    }
+
+    public function testAddTraitsWithDuplicatesAndEmptyValues(): void
+    {
+        $file = $this->generateOriginalStructurePath('class.php');
+
+        $this->mockNativeFunction(
+            'RonasIT\Larabuilder\Builders',
+            $this->callFilePutContent($file, 'add_traits_to_class.php'),
+        );
+
+        new PHPFileBuilder($file)
+            ->addTraits([
+                'RonasIT\Support\Traits\FirstTrait',
+                '',
+                'RonasIT\Support\Traits\SecondTrait',
+                'RonasIT\Support\Traits\ThirdTrait',
+                'RonasIT\Support\Traits\SecondTrait',
+            ])
+            ->save();
+    }
+
     public function testAddTraitsNotClassTraitEnum(): void
     {
         $file = $this->generateOriginalStructurePath('interface.php');
 
-        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTraits' operation may only be applied to: Class, Trait, Enum.");
+        $this->assertExceptionThrew(InvalidStructureTypeException::class, "'AddTrait' operation may only be applied to: Class, Trait, Enum.");
 
         new PHPFileBuilder($file)
             ->addTraits([

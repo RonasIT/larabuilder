@@ -7,26 +7,15 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
+use RonasIT\Larabuilder\Contracts\InsertNodeContract;
 
-class AddImports extends AbstractInsertNodesVisitor
+class AddImport extends AbstractNodeVisitor implements InsertNodeContract
 {
     protected array $allowedParentNodesTypes = self::ANY_TYPE;
 
-    public function __construct(array $imports)
-    {
-        $nodesToInsert = collect($imports)
-            ->filter()
-            ->unique();
-
-        parent::__construct(
-            nodesToInsert: $nodesToInsert,
-            targetNodeClass: Use_::class,
-        );
-    }
-
-    public function leaveNode(Node $node): Node
-    {
-        return $node;
+    public function __construct(
+        protected string $import,
+    ) {
     }
 
     public function afterTraverse(array $nodes): ?array
@@ -40,19 +29,22 @@ class AddImports extends AbstractInsertNodesVisitor
             $targetNodes = &$nodes;
         }
 
-        $this->insertNodes($targetNodes);
+        $this->insertNode($targetNodes);
 
         return $nodes;
     }
 
-    /** @param Use_ $node */
-    protected function getChildNodes(Node $node): array
+    public function getInsertableNode(): Node
     {
-        return $node->uses;
+        return new Use_([new UseItem(new Name($this->import))]);
     }
 
-    protected function getInsertableNode(string $name): Node
+    public function shouldInsertNode(array $stmts): bool
     {
-        return new Use_([new UseItem(new Name($name))]);
+        return collect($stmts)
+            ->whereInstanceOf(Use_::class)
+            ->flatMap(fn (Use_ $use) => $use->uses)
+            ->map(fn (UseItem $useItem) => $useItem->name->toString())
+            ->doesntContain($this->import);
     }
 }
