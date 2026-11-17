@@ -41,18 +41,7 @@ class AddImport extends AbstractNodeVisitor implements InsertNodeContract
 
     protected function isDuplicate(array $stmts): bool
     {
-        foreach ($stmts as $stmt) {
-            if (!($stmt instanceof Use_)) {
-                continue;
-            }
-
-            foreach ($stmt->uses as $useItem) {
-                if ($useItem->name->toString() === $this->import) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return array_any($stmts, fn ($stmt) => $stmt instanceof Use_
+            && array_any($stmt->uses, fn (UseItem $useItem) => $useItem->name->toString() === $this->import));
     }
 }

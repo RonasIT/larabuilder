@@ -31,18 +31,7 @@ class AddTrait extends AbstractNodeVisitor implements InsertNodeContract
 
     protected function isDuplicate(array $stmts): bool
     {
-        foreach ($stmts as $stmt) {
-            if (!($stmt instanceof TraitUse)) {
-                continue;
-            }
-
-            foreach ($stmt->traits as $traitName) {
-                if ($traitName->getLast() === $this->trait) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return array_any($stmts, fn ($stmt) => $stmt instanceof TraitUse
+            && array_any($stmt->traits, fn (Name $name) => $name->getLast() === $this->trait));
     }
 }

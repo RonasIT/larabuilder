@@ -68,7 +68,7 @@ class PHPFileBuilder
 
     public function addImports(array $imports): self
     {
-        foreach ($imports as $import) {
+        foreach (array_filter($imports) as $import) {
             $this->traverser->addVisitor(new AddImport($import));
         }
 
@@ -77,7 +77,7 @@ class PHPFileBuilder
 
     public function addTraits(array $traits): self
     {
-        foreach ($traits as $trait) {
+        foreach (array_filter($traits) as $trait) {
             $this->traverser->addVisitor(new AddTrait($trait));
         }
 
