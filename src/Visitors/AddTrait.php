@@ -31,7 +31,10 @@ class AddTrait extends AbstractNodeVisitor implements InsertNodeContract
 
     public function shouldInsertNode(array $stmts): bool
     {
-        return !array_any($stmts, fn ($stmt) => $stmt instanceof TraitUse
-            && array_any($stmt->traits, fn (Name $name) => $name->getLast() === $this->trait));
+        return collect($stmts)
+            ->whereInstanceOf(TraitUse::class)
+            ->flatMap(fn (TraitUse $traitUse) => $traitUse->traits)
+            ->map(fn (Name $name) => $name->getLast())
+            ->doesntContain($this->trait);
     }
 }

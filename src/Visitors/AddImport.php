@@ -41,7 +41,10 @@ class AddImport extends AbstractNodeVisitor implements InsertNodeContract
 
     public function shouldInsertNode(array $stmts): bool
     {
-        return !array_any($stmts, fn ($stmt) => $stmt instanceof Use_
-            && array_any($stmt->uses, fn (UseItem $useItem) => $useItem->name->toString() === $this->import));
+        return collect($stmts)
+            ->whereInstanceOf(Use_::class)
+            ->flatMap(fn (Use_ $use) => $use->uses)
+            ->map(fn (UseItem $useItem) => $useItem->name->toString())
+            ->doesntContain($this->import);
     }
 }
