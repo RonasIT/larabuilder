@@ -13,8 +13,8 @@ Please review these guidelines before submitting any pull requests.
 ## Guidelines
 
 * Before diving into code, read the [Architecture overview](ARCHITECTURE.md) to understand the visitor pattern and project structure.
-* Please follow the code style enforced by [Laravel Pint](https://laravel.com/docs/pint). Run `./vendor/bin/pint` before committing.
-* Ensure all tests pass: `./vendor/bin/phpunit`.
+* Please follow the code style enforced by [Laravel Pint](https://laravel.com/docs/pint). Run `composer lint:fix` before committing; `composer lint` checks the style the same way CI does.
+* Ensure all tests pass: `composer test`.
 * Send a coherent commit history, making sure each individual commit in your pull request is meaningful.
 * Please follow the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/).
 * You may need to [rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing) to avoid merge conflicts.

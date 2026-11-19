@@ -26,5 +26,10 @@
             "RonasIT\\Larabuilder\\Tests\\": "tests/",
             "RonasIT\\Larabuilder\\Tests\\Support\\": "tests/Support"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "pint --test",
+        "lint:fix": "pint"
     }
 }
