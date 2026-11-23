@@ -41,6 +41,11 @@ class SetProperty extends AbstractPropertyVisitor implements InsertNodeContract
         }
     }
 
+    public function shouldInsertNode(array $stmts): bool
+    {
+        return true;
+    }
+
     public function getInsertableNode(): Node
     {
         return new Property(

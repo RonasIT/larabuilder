@@ -7,4 +7,6 @@ enum StatementAttributeEnum: string
     case Parent = 'parent';
     case Previous = 'previous';
     case Comments = 'comments';
+    case Modified = 'modified';
+    case Multiline = 'multiline';
 }

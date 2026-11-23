@@ -11,9 +11,10 @@ use RonasIT\Larabuilder\Enums\InsertPositionEnum;
 use RonasIT\Larabuilder\Exceptions\InvalidPHPFileException;
 use RonasIT\Larabuilder\NodeTraverser;
 use RonasIT\Larabuilder\Printer;
-use RonasIT\Larabuilder\Visitors\AddImports;
-use RonasIT\Larabuilder\Visitors\AddTraits;
+use RonasIT\Larabuilder\Visitors\AddImport;
+use RonasIT\Larabuilder\Visitors\AddTrait;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\AddMethod;
+use RonasIT\Larabuilder\Visitors\MethodVisitors\AddReturnedArrayItem;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\InsertCodeToMethod;
 use RonasIT\Larabuilder\Visitors\MethodVisitors\RemoveMethod;
 use RonasIT\Larabuilder\Visitors\PropertyVisitors\AddArrayPropertyItem;
@@ -68,7 +69,9 @@ class PHPFileBuilder
 
     public function addImports(array $imports): self
     {
-        $this->traverser->addVisitor(new AddImports($imports));
+        foreach (array_filter($imports) as $import) {
+            $this->traverser->addVisitor(new AddImport($import));
+        }
 
         return $this;
     }
@@ -84,7 +87,9 @@ class PHPFileBuilder
 
     public function addTraits(array $traits): self
     {
-        $this->traverser->addVisitor(new AddTraits($traits));
+        foreach (array_filter($traits) as $trait) {
+            $this->traverser->addVisitor(new AddTrait($trait));
+        }
 
         $this->addImports($traits);
 
@@ -101,6 +106,13 @@ class PHPFileBuilder
         bool $isReturnsByRef = false,
     ): self {
         $this->traverser->addVisitor(new AddMethod($name, $code, $params, $returnType, $accessModifier, $isStatic, $isReturnsByRef));
+
+        return $this;
+    }
+
+    public function addReturnedArrayItem(string $methodName, string $value, ?string $key = null): self
+    {
+        $this->traverser->addVisitor(new AddReturnedArrayItem($methodName, $value, $key));
 
         return $this;
     }

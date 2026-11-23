@@ -82,13 +82,28 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
             $this->updatableNodeNotFoundHook();
         }
 
-        return ($this instanceof InsertNodeContract)
-            ? $this->insertNode($node)
-            : $node;
+        if ($this instanceof InsertNodeContract) {
+            $this->insertNode($node->stmts);
+        }
+
+        return $node;
     }
 
     protected function updatableNodeNotFoundHook(): void
     {
+    }
+
+    protected function insertNode(array &$stmts): void
+    {
+        if ($this->shouldInsertNode($stmts)) {
+            $this->nodeInserter ??= new NodeInserter();
+
+            $newNode = $this->getInsertableNode();
+
+            $this->linkParents($newNode);
+
+            $this->nodeInserter->insertNode($stmts, $newNode);
+        }
     }
 
     protected function linkParents(Node $parent): void
@@ -112,19 +127,5 @@ abstract class AbstractNodeVisitor extends NodeVisitorAbstract
         }
 
         return $nodes;
-    }
-
-    /** @param Class_|Trait_|Enum_ $node */
-    private function insertNode(Node $node): Node
-    {
-        $this->nodeInserter ??= new NodeInserter();
-
-        $newNode = $this->getInsertableNode();
-
-        $this->linkParents($newNode);
-
-        $this->nodeInserter->insertNodes($node->stmts, [$newNode]);
-
-        return $node;
     }
 }

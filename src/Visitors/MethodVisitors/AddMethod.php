@@ -21,7 +21,7 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
     protected PreformattedCode $code;
 
     public function __construct(
-        protected string $name,
+        string $name,
         string $code,
         protected MethodParamsList $paramsList,
         protected ?string $returnType = null,
@@ -29,18 +29,20 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
         protected bool $isStatic = false,
         protected bool $isReturnsByRef = false,
     ) {
+        parent::__construct($name);
+
         $this->code = new PreformattedCode($code);
     }
 
-    protected function modify(Node $node): Node
+    public function shouldInsertNode(array $stmts): bool
     {
-        foreach ($node->stmts as $stmt) {
-            if ($stmt instanceof ClassMethod && $stmt->name->name === $this->name) {
-                throw new NodeAlreadyExistsException('Method', $this->name);
-            }
+        $exists = array_any($stmts, fn ($stmt) => $stmt instanceof ClassMethod && $stmt->name->name === $this->methodName);
+
+        if ($exists) {
+            throw new NodeAlreadyExistsException('Method', $this->methodName);
         }
 
-        return parent::modify($node);
+        return true;
     }
 
     public function getInsertableNode(): Node
@@ -51,7 +53,7 @@ class AddMethod extends BaseMethodVisitor implements InsertNodeContract
             $flags |= Modifiers::STATIC;
         }
 
-        return new ClassMethod($this->name, [
+        return new ClassMethod($this->methodName, [
             'flags' => $flags,
             'byRef' => $this->isReturnsByRef,
             'params' => $this->buildParams(),
