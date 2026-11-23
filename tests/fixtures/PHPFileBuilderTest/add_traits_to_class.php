@@ -3,8 +3,13 @@
 namespace RonasIT\Larabuilder\Tests\Support;
 
 use RonasIT\Larabuilder\Tests\Support\FirstClass;
-use Some\SomeTrait;
+use Some\{SomeTrait, AnotherTrait};
 use RonasIT\Support\Traits\FirstTrait;
+use App\Service\UserService;
+use RonasIT\Support\SecondTrait;
+use RonasIT\Support\Traits\NewTrait as SomeTrait;
+use App\Support\Traits\SecondTrait as UnusedTrait, App\Support\Classname;
+use Illuminate\Support as Helpers;
 use RonasIT\Support\Traits\SecondTrait;
 use RonasIT\Support\Traits\ThirdTrait;
 
@@ -34,7 +39,9 @@ class SomeClass implements Test, Some
 
         $db->table('users')->where('id', 1)->first();
 
-        Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
+        Helpers\Arr::map($arr, fn ($value) => str_replace('0', '1', $value));
+
+        $x = \App\Service\UserService::CONST;
     }
 
     protected function casts(): array

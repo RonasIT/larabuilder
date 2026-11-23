@@ -4,7 +4,6 @@ namespace RonasIT\Larabuilder\Visitors;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RonasIT\Larabuilder\Contracts\InsertNodeContract;
@@ -20,14 +19,7 @@ class AddImport extends AbstractNodeVisitor implements InsertNodeContract
 
     public function afterTraverse(array $nodes): ?array
     {
-        $targetNamespace = array_find($nodes, fn ($node) => $node instanceof Namespace_);
-
-        if (!is_null($targetNamespace)) {
-            /** @var Namespace_ $targetNamespace */
-            $targetNodes = &$targetNamespace->stmts;
-        } else {
-            $targetNodes = &$nodes;
-        }
+        $targetNodes = &$this->getNamespaceStatements($nodes);
 
         $this->insertNode($targetNodes);
 
